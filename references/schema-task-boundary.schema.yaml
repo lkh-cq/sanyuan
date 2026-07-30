@@ -1,0 +1,99 @@
+# Task Boundary Schema
+# 任务边界 B_T
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: TaskBoundary
+description: "任务边界: 在过滤/归一化之前编译的任务条件对象"
+
+type: object
+required:
+  - boundary_id
+  - task_goal
+  - F_T
+  - forbidden_loss
+  - epsilon_T
+  - required_spaces
+  - optional_spaces
+
+properties:
+  boundary_id:
+    type: string
+    description: "边界ID, 格式 bt_{timestamp}_{seq}"
+    pattern: "^bt_\\d{8}_\\d{3}$"
+
+  task_goal:
+    type: string
+    description: "任务目标, 一句话主谓宾结构"
+
+  F_T:
+    type: object
+    description: "任务功能, 可验证的功能测试"
+    required:
+      - description
+      - test_cases
+    properties:
+      description:
+        type: string
+      test_cases:
+        type: array
+        items:
+          type: object
+          properties:
+            input:
+              type: string
+            expected:
+              type: string
+
+  forbidden_loss:
+    type: array
+    description: "禁止损失: 不能被压缩删除的特征/关系/路径"
+    items:
+      type: string
+
+  epsilon_T:
+    type: number
+    description: "误差预算, 允许的最大功能损失"
+    exclusiveMinimum: 0
+    maximum: 1
+
+  required_spaces:
+    type: array
+    description: "必需观测空间"
+    items:
+      type: string
+      enum: [meta, hu, time, evidence, source, uncertainty, risk, execution, history]
+    contains:
+      enum: [meta]
+
+  optional_spaces:
+    type: array
+    description: "可选观测空间"
+    items:
+      type: string
+      enum: [time, evidence, source, uncertainty, risk, execution, history]
+
+  meta_axes:
+    type: array
+    description: "元信息空间内部选择轴"
+    items:
+      type: string
+      enum: [tiancai, dicai, rencai]
+
+  hu_axes:
+    type: array
+    description: "互信息空间内部选择轴"
+    items:
+      type: string
+      enum: [direct, composite, path_residual, flow, stop, filter, transform, buffer, feedback]
+
+  recipe_route:
+    type: string
+    enum: [research, fast_filter]
+    description: "配方路由: 由路由门自动判定"
+
+allOf:
+  - description: "hu 始终在 required_spaces 中"
+    properties:
+      required_spaces:
+        contains:
+          enum: [hu]

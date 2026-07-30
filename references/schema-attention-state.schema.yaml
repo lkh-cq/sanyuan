@@ -1,0 +1,78 @@
+# Attention State Schema
+# 意识总线注意力状态模型
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: AttentionState
+description: "ρ/θ/θ' 注意力状态快照"
+
+type: object
+required:
+  - timestamp
+  - rho
+  - theta
+  - theta_prime
+  - omega
+  - grad_E
+  - dtheta_prime_dt
+  - phase
+
+properties:
+  timestamp:
+    type: string
+    format: date-time
+    description: "状态采样时间"
+
+  rho:
+    type: number
+    minimum: 0
+    maximum: 1
+    description: "注意力收束度。当前指定方向上的拟合概率分布。不是正确率。"
+
+  theta:
+    type: number
+    minimum: 0
+    maximum: 1
+    description: "局部注意力散逸度。θ = 1 - ρ。当前任务内可逆。不是错误率。"
+
+  theta_prime:
+    type: number
+    minimum: 0
+    description: "跨上下文残留累积。单调不减。用作索引陈旧时钟。"
+
+  omega:
+    type: number
+    minimum: 0
+    maximum: 1
+    description: "上下文完整性。Ω=1完整，Ω<1部分丢失(压缩后)。"
+
+  grad_E:
+    type: number
+    description: "错误拟合概率梯度。缓存结论偏离磁盘真实数据的速率。"
+
+  dtheta_prime_dt:
+    type: number
+    description: "θ'变化率。加速(二阶导>0)=入睡信号。"
+
+  phase:
+    type: string
+    enum: [rising, ebbing, deep_sleep]
+    description: |
+      缓存波相位:
+      - rising (涨潮): Ω=1, 正常读取和积累
+      - ebbing (退潮): Ω<1, 压缩筛选保留结论层
+      - deep_sleep (深睡): 推理链落盘, 索引重建, 常驻集重置
+
+  scene_boundary:
+    type: string
+    description: "当前场景边界标识"
+
+  active_vectors:
+    type: array
+    items:
+      type: string
+    description: "当前活跃的注意力向量ID列表"
+
+# 冻结约束
+# 1. theta 必须等于 1 - rho
+# 2. phase 触发逻辑必须来自 omega + grad_E + dtheta_prime_dt
+# 3. 禁止仅依赖上下文使用率百分比触发 phase 切换

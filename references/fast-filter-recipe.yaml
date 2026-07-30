@@ -1,0 +1,74 @@
+# 快速信息筛选配方
+# v3.2.0: 快速通道也不省略元互双空间, 只降低精度
+
+recipe_id: fast-filter
+name: 快速信息筛选
+description: "简单任务的快速通道。降低轴数和精度, 但不关闭元或互。"
+
+modules:
+  - task-boundary-compiler
+  - meta-normalization
+  - hu-normalization
+  - conscious-rho
+  - unconscious-theta
+  - cache-wave
+
+sequence:
+  - step: 1
+    module: task-boundary-compiler
+    action: "简化任务边界: 生成B_T(路由门判定为快速通道)"
+    output: B_T
+    constraints:
+      epsilon_T: 0.2
+      meta_axes_min: 1
+      hu_axes_min: 1
+
+  - step: 2
+    module: meta-normalization
+    action: "最小元信息提取: 单轴提取, 粗粒度压缩"
+    input: B_T + raw_material
+    output: M_T
+    constraints:
+      axes_max: 1
+      use_coarse_route_code: true
+
+  - step: 3
+    module: hu-normalization
+    action: "最小互信息提取: 仅直接互, 不展开复合互"
+    input: B_T + raw_relations
+    output: H_T
+    constraints:
+      axes_max: 1
+      relation_type: direct
+      skip_composite: true
+      skip_path_residual: false
+
+  - step: 4
+    action: "快速任务掩码匹配: 用q_M和q_H做一级路由"
+    description: |
+      卦码仅用于候选粗筛和状态变化检测。
+      不用于质量判断、真实性判断、深度判断。
+
+  - step: 5
+    module: conscious-rho
+    action: "ρ收束"
+
+  - step: 6
+    module: unconscious-theta
+    action: "θ边界检查"
+
+  - step: 7
+    action: "低成本功能检查: 仅验证required特征覆盖"
+
+  - step: 8
+    module: cache-wave
+    action: "缓存波更新"
+
+constraints:
+  - "不得把互信息降为零(即使快速任务)"
+  - "不得关闭元信息提取(即使快速任务)"
+  - "只能降低轴数量(最低各1轴)"
+  - "只能降低关系展开深度(只保留直接互)"
+  - "只能降低补充空间数量(全部optional)"
+  - "只能使用粗粒度卦码"
+  - "路径残差如果存在则必须保留"

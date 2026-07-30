@@ -1,0 +1,205 @@
+# 状态协议 Schema - 意识总线核心状态定义
+# 引用: references/schema-attention-state.schema.yaml
+# 冻结定义: ρ+θ=1, θ=1-ρ; θ可逆, θ'单调不减; 缓存波三相位
+
+$schema: "https://json-schema.org/draft/2020-12/schema"
+$id: "意识总线_总项目/references/state-protocol.schema.yaml"
+title: "Attention State Protocol"
+description: |
+  意识总线核心状态协议的 schema 定义。
+  基于冻结定义:
+    1. ρ+θ=1, θ=1-ρ
+    2. θ是局部散逸(可逆), θ'是跨上下文残留(单调不减)
+    3. 缓存波三相位: 涨潮(Ω=1)/退潮(Ω<1,∇E↑)/深睡(dθ'/dt加速触发)
+    4. deep-conscious: 离线Dijkstra建地址表, 调用时O(1)查表
+    5. 三思而后行依赖conscious的ρ和unconscious的θ
+
+type: object
+required:
+  - rho
+  - theta
+  - theta_prime
+  - omega
+  - tidal_phase
+  - mode
+properties:
+  # === 核心注意力变量 ===
+  rho:
+    description: |
+      注意力收束度。当前 ρ(t) = ρ_raw(t) / (1 + θ'(t)/θ_critical)。
+      是自报快照，不附带质量声称。ρ收束模块追踪。
+    type: number
+    minimum: 0
+    maximum: 1
+    examples: [0.85, 0.50]
+
+  theta:
+    description: |
+      局部散逸度。θ=1-ρ。可逆：新证据进来 θ 可降。
+      θ切换模块追踪。
+    type: number
+    minimum: 0
+    maximum: 1
+    examples: [0.15, 0.50]
+
+  theta_prime:
+    description: |
+      跨上下文残留。单调不减。每次跨边界(压缩/新session/窗口裁剪)只加不减。
+      θ'(t) = ∫ α·(1 - Ω(τ)) dτ
+      入睡信号: dθ'/dt 包络线开始加速 = 该深睡(磁盘巩固)。
+    type: number
+    minimum: 0
+    examples: [0.3, 2.5]
+
+  # === 缓存波相位 ===
+  omega:
+    description: |
+      上下文完整性。Ω=1 = 全精度上下文窗口; Ω<1 = 压缩后状态(仅结论层可恢复)。
+      H ≠ Ω: 命中率高不等于上下文完整。H-Ω = 虚假信心差。
+    type: number
+    minimum: 0
+    maximum: 1
+    examples: [1.0, 0.3]
+
+  tidal_phase:
+    description: |
+      缓存波三相位。退潮触发不是r>80%，是∇E超过阈值。
+    type: string
+    enum:
+      - rising_tide    # 涨潮: Ω=1, 前额叶连续运行, 注意力自然生长
+      - ebb_tide       # 退潮: Ω<1 OR ∇E超阈值 OR dθ'/dt加速; condense快照保存结论层
+      - deep_sleep     # 深睡: dθ'/dt二阶导为正(sleep-onset); 磁盘巩固, 推理链落盘, 重置Ω=1
+
+  # === 梯度信号 ===
+  delta_E:
+    description: |
+      错误拟合概率梯度--缓存结论偏离真实数据的速率。
+      退潮触发条件: ∇E 超过阈值(非r>80%)。
+    type: number
+    minimum: 0
+
+  dtheta_prime_dt:
+    description: |
+      θ'的一阶导。正二阶导(或N个连续上升Δθ'/Δt样本)定义入睡信号。
+      逼近缓存极限时: dθ'/dt ≈ θ'_base + k/(r_critical - r)
+    type: number
+
+  # === 运行模式 ===
+  mode:
+    description: |
+      当前注意力运行模式。
+      ρ-only: 推理/批判任务最优(严谨度最高)
+      θ-only: 检测场景边界失效, 但缺执行回路
+      ρ+θ: 生产执行最优(覆盖率最高, 牺牲严谨度)
+    type: string
+    enum:
+      - rho_only
+      - theta_only
+      - rho_theta
+
+  # === Shift 接口 ===
+  completion_status:
+    description: 产出完成度信号(正向模式切换)
+    type: string
+    enum:
+      - complete      # ✅ 任务闭环
+      - partial       # ⚠️ 部分完成
+      - blocked       # ❌ 需外部条件
+
+  next_step:
+    description: |
+      下一步模式切换目标。完成度脚注 = shift 信号编码。
+      ρ(验证)=审计; θ(切换方向)=重识别场景; ρ+θ(执行)=继续生产; 用户决策=等待。
+    type: string
+    enum:
+      - rho_verify
+      - theta_switch
+      - rho_theta_execute
+      - user_decision
+
+  block_reason:
+    description: 阻塞原因(仅完成度非✅时填写)
+    type: string
+
+  # === n位聚焦(deep-conscious)状态 ===
+  routing_table_stale:
+    description: |
+      routing table 是否过期。
+      如果交互触发最短路径搜索而非查表 = routing table 过期或缺失 = 深睡重建信号。
+    type: boolean
+    default: false
+
+  n_position:
+    description: |
+      当前交互命中的 n 位元素主题词位置。
+      内容寻址: n 由当前交互决定, 非静态排名。交互完成后释放。
+    type: integer
+    minimum: 1
+
+  # === condense 协议状态 ===
+  condense_anchors:
+    description: 锚点事实(磁盘验证, 压缩后不可丢, ≤10条)
+    type: array
+    maxItems: 10
+    items:
+      type: object
+      properties:
+        fact:
+          type: string
+        source:
+          type: string
+
+  condense_overturned:
+    description: 已推翻列表(每条必须附推翻依据)
+    type: array
+    items:
+      type: object
+      required: [claim, basis]
+      properties:
+        claim:
+          type: string
+        basis:
+          type: string
+        original_source:
+          type: string
+
+  condense_tensions:
+    description: 张力对(互斥但都未证伪的论述对)
+    type: array
+    items:
+      type: object
+      required: [a, b]
+      properties:
+        a:
+          type: string
+        b:
+          type: string
+        status:
+          type: string
+          enum: [unrefuted]
+
+# === 约束 ===
+allOf:
+  # ρ + θ = 1
+  - description: "冻结定义1: ρ+θ=1"
+    properties:
+      rho: {}
+      theta: {}
+    # 数值约束: rho + theta = 1 (应用层校验)
+  # 退潮 -> condense
+  - if:
+      properties:
+        tidal_phase:
+          const: ebb_tide
+    then:
+      description: "退潮相位 = condense 协议执行窗口"
+  # 深睡 -> 重建 routing table
+  - if:
+      properties:
+        tidal_phase:
+          const: deep_sleep
+    then:
+      description: "深睡相位 = Dijkstra 重建, 推理链 flush, Ω→1"
+      properties:
+        routing_table_stale:
+          const: false

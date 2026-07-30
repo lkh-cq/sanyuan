@@ -1,0 +1,115 @@
+# Store Node Schema
+# 三才藏节点 - 信息的储存方式
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: StoreNode
+description: "三才藏节点: 信息以什么规律存在, 在什么环境中被承载, 由什么实践留下具体记录"
+
+type: object
+required:
+  - store_id
+  - source_id
+  - title
+  - tiancai
+  - dicai
+  - rencai
+  - concrete_content
+  - evidence_type
+  - confidence
+  - version
+
+properties:
+  store_id:
+    type: string
+    description: "藏节点唯一ID"
+
+  source_id:
+    type: string
+    description: "来源ID(对应source层)"
+
+  title:
+    type: string
+    description: "节点标题"
+
+  tiancai:
+    type: object
+    description: "天才=规律"
+    properties:
+      patterns:
+        type: array
+        items: {type: string}
+        description: "规律/周期/阈值/稳定模式"
+      constraints:
+        type: array
+        items: {type: string}
+        description: "变化规律/约束"
+      timescale:
+        type: string
+        description: "时间尺度"
+
+  dicai:
+    type: object
+    description: "地才=环境"
+    properties:
+      environment:
+        type: string
+        description: "环境/载体/空间"
+      carrier:
+        type: string
+        description: "承载媒介"
+      boundary:
+        type: string
+        description: "边界/保存条件"
+      storage_condition:
+        type: string
+        description: "保存条件/制度约束"
+
+  rencai:
+    type: object
+    description: "人才=实践"
+    properties:
+      actors:
+        type: array
+        items: {type: string}
+        description: "行动者"
+      practices:
+        type: array
+        items: {type: string}
+        description: "生产/行动/使用/实验/观察/记录"
+      recording_action:
+        type: string
+        description: "留下记录的具体行为"
+
+  concrete_content:
+    type: string
+    description: "具体内容(藏保存的是具体内容, 不是抽象规律)"
+
+  source_anchor:
+    type: string
+    description: "来源锚点(文件路径/页码/URL等)"
+
+  evidence_type:
+    type: string
+    enum: [excavation, text, experiment, user_input, observation, literature]
+    description: "证据类型"
+
+  confidence:
+    type: number
+    minimum: 0
+    maximum: 1
+    description: "置信度"
+
+  disputed:
+    type: boolean
+    default: false
+    description: "是否存在争议"
+
+  version:
+    type: string
+    description: "节点版本号"
+
+# 冻结约束:
+# 1. 地才不是"地理物质条件", 是"环境/载体/边界/保存条件"
+# 2. 天才不是"时空节律", 是"规律/周期/阈值/稳定模式"
+# 3. 人才不是"社会身份", 是"生产/行动/使用/实验/观察/记录"
+# 4. 藏保存具体内容, 不保存抽象规律(抽象属于归)

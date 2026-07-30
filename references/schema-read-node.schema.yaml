@@ -1,0 +1,118 @@
+# Read Node Schema
+# 三题归节点 - 信息的流通方式
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: ReadNode
+description: "三题归节点: 信息原本是什么, 通过什么方式被读取, 读取后留下什么记录"
+
+type: object
+required:
+  - read_id
+  - source_store_ids
+  - tianti
+  - diti
+  - renti
+  - abstraction
+  - provenance
+
+properties:
+  read_id:
+    type: string
+    description: "归节点唯一ID"
+
+  source_store_ids:
+    type: array
+    items: {type: string}
+    description: "引用的藏节点ID列表"
+
+  tianti:
+    type: object
+    description: "天题=信息的本来样貌"
+    properties:
+      original_form:
+        type: string
+        description: "信息在被解释前实际呈现的结构/状态/痕迹"
+      observed_structure:
+        type: string
+        description: "可见规律"
+      unknowns:
+        type: array
+        items: {type: string}
+        description: "未知/待解部分"
+
+  diti:
+    type: object
+    description: "地题=读取方式"
+    properties:
+      method:
+        type: string
+        description: "读取方法"
+      tool:
+        type: string
+        description: "工具/媒介"
+      path:
+        type: string
+        description: "读取路径"
+      filter:
+        type: string
+        description: "过滤条件"
+      scope:
+        type: string
+        description: "读取范围"
+      loss_risk:
+        type: string
+        description: "信息损失风险"
+
+  renti:
+    type: object
+    description: "人题=读取记录"
+    properties:
+      reader:
+        type: string
+        description: "读取者"
+      reading_record:
+        type: string
+        description: "读取形成的记录"
+      interpretation:
+        type: string
+        description: "解释"
+      hypothesis:
+        type: string
+        description: "假说"
+      disagreement:
+        type: string
+        description: "争议"
+
+  abstraction:
+    type: object
+    description: "抽象规律(归产生抽象, 藏保存具体)"
+    properties:
+      derived_pattern:
+        type: string
+        description: "推导出的抽象模式"
+      applicability:
+        type: string
+        description: "适用范围"
+      limitations:
+        type: string
+        description: "局限"
+
+  provenance:
+    type: object
+    description: "溯源"
+    properties:
+      source_files:
+        type: array
+        items: {type: string}
+      created_at:
+        type: string
+        format: date-time
+      agent:
+        type: string
+
+# 冻结约束:
+# 1. 天题不是"规律层提问", 是"信息的本来样貌"
+# 2. 地题不是"条件/边界层提问", 是"读取方式"
+# 3. 人题不是"实践层提问", 是"读取记录"
+# 4. 归产生的结论不得覆盖原始藏内容, 必须生成新节点/新版本
+# 5. 天题/地题/人题是归(读取)的三层结构, 不是藏(存储)的三层结构

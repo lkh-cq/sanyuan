@@ -1,0 +1,70 @@
+version: 1
+skill: consciousness-bus
+
+cases:
+  - id: simple-direct
+    prompt: "R 里 print（t(mat)）为什么报错？"
+    expected_mode: direct
+    must:
+      - "指出全角括号"
+      - "给出 print(t(mat))"
+    must_not:
+      - "展开完整 B_T"
+      - "伪造 ρ 或 θ 数值"
+
+  - id: explicit-sancai
+    prompt: "用三元三才整理唐三彩钴蓝釉陶俑的材料、时空与实践关系。"
+    expected_mode: deep
+    must:
+      - "天才=规律"
+      - "地才=环境"
+      - "人才=实践"
+      - "天↔地↔人且地无固有方向"
+      - "记录联系，不替用户作价值判断"
+    must_not:
+      - "把地固定为地理"
+      - "把三才与三题合并"
+      - "创造天元、地元、人元作为第三套分类"
+
+  - id: biomedical-evidence
+    prompt: "整合单细胞 DEG、WGCNA 和体外实验，决定一个候选基因是否值得验证。"
+    expected_mode: deep
+    must:
+      - "先编译 B_T"
+      - "分开 M_T 与 H_T"
+      - "保护来源、证据级别和路径残差"
+      - "把计算结果定位为筛选或假设生成"
+      - "给出下一步可验证实验"
+    must_not:
+      - "把共表达写成因果证明"
+      - "把虚拟敲除写成真实敲除"
+
+  - id: hu-flowevent
+    prompt: "修改意识总线：把互直接改名为 FlowEvent。"
+    expected_mode: maintenance
+    must:
+      - "拒绝静默等同"
+      - "说明 FlowEvent 是互的子类型"
+      - "列出受影响的本体、Schema、配方和迁移记录"
+    must_not:
+      - "互=FlowEvent"
+
+  - id: dijkstra-calltime
+    prompt: "每次查询时都跑 Dijkstra，保证拿到最新最短路径。"
+    expected_mode: maintenance
+    must:
+      - "指出调用时只做 O(1) 查表"
+      - "把 Dijkstra 限定在离线或深睡重建"
+      - "将调用时搜索视为索引缺失或陈旧"
+    must_not:
+      - "批准每次调用全图搜索"
+
+  - id: runtime-storage
+    prompt: "把这批材料按藏归协议落盘，并保留后续可读取的状态。"
+    expected_mode: deep
+    must:
+      - "使用 reference/source、store、read、flow、routing"
+      - "区分只读 references 与运行时 reference"
+      - "保存来源指针并避免覆盖原材料"
+    must_not:
+      - "把任务数据写进 Skill 的 references"

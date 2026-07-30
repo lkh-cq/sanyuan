@@ -1,0 +1,125 @@
+# Mutual Node Schema
+# 互节点 - 互信息空间的基本单元
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: MutualNode
+description: "互节点: 描述两个或多个信息节点之间的关系。互≠FlowEvent, FlowEvent⊂互。"
+
+type: object
+required:
+  - mutual_id
+  - endpoint_refs
+  - observation_system
+  - relation_type
+  - direct_or_composite
+
+properties:
+  mutual_id:
+    type: string
+    description: "互节点ID, 格式 hu_{timestamp}_{seq}"
+    pattern: "^hu_\\d{8}_\\d{3}$"
+
+  endpoint_refs:
+    type: array
+    description: "关系端点引用(2个或更多StoreNode ID)"
+    items:
+      type: string
+    minItems: 2
+
+  observation_system:
+    type: string
+    enum: [hu]
+
+  origin:
+    type: string
+    description: "互空间原点描述"
+
+  relation_type:
+    type: string
+    enum:
+      - direct              # 直接互
+      - composite           # 复合互(经由中介)
+      - flow_event          # 流止事件(天地人拓扑)
+      - transform           # 转换互
+      - feedback            # 反馈互
+      - conditional         # 条件互
+      - temporal            # 时序互
+      - observational       # 观测互
+      - task                # 任务互
+      - path_residual       # 路径残差
+
+  direct_or_composite:
+    type: string
+    enum: [direct, composite]
+
+  path:
+    type: array
+    description: "复合互的路径(端点序列)"
+    items:
+      type: string
+
+  path_residual:
+    type:
+      - string
+      - "null"
+    description: "路径残差: 直接互与复合互的差异"
+
+  conditions:
+    type: array
+    description: "关系成立条件"
+    items:
+      type: string
+
+  strength:
+    type: number
+    description: "关系强度 [0, 1]"
+    minimum: 0
+    maximum: 1
+
+  timestamp:
+    type: string
+    description: "时序标记(可选)"
+
+  via_role:
+    description: "中介角色。仅flow_event子类型强制为di"
+    type:
+      - string
+      - "null"
+    enum: [di, tian, ren, null]
+
+  route_code:
+    type: string
+    description: "离散路由码 q_H"
+    pattern: "^[01]+$"
+
+  continuous_signal:
+    type: object
+    description: "连续信号 s_H"
+    properties:
+      direction:
+        type: number
+        minimum: 0
+        maximum: 1
+      condition:
+        type: number
+        minimum: 0
+        maximum: 1
+      strength:
+        type: number
+        minimum: 0
+        maximum: 1
+      temporal:
+        type: number
+        minimum: 0
+        maximum: 1
+
+# via_role 约束: 仅 flow_event 强制 di
+allOf:
+  - if:
+      properties:
+        relation_type:
+          const: flow_event
+    then:
+      properties:
+        via_role:
+          const: di

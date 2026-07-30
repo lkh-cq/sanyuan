@@ -1,0 +1,117 @@
+# Flow Event Schema
+# 流止事件 - 互空间的子类型, 专门记录天↔地↔人拓扑中的运行事件
+# FlowEvent ⊂ 互
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: FlowEvent
+description: "互空间子类型: 信息在天↔地↔人拓扑中发生流、止、过滤、转换、缓冲、反馈时的事件表示。FlowEvent ⊂ 互, 不等于互的全部。"
+
+type: object
+required:
+  - event_id
+  - representation_space
+  - representation_subtype
+  - layer
+  - from_role
+  - via_role
+  - to_role
+  - operation
+  - timestamp
+
+properties:
+  event_id:
+    type: string
+    description: "事件唯一ID"
+
+  representation_space:
+    type: string
+    enum: [hu]
+    description: "所属观测空间: 互信息空间"
+
+  representation_subtype:
+    type: string
+    enum: [flow_event]
+    description: "互空间子类型: 流止事件"
+
+  mutual_node_ref:
+    type: string
+    description: "关联的MutualNode ID(互空间主节点)"
+
+  layer:
+    type: string
+    enum: [zang, gui]
+    description: "发生在藏层还是归层"
+
+  from_role:
+    type: string
+    enum: [tian, di, ren]
+    description: "信息来源角色"
+
+  via_role:
+    type: string
+    enum: [di]
+    description: "经由角色(FlowEvent子类型强制为地, 地居中)"
+
+  to_role:
+    type: string
+    enum: [tian, di, ren]
+    description: "信息目标角色"
+
+  operation:
+    type: object
+    required: [type]
+    properties:
+      type:
+        type: string
+        enum: [flow, stop, filter, buffer, transform, feedback, merge, conflict, loss, restore]
+        description: |
+          事件类型:
+          - flow: 信息流动
+          - stop: 信息停止
+          - filter: 信息过滤
+          - buffer: 信息缓冲
+          - transform: 信息转换
+          - feedback: 信息反馈
+          - merge: 信息合并
+          - conflict: 信息冲突
+          - loss: 信息丢失
+          - restore: 信息恢复
+      description:
+        type: string
+
+  trigger:
+    type: string
+    description: "触发条件"
+
+  threshold:
+    type: string
+    description: "阈值"
+
+  state_before:
+    type: string
+    description: "事件前状态"
+
+  state_after:
+    type: string
+    description: "事件后状态"
+
+  information_loss:
+    type: string
+    description: "信息损失描述"
+
+  evidence_refs:
+    type: array
+    items: {type: string}
+    description: "证据引用"
+
+  timestamp:
+    type: string
+    format: date-time
+
+# 冻结约束:
+# 1. FlowEvent ⊂ 互, 不等于互的全部
+# 2. via_role=di 仅在 FlowEvent 子类型中强制(地居中)
+# 3. 一般 MutualNode 的 via_role 不受此约束
+# 4. 地位于天与人之间, 所有流止事件必须经由地
+# 5. 地本身不携带固有方向, 方向只存在于具体流通事件中
+# 6. 不默认存在绕过地的天->人或人->天直连

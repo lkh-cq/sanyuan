@@ -1,0 +1,14 @@
+interface:
+  display_name: 三元三才·意识总线
+  short_description: 编译任务边界，以三才、三题、元互双空间与ρθ总线组织复杂任务
+  default_prompt: Use $consciousness-bus to compile this complex task into a bounded,
+    traceable reasoning workflow.
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

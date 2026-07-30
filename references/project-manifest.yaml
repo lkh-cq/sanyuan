@@ -1,0 +1,189 @@
+project:
+  id: consciousness-bus
+  name: 意识总线
+  version: 3.2.0
+
+entrypoints:
+  root: SKILL.md
+  research: references/research-recipe.yaml
+  fast_filter: references/fast-filter-recipe.yaml
+
+core:
+  conscious:
+    id: conscious-rho
+    name: ρ收束
+    path: references/rho-convergence.md
+    version: 3.0.0
+    module_id: core-rho-convergence
+
+  unconscious:
+    id: unconscious-theta
+    name: θ切换
+    path: references/theta-switching.md
+    version: 1.4.0
+    module_id: core-theta-switching
+    depends_on:
+      - conscious-rho
+
+  deep_conscious:
+    id: deep-conscious
+    name: n位聚焦
+    path: references/n-focus.md
+    version: 3.0.0
+    module_id: core-deep-conscious
+    depends_on:
+      - conscious-rho
+      - unconscious-theta
+      - cache-wave
+
+  cache_wave:
+    id: cache-wave
+    name: 缓存波动力学
+    path: references/cache-wave.md
+    version: 1.0.0
+    module_id: core-cache-wave-dynamics
+
+  condense:
+    id: condense
+    name: condense协议
+    path: references/condense-protocol.md
+    version: "0.2"
+    module_id: core-condense-protocol
+
+preprocessors:
+  task_boundary:
+    id: task-boundary-compiler
+    name: 任务边界编译
+    path: references/task-boundary.md
+    version: 0.1.0
+    module_id: preprocessor-task-boundary
+
+  meta_normalization:
+    id: meta-normalization
+    name: 元归一化
+    path: references/meta-normalization.md
+    version: 0.1.0
+    module_id: preprocessor-meta-normalization
+    depends_on:
+      - task-boundary-compiler
+
+  hu_normalization:
+    id: hu-normalization
+    name: 互归一化
+    path: references/hu-normalization.md
+    version: 0.1.0
+    module_id: preprocessor-hu-normalization
+    depends_on:
+      - task-boundary-compiler
+
+  think_before_responding:
+    id: think-before-responding
+    name: 三思而后行
+    path: references/think-before-responding.md
+    version: 0.3.0
+    module_id: preprocessor-think-before-responding
+    depends_on:
+      - conscious-rho
+      - unconscious-theta
+
+  task_decomposition:
+    id: task-decomposition
+    name: 子任务拆分
+    path: references/task-decomposition.md
+    version: 0.3.0
+    module_id: preprocessor-task-decomposition
+
+observation_spaces:
+  meta:
+    id: meta-observation-space
+    encoder: references/sancai-store.md
+    normalizer: references/meta-normalization.md
+    mandatory: true
+
+  hu:
+    id: hu-observation-space
+    path: references/hu-observation-space.md
+    normalizer: references/hu-normalization.md
+    mandatory: true
+
+  supplementary:
+    mandatory: false
+    selectable:
+      - time
+      - evidence
+      - source
+      - uncertainty
+      - risk
+      - execution
+      - history
+
+branches:
+  zang_gui:
+    entrypoint: references/zang-gui-orchestrator.md
+    id: zang-gui-orchestrator
+    version: 0.3.0
+    module_id: branch-zang-gui
+    sub_modules:
+      sancai_store:
+        path: references/sancai-store.md
+      tiancai:
+        path: references/tiancai.md
+      dicai:
+        path: references/dicai.md
+      rencai:
+        path: references/rencai.md
+      write_spec:
+        path: references/store-write-spec.md
+      santi_read:
+        path: references/santi-read.md
+      tianti:
+        path: references/tianti.md
+      diti:
+        path: references/diti.md
+      renti:
+        path: references/renti.md
+      read_inject:
+        path: references/read-injection.md
+      topology:
+        path: references/flow-topology.md
+      flow_event_catalog:
+        path: references/flow-event-catalog.yaml
+      cycle:
+        path: references/zang-gui-cycle.md
+
+recipes:
+  research:
+    path: references/research-recipe.yaml
+  fast_filter:
+    path: references/fast-filter-recipe.yaml
+
+storage:
+  root: reference/
+  source: reference/source/
+  store: reference/store/
+  read: reference/read/
+  flow: reference/flow/
+  routing: reference/routing/
+
+schemas:
+  attention_state: references/schema-attention-state.schema.yaml
+  store_node: references/schema-store-node.schema.yaml
+  read_node: references/schema-read-node.schema.yaml
+  flow_event: references/schema-flow-event.schema.yaml
+  cycle_link: references/schema-cycle-link.schema.yaml
+  recipe: references/schema-recipe.schema.yaml
+  task_boundary: references/schema-task-boundary.schema.yaml
+  meta_normalization: references/schema-meta-normalization.schema.yaml
+  hu_normalization: references/schema-hu-normalization.schema.yaml
+  mutual_node: references/schema-mutual-node.schema.yaml
+
+canvas:
+  total: assets/canvas/意识总线_总架构.canvas
+  sancai: assets/canvas/藏_三才.canvas
+  santi: assets/canvas/归_三题.canvas
+  flow: assets/canvas/运行时流止.canvas
+  meta_hu: assets/canvas/元互双空间.canvas
+
+archive:
+  provenance: references/version-provenance.md
+  runtime_included: false

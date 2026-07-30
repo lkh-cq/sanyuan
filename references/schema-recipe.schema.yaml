@@ -1,0 +1,64 @@
+# Recipe Schema
+# 任务配方
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: Recipe
+description: "任务配方: 定义加载哪些模块、调用顺序、依赖、分支条件"
+
+type: object
+required:
+  - recipe_id
+  - name
+  - modules
+  - sequence
+  - dependencies
+
+properties:
+  recipe_id:
+    type: string
+
+  name:
+    type: string
+
+  description:
+    type: string
+
+  modules:
+    type: array
+    items:
+      type: string
+    description: "加载的模块ID列表"
+
+  sequence:
+    type: array
+    items:
+      type: object
+      properties:
+        step:
+          type: integer
+        module:
+          type: string
+        action:
+          type: string
+        optional:
+          type: boolean
+          default: false
+    description: "调用顺序"
+
+  dependencies:
+    type: object
+    description: "模块间依赖关系"
+
+  upgrade_conditions:
+    type: array
+    items: {type: string}
+    description: "升级到更高配方的条件"
+
+  downgrade_conditions:
+    type: array
+    items: {type: string}
+    description: "降级到更低配方的条件"
+
+  failure_handling:
+    type: object
+    description: "失败处理"

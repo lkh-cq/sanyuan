@@ -1,0 +1,56 @@
+# Cycle Link Schema
+# 藏归循环链接
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: CycleLink
+description: "藏归循环: 现实材料->三才藏->具体内容->三题归->读取记录与抽象规律->新实践->再次进入藏"
+
+type: object
+required:
+  - link_id
+  - cycle_type
+  - source_node
+  - target_node
+  - relationship
+
+properties:
+  link_id:
+    type: string
+    description: "循环链接唯一ID"
+
+  cycle_type:
+    type: string
+    enum: [store_to_read, read_to_store, store_to_store, read_to_read]
+    description: |
+      循环类型:
+      - store_to_read: 藏->归(三才藏节点被三题归读取)
+      - read_to_store: 归->藏(归产生的抽象规律进入下一轮藏, 必须生成新节点)
+      - store_to_store: 藏->藏(藏节点之间的关联)
+      - read_to_read: 归->归(归节点之间的关联)
+
+  source_node:
+    type: string
+    description: "源节点ID"
+
+  target_node:
+    type: string
+    description: "目标节点ID"
+
+  relationship:
+    type: string
+    description: "关系描述"
+
+  derived:
+    type: boolean
+    default: false
+    description: "是否为派生关系(归->藏时必须为true, 生成新节点)"
+
+  version_chain:
+    type: array
+    items: {type: string}
+    description: "版本链(同一信息的多个版本)"
+
+# 冻结约束:
+# 1. 归产生的读取记录不得直接覆盖原始藏内容
+# 2. 归结论进入下一轮藏时, 必须生成新节点/新版本/明确的派生关系
+# 3. 藏归循环不是单向因果链, 信息流通过FlowEvent记录

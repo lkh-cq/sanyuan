@@ -1,0 +1,61 @@
+# Flow Event Schema (藏归流止事件)
+
+# 事件类型定义
+# "互"不是第四个固定节点, 是运行状态
+
+events:
+  flow:
+    description: "信息流动"
+    trigger: "信息从一个角色流向另一个角色, 经由地"
+    example: "天才(钴呈色规律) -> 地才(窑场环境) -> 人才(窑匠实践)"
+
+  stop:
+    description: "信息停止"
+    trigger: "信息流被环境边界阻止"
+    example: "钴矿供应中断 -> 钴蓝釉生产停止"
+
+  filter:
+    description: "信息过滤"
+    trigger: "地才/地题的边界条件过滤信息"
+    example: "地题(读取方式)过滤掉非唐代样本"
+
+  buffer:
+    description: "信息缓冲"
+    trigger: "地才暂存信息, 延迟传递"
+    example: "陶俑埋藏保存, 延迟到考古发掘才被读取"
+
+  transform:
+    description: "信息转换"
+    trigger: "信息经地才转换后传递"
+    example: "钴矿(原料) -> 地才(釉料制备) -> 钴蓝釉(产品)"
+
+  feedback:
+    description: "信息反馈"
+    trigger: "人题读取结果反馈到藏层"
+    example: "考古发现修正了文献记载的错误"
+
+  merge:
+    description: "信息合并"
+    trigger: "多条信息流经地合并"
+    example: "XRF数据 + 文献记录 -> 综合判断"
+
+  conflict:
+    description: "信息冲突"
+    trigger: "不同来源的信息在地处冲突"
+    example: "甘肃本土钴矿说 vs 波斯进口说"
+
+  loss:
+    description: "信息丢失"
+    trigger: "信息在流止过程中丢失"
+    example: "烧制工艺细节未留下文字记录"
+
+  restore:
+    description: "信息恢复"
+    trigger: "丢失的信息通过新读取恢复"
+    example: "XRF检测恢复了釉料成分信息"
+
+# 冻结约束:
+# 1. 所有事件必须经由地(via_role=di)
+# 2. 不存在绕过地的天->人或人->天直连
+# 3. 地不是固定输入或固定输出
+# 4. 同一个地可以在不同事件中承担不同方向

@@ -1,0 +1,96 @@
+{
+  "nodes": [
+    {
+      "id": "grp-zang",
+      "type": "group",
+      "x": 0,
+      "y": 0,
+      "width": 800,
+      "height": 300,
+      "color": "3",
+      "label": "三才藏"
+    },
+    {
+      "id": "f-tiancai",
+      "type": "file",
+      "file": "references/tiancai.md",
+      "x": 20,
+      "y": 40,
+      "width": 220,
+      "height": 100,
+      "color": "1"
+    },
+    {
+      "id": "f-dicai",
+      "type": "file",
+      "file": "references/dicai.md",
+      "x": 290,
+      "y": 40,
+      "width": 220,
+      "height": 100,
+      "color": "4"
+    },
+    {
+      "id": "f-rencai",
+      "type": "file",
+      "file": "references/rencai.md",
+      "x": 560,
+      "y": 40,
+      "width": 220,
+      "height": 100,
+      "color": "5"
+    },
+    {
+      "id": "f-ontology",
+      "type": "file",
+      "file": "references/sancai-store.md",
+      "x": 290,
+      "y": 170,
+      "width": 220,
+      "height": 60,
+      "color": "3"
+    },
+    {
+      "id": "f-write",
+      "type": "file",
+      "file": "references/store-write-spec.md",
+      "x": 20,
+      "y": 170,
+      "width": 220,
+      "height": 60,
+      "color": "3"
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "fromNode": "f-tiancai",
+      "toNode": "f-dicai",
+      "label": "天↔地"
+    },
+    {
+      "id": "e2",
+      "fromNode": "f-dicai",
+      "toNode": "f-rencai",
+      "label": "地↔人"
+    },
+    {
+      "id": "e3",
+      "fromNode": "f-tiancai",
+      "toNode": "f-ontology",
+      "label": "定义"
+    },
+    {
+      "id": "e4",
+      "fromNode": "f-dicai",
+      "toNode": "f-ontology",
+      "label": "定义"
+    },
+    {
+      "id": "e5",
+      "fromNode": "f-rencai",
+      "toNode": "f-ontology",
+      "label": "定义"
+    }
+  ]
+}
