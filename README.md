@@ -1,5 +1,14 @@
 # 三元三才·意识总线
 
+<p align="center">
+  <img src="assets/mascot-abigail.webp" alt="阿比盖尔，三元三才项目吉祥物" width="240">
+</p>
+
+<p align="center">
+  <strong>阿比盖尔 / 塞壬种子</strong><br>
+  三元三才项目展示页吉祥物，象征可缓慢生长、可迁移、可再组织的认知新芽。
+</p>
+
 意识总线是一个面向复杂科研、知识整理、项目规划和长上下文任务的认知预处理协议。它的目标不是替代现实证据、证明系统或通用 Agent, 而是在回答、阅读、整理和迁移材料之前, 先把任务边界、信息结构、关系路径和可验证输出整理清楚。
 
 当前公开基线为 `V3.2.0`。
@@ -68,6 +77,9 @@
 .
 ├── SKILL.md                         # Skill 运行入口
 ├── README.md                        # 人类读者说明书
+├── assets/
+│   ├── mascot-abigail.webp           # 项目展示页吉祥物
+│   └── canvas/                       # Obsidian Canvas 架构图
 └── references/
     ├── architecture.md              # 冻结本体与总体架构
     ├── project-manifest.yaml         # 机器清单
