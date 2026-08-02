@@ -177,6 +177,26 @@ schemas:
   hu_normalization: references/schema-hu-normalization.schema.yaml
   mutual_node: references/schema-mutual-node.schema.yaml
 
+extensions:
+  archive_ingestion:
+    id: archive-ingestion
+    name: 归档方案迁移协议
+    path: references/archive-ingestion.md
+    version: 0.1.0
+    module_id: extension-archive-ingestion
+  reading_topology:
+    id: reading-topology
+    name: 三元语法阅读拓扑
+    path: references/reading-topology.md
+    version: 0.1.0
+    module_id: extension-reading-topology
+  modality_boundary:
+    id: modality-boundary
+    name: 模态可见性边界
+    path: references/modality-boundary.md
+    version: 0.1.0
+    module_id: extension-modality-boundary
+
 canvas:
   total: assets/canvas/意识总线_总架构.canvas
   sancai: assets/canvas/藏_三才.canvas
