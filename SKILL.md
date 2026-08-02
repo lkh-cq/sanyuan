@@ -108,6 +108,13 @@ reference/
 - 写入与读取：[store-write-spec.md](references/store-write-spec.md)、[read-injection.md](references/read-injection.md)
 - 拓扑与循环：[flow-topology.md](references/flow-topology.md)、[flow-event-catalog.yaml](references/flow-event-catalog.yaml)、[zang-gui-cycle.md](references/zang-gui-cycle.md)
 
+
+### 扩展与归档
+
+- 归档方案迁移：[archive-ingestion.md](references/archive-ingestion.md)
+- 三元语法阅读拓扑：[reading-topology.md](references/reading-topology.md)
+- 模态可见性边界：[modality-boundary.md](references/modality-boundary.md)
+
 ### 机器约束
 
 - 项目清单：[project-manifest.yaml](references/project-manifest.yaml)
