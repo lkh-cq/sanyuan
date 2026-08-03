@@ -104,6 +104,18 @@ def main() -> int:
         "task-boundary.md": ["B_T", "F_T", "forbidden_loss", "epsilon_T"],
         "hu-observation-space.md": ["互 ≠ 信息论中的 mutual information", "FlowEvent ⊂ 互"],
         "n-focus.md": ["offline", "O(1)"],
+        "reader-facing-analysis.md": [
+            "内部推理层",
+            "读者交付层",
+            "2—4 句",
+            "正文应以连续段落为主",
+            "不得把工作层的压缩表示直接复制为最终回答",
+        ],
+        "output-contract.md": [
+            "内部推理层负责保存节点、关系、路径和校验状态",
+            "不要把“节点—箭头—节点”",
+            "只有用户明确要求查看过程、框架、机器表示或验证 Skill 时",
+        ],
     }
     for filename, needles in required_invariants.items():
         text = (ROOT / "references" / filename).read_text(encoding="utf-8")
@@ -114,6 +126,7 @@ def main() -> int:
     forbidden_active = {
         "architecture.md": ["三思而后行 -> 多重归一化过滤", "> 版本: 3.1.0"],
         "task-boundary.md": ["预处理/多重归一化过滤/SKILL.md"],
+        "output-contract.md": ["复杂任务可在结果后附一个最小审计块"],
     }
     for filename, needles in forbidden_active.items():
         text = (ROOT / "references" / filename).read_text(encoding="utf-8")
@@ -125,23 +138,45 @@ def main() -> int:
         recipe = yaml.safe_load(
             (ROOT / "references" / "research-recipe.yaml").read_text(encoding="utf-8")
         )
-        steps = {item.get("module"): item["step"] for item in recipe["sequence"] if "module" in item}
+        sequence = recipe["sequence"]
+        steps = {item.get("module"): item["step"] for item in sequence if "module" in item}
         if not (
             steps["task-boundary-compiler"]
             < steps["meta-normalization"]
             and steps["task-boundary-compiler"] < steps["hu-normalization"]
         ):
             fail("task boundary must precede both normalizers", failures)
+        synthesis_step = next(
+            item["step"]
+            for item in sequence
+            if item.get("action", "").startswith("内部结果合成")
+        )
+        if not (
+            synthesis_step
+            < steps["reader-facing-analysis"]
+            < steps["cache-wave"]
+        ):
+            fail(
+                "reader-facing analysis must follow internal synthesis and precede cache update",
+                failures,
+            )
     except Exception as exc:
         fail(f"research recipe: {exc}", failures)
 
     try:
         acceptance = yaml.safe_load(ACCEPTANCE.read_text(encoding="utf-8"))
         cases = acceptance.get("cases", [])
-        if len(cases) < 6:
-            fail("acceptance suite must contain at least six cases", failures)
+        if len(cases) < 8:
+            fail("acceptance suite must contain at least eight cases", failures)
         if len({case["id"] for case in cases}) != len(cases):
             fail("acceptance case IDs must be unique", failures)
+        required_cases = {"literature-readable-delivery", "explicit-audit-after-result"}
+        missing_cases = required_cases - {case["id"] for case in cases}
+        if missing_cases:
+            fail(
+                f"acceptance suite missing delivery cases: {sorted(missing_cases)}",
+                failures,
+            )
     except Exception as exc:
         fail(f"acceptance tests: {exc}", failures)
 

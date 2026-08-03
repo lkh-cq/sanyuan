@@ -188,8 +188,16 @@ extensions:
     id: reading-topology
     name: 三元语法阅读拓扑
     path: references/reading-topology.md
-    version: 0.1.0
+    version: 0.2.0
     module_id: extension-reading-topology
+  reader_facing_analysis:
+    id: reader-facing-analysis
+    name: 读者端分析交付
+    path: references/reader-facing-analysis.md
+    version: 0.1.0
+    module_id: extension-reader-facing-analysis
+    depends_on:
+      - reading-topology
   modality_boundary:
     id: modality-boundary
     name: 模态可见性边界

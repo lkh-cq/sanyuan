@@ -1,4 +1,4 @@
-version: 1
+version: 2
 skill: consciousness-bus
 
 cases:
@@ -38,6 +38,33 @@ cases:
     must_not:
       - "把共表达写成因果证明"
       - "把虚拟敲除写成真实敲除"
+
+  - id: literature-readable-delivery
+    prompt: "精读一篇铁死亡机制论文，分析每一段的写作逻辑、段间衔接和证据缺口。"
+    expected_mode: deep
+    must:
+      - "主要结果使用可独立阅读的自然语言段落"
+      - "主要逻辑分析以连续段落呈现"
+      - "说明作者先写什么、再写什么"
+      - "展开承接、递进、转折、解释或限制等具体逻辑关系"
+      - "说明证据实际支持到哪里以及缺口如何影响结论"
+    must_not:
+      - "用节点编号、关系代码或裸箭头代替段落分析"
+      - "直接展示B_T、M_T、H_T或Z_T"
+      - "交付无图例、无完整名称或无关系说明的简图"
+      - "把supports、D1或D4等内部简写当作正文"
+      - "把承接、递进、转折或解释机械拆成一条关系一个项目符号"
+
+  - id: explicit-audit-after-result
+    prompt: "先给我可读的论文逻辑分析，再附上内部拓扑审计记录。"
+    expected_mode: deep
+    must:
+      - "先提供自然语言主要结果"
+      - "把内部拓扑放在独立审计附录"
+      - "保持事实、推断、缺口和证据边界可追溯"
+    must_not:
+      - "用审计块替代自然语言结论"
+      - "把内部编码混入正文句子"
 
   - id: hu-flowevent
     prompt: "修改意识总线：把互直接改名为 FlowEvent。"
