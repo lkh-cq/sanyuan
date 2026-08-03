@@ -1,0 +1,105 @@
+$schema: "https://json-schema.org/draft-07/schema#"
+title: CouplingState
+description: "耦合态写入封套：连接内容节点、读取节点与关系节点，不把它们压成同一对象。"
+
+type: object
+additionalProperties: false
+required:
+  - coupling_id
+  - store_refs
+  - mutual_refs
+  - coupling_summary
+  - status
+  - provenance
+
+properties:
+  coupling_id:
+    type: string
+    pattern: "^coupling_[0-9]{8}_[0-9]{3}$"
+
+  store_refs:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      type: string
+
+  read_refs:
+    type: array
+    uniqueItems: true
+    items:
+      type: string
+
+  mutual_refs:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      type: string
+
+  coupling_summary:
+    type: string
+    minLength: 1
+    description: "关系如何成立的自然语言摘要，不得只写 related。"
+
+  conditions:
+    type: array
+    items:
+      type: string
+
+  evidence_boundaries:
+    type: array
+    items:
+      type: string
+
+  status:
+    type: string
+    enum:
+      - observed
+      - hypothesized
+      - disputed
+      - incomplete
+
+  topology_level:
+    type: string
+    enum:
+      - source
+      - local
+      - section
+      - task
+      - project
+
+  signal:
+    type: string
+    enum:
+      - weak
+      - medium
+      - strong
+      - unknown
+
+  provenance:
+    type: object
+    additionalProperties: false
+    required:
+      - source_anchors
+      - created_at
+    properties:
+      source_anchors:
+        type: array
+        minItems: 1
+        items:
+          type: string
+      created_at:
+        type: string
+        format: date-time
+      created_by:
+        type: string
+
+  supersedes:
+    type:
+      - string
+      - "null"
+
+  version:
+    type: string
+    pattern: '^[0-9]+\.[0-9]+\.[0-9]+$'

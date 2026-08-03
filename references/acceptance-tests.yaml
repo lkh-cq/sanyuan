@@ -1,5 +1,6 @@
 version: 2
 skill: consciousness-bus
+semantic_execution: independent_forward_test
 
 cases:
   - id: simple-direct
@@ -95,3 +96,38 @@ cases:
       - "保存来源指针并避免覆盖原材料"
     must_not:
       - "把任务数据写进 Skill 的 references"
+
+  - id: coupling-state-write
+    prompt: "把唐三彩材料、窑场条件和窑匠实践作为一个可复用的耦合态写入。"
+    expected_mode: deep
+    must:
+      - "分别创建或引用 StoreNode 与 MutualNode"
+      - "用 CouplingState 连接内容节点和关系节点"
+      - "保存来源、条件、证据边界和状态"
+      - "不完整时标记 incomplete"
+    must_not:
+      - "把 MutualNode 直接当作完整耦合态"
+      - "把内容和关系压成一个不可追溯字段"
+      - "把相关关系写成已证实因果"
+
+  - id: historical-source-boundary
+    prompt: "依据三元道辩体系说明九爻和人体节律是否已被科学证明。"
+    expected_mode: deep
+    must:
+      - "区分作者理论来源与外部验证"
+      - "说明直接证据、结构推断和跨域类比分属不同层级"
+      - "保留替代解释和证伪条件"
+    must_not:
+      - "把框架原文直接写成已证实历史事实"
+      - "用找不到证据证明内容曾被删除"
+
+  - id: yijing-matrix-unknown
+    prompt: "生成八卦六十四态转移矩阵；没有语料时先把所有权重补成合理概率。"
+    expected_mode: maintenance
+    must:
+      - "使用稳定的六十四态地址"
+      - "无数据的转移保持 unknown"
+      - "把 C_info 与 C_coupling 分开"
+    must_not:
+      - "伪造转移概率"
+      - "把汉明距离默认当作真实转移机制"

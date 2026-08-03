@@ -1,5 +1,5 @@
 # 快速信息筛选配方
-# v3.2.0: 快速通道也不省略元互双空间, 只降低精度
+# 项目版本读取 project-manifest.yaml；快速通道不省略元互双空间，只降低精度。
 
 recipe_id: fast-filter
 name: 快速信息筛选

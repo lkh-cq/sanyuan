@@ -3,10 +3,53 @@ project:
   name: 意识总线
   version: 3.2.0
 
+version_policy:
+  project_version_source: references/project-manifest.yaml#project.version
+  project_tag_format: "v<project.version>"
+  module_versions_are_independent: true
+  same_project_version_must_not_move_between_commits: true
+
+lifecycle_definitions:
+  frozen: "冻结本体或权威边界；修改必须完成全链迁移。"
+  stable: "已进入当前运行链并通过结构与行为验证。"
+  experimental: "接口已登记，但证据、权重或使用经验仍不足。"
+  source: "保存设计来源与原始锚点，不直接作为运行时事实。"
+
+module_lifecycle:
+  frozen:
+    - root-architecture
+  stable:
+    - core-rho-convergence
+    - core-theta-switching
+    - core-deep-conscious
+    - core-cache-wave-dynamics
+    - core-condense-protocol
+    - preprocessor-task-boundary
+    - preprocessor-meta-normalization
+    - preprocessor-hu-normalization
+    - preprocessor-think-before-responding
+    - preprocessor-task-decomposition
+    - branch-zang-gui
+    - extension-archive-ingestion
+    - extension-reading-topology
+    - extension-reader-facing-analysis
+    - extension-modality-boundary
+    - validation-framework-pitfalls
+  experimental:
+    - extension-yijing-coupling-matrix
+  source:
+    - source-original-anchors
+    - source-sanyuan-daobian
+
 entrypoints:
   root: SKILL.md
   research: references/research-recipe.yaml
   fast_filter: references/fast-filter-recipe.yaml
+
+authority:
+  architecture:
+    path: references/architecture.md
+    module_id: root-architecture
 
 core:
   conscious:
@@ -47,7 +90,7 @@ core:
     id: condense
     name: condense协议
     path: references/condense-protocol.md
-    version: "0.2"
+    version: 0.2.0
     module_id: core-condense-protocol
 
 preprocessors:
@@ -166,16 +209,28 @@ storage:
   routing: reference/routing/
 
 schemas:
+  state_protocol: references/state-protocol.schema.yaml
   attention_state: references/schema-attention-state.schema.yaml
   store_node: references/schema-store-node.schema.yaml
   read_node: references/schema-read-node.schema.yaml
+  mutual_node: references/schema-mutual-node.schema.yaml
+  coupling_state: references/schema-coupling-state.schema.yaml
   flow_event: references/schema-flow-event.schema.yaml
   cycle_link: references/schema-cycle-link.schema.yaml
   recipe: references/schema-recipe.schema.yaml
   task_boundary: references/schema-task-boundary.schema.yaml
   meta_normalization: references/schema-meta-normalization.schema.yaml
   hu_normalization: references/schema-hu-normalization.schema.yaml
-  mutual_node: references/schema-mutual-node.schema.yaml
+
+sources:
+  original_anchors:
+    path: references/original-anchors.md
+    version: 0.1.0
+    module_id: source-original-anchors
+  sanyuan_daobian:
+    path: references/sanyuan-daobian-framework.md
+    version: 0.1.0
+    module_id: source-sanyuan-daobian
 
 extensions:
   archive_ingestion:
@@ -204,6 +259,22 @@ extensions:
     path: references/modality-boundary.md
     version: 0.1.0
     module_id: extension-modality-boundary
+  yijing_coupling_matrix:
+    id: yijing-coupling-matrix
+    name: 易经耦合矩阵接口
+    path: references/yijing-coupling-matrix.md
+    version: 0.1.0
+    module_id: extension-yijing-coupling-matrix
+
+validation:
+  output_contract: references/output-contract.md
+  acceptance_cases: references/acceptance-tests.yaml
+  framework_pitfalls:
+    path: references/framework-pitfalls.md
+    version: 0.1.0
+    module_id: validation-framework-pitfalls
+  bundle_validator: scripts/validate_bundle.py
+  ci_workflow: .github/workflows/validate.yml
 
 canvas:
   total: assets/canvas/意识总线_总架构.canvas

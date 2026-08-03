@@ -106,6 +106,8 @@ manifest_ref: references/project-manifest.yaml
 
 ## 四、写入规范
 
+完整写入事务还必须遵守 [store-write-spec.md](store-write-spec.md)：StoreNode 与 MutualNode 分开保存，再以 CouplingState 登记为可检索单元。孤立 StoreNode 只能作为 `incomplete` 暂存，不能声称已经完成关系耦合。
+
 ### 4.1 StoreNode 格式
 
 三才藏写入的节点必须符合 `references/schema-store-node.schema.yaml`:
@@ -154,6 +156,7 @@ reference/store/{store_id}.yaml
 5. 不得使用天×人->地作为基础本体
 6. 写入后必须读回验证(铁律1)
 7. 使用相对路径, 禁止绝对路径
+8. 完整入库必须创建符合 `schema-coupling-state.schema.yaml` 的耦合态封套
 
 ---
 
@@ -174,4 +177,4 @@ reference/store/{store_id}.yaml
 
 > 版本: 0.3.0 | 2026-07-27
 > 来源: 三元道辩体系 v1.0 + V3冻结定义
-> 依赖: references/schema-store-node.schema.yaml
+> 依赖: references/schema-store-node.schema.yaml、references/schema-coupling-state.schema.yaml
