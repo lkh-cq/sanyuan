@@ -24,6 +24,7 @@
 | 互信息空间 | 记录关系、流止、转换、反馈和路径残差 | [`references/hu-observation-space.md`](references/hu-observation-space.md) |
 | 藏归循环 | 写入具体内容, 再按任务读取相关节点 | [`references/zang-gui-orchestrator.md`](references/zang-gui-orchestrator.md) |
 | 注意力控制 | 用 `ρ/θ`、缓存波和 `n` 位聚焦控制收束与切换 | [`references/rho-convergence.md`](references/rho-convergence.md), [`references/theta-switching.md`](references/theta-switching.md), [`references/n-focus.md`](references/n-focus.md) |
+| 读者端交付 | 把内部关系结构转译为简明、连贯、可独立阅读的文字 | [`references/reader-facing-analysis.md`](references/reader-facing-analysis.md) |
 | 扩展迁移 | 接收归档对话中的新方案, 但不直接污染冻结本体 | [`references/archive-ingestion.md`](references/archive-ingestion.md) |
 
 最短理解方式:
@@ -57,6 +58,9 @@
 - 路径是对文本实际组织方式的描述。
 - 常见路径只能是语料观察结果, 不能反过来变成写作强制模板。
 - 阅读拓扑需要记录阅读者任务坐标、证据压力、拓扑断裂和缺席节点。
+- 节点、编号、关系代码和箭头属于内部工作表示；正式产物必须把它们转译为段落级逻辑分析。
+
+读者看到的结果应直接说明“作者先写什么、如何承接或推进、证据支持到哪里”，而不是面对一张没有注释的内部关系图。详细交付规则见 [`references/reader-facing-analysis.md`](references/reader-facing-analysis.md)。
 
 ## 多模态边界
 
@@ -98,6 +102,7 @@
     ├── condense-protocol.md          # 压缩协议
     ├── archive-ingestion.md          # 归档方案迁移协议
     ├── reading-topology.md           # 三元语法阅读拓扑
+    ├── reader-facing-analysis.md     # 读者端自然语言交付
     └── modality-boundary.md          # 模态可见性边界
 ```
 
@@ -114,6 +119,7 @@
 | 修改本体、公式、模块或版本 | [`references/architecture.md`](references/architecture.md) + [`references/project-manifest.yaml`](references/project-manifest.yaml) |
 | 把旧对话方案纳入项目 | [`references/archive-ingestion.md`](references/archive-ingestion.md) |
 | 讨论三元语法 | [`references/reading-topology.md`](references/reading-topology.md) |
+| 输出可读的文献逻辑分析 | [`references/reader-facing-analysis.md`](references/reader-facing-analysis.md) |
 | 处理图表、图像、视频缺失风险 | [`references/modality-boundary.md`](references/modality-boundary.md) |
 
 ## 归档方案迁移
@@ -148,6 +154,6 @@
 
 ## 当前状态
 
-`V3.2.0` 已提供可读的 Skill 入口、核心模块、预处理模块、藏归模块、互空间模块、任务配方、Schema 和扩展迁移层。
+`V3.2.0` 已提供可读的 Skill 入口、核心模块、预处理模块、藏归模块、互空间模块、任务配方、Schema、扩展迁移层，以及内部拓扑到读者端自然语言的交付接口。
 
 下一步重点不是继续堆概念, 而是把归档对话中的候选方案逐条迁移为可判断、可接线、可拒绝、可追溯的项目条目。

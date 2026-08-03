@@ -6,7 +6,7 @@
 
 它以已经存在的文本为输入, 读取作者实际如何组织信息, 并把文本中的行文功能、衔接、顺序、回环、证据承重、缺口和引用关系转写为可追溯、可比较、可统计的拓扑表示。
 
-## 输入、操作、输出
+## 输入、操作、内部产物
 
 ~~~yaml
 reading_topology:
@@ -25,12 +25,40 @@ reading_topology:
     - record_loop
     - record_gap
     - bind_citation_or_evidence
-  output:
+  internal_working_artifacts:
     - observed_topology
     - evidence_pressure_map
     - topology_gap_map
     - absent_expected_node_map
 ~~~
+
+这些产物用于工作层的追踪、比较和校验，不是默认交付格式。面向读者的分析必须继续经过 [reader-facing-analysis.md](reader-facing-analysis.md) 的自然语言转译。
+
+## 双层接口
+
+~~~yaml
+delivery_interface:
+  internal_reasoning:
+    keeps:
+      - node_and_edge_ids
+      - relation_codes
+      - evidence_pressure
+      - topology_gaps
+      - expected_but_absent
+  reader_facing:
+    requires:
+      - readable_paragraphs
+      - explicit_logical_relations
+      - evidence_boundaries
+      - necessary_limitations
+    suppresses_by_default:
+      - internal_ids
+      - bare_arrows
+      - schema_fields
+      - unexplained_abbreviations
+~~~
+
+默认结果解释作者如何组织论述以及连接是否成立，不展示三元语法如何编码该结果。只有用户明确要求查看拓扑表示或审计记录时，才把内部产物作为独立附录提供。
 
 ## 禁止倒置
 
@@ -130,4 +158,4 @@ expected_but_absent:
 
 本模块属于补充观测空间与归档迁移层。它不修改三才、三题、互、FlowEvent、ρ/θ 或 n位聚焦的冻结定义。
 
-三元语法读取结果应优先写入运行时 `reference/read/` 与 `reference/flow/`, 不写入 Skill 的只读 `references/`。
+三元语法的内部读取结果应优先写入运行时 `reference/read/` 与 `reference/flow/`, 不写入 Skill 的只读 `references/`。对用户的正式交付则按读者端分析规范生成连贯文字，不把运行时节点直接转印为正文。

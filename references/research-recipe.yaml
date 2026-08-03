@@ -1,9 +1,9 @@
 # 科研深度分析配方
-# v3.2.0: 任务边界优先, 元互双空间独立归一化, 跨空间一致性检查
+# v3.2.0: 任务边界优先, 元互双空间独立归一化, 跨空间一致性检查, 内外输出分层
 
 recipe_id: research-deep
 name: 科研深度分析
-description: "复杂科研任务的完整认知预处理流程。任务边界编译->元互双空间独立归一化->跨空间一致性->藏归->核心。"
+description: "复杂科研任务的完整认知预处理流程。任务边界编译->元互双空间独立归一化->跨空间一致性->藏归->核心->读者端自然语言交付。"
 
 modules:
   - think-before-responding
@@ -15,6 +15,7 @@ modules:
   - deep-conscious
   - conscious-rho
   - unconscious-theta
+  - reader-facing-analysis
   - cache-wave
 
 sequence:
@@ -90,17 +91,32 @@ sequence:
         - F_T.test_cases通过
 
   - step: 13
-    action: "结果合成: 生成Z_T任务特定表示"
+    action: "内部结果合成: 生成Z_T任务特定表示"
     output: Z_T
     description: |
-      Z_T必含:
+      Z_T是内部工作表示, 不直接作为读者端交付。
+      内部必含:
         - M_T元信息视图
         - H_T互信息视图
-      Z_T选含:
+      内部选含:
         - 补充空间视图(时间/证据/来源)
         - loss_vector
 
   - step: 14
+    module: reader-facing-analysis
+    action: "读者端转译: 将Z_T编译为简明、连贯、可独立阅读的自然语言结果"
+    input: Z_T + B_T.output_contract
+    output: reader_deliverable
+    description: |
+      默认交付:
+        - 隐藏内部节点、边、关系代码和M_T/H_T/Z_T字段
+        - 用完整句子展开内容顺序、逻辑作用和证据边界
+        - 文献分析以2—4句论述单元为主
+        - 图表仅作有完整名称、关系说明、来源和图例的补充
+      仅当用户明确要求审计时:
+        - 在主要结果之后追加独立audit_appendix
+
+  - step: 15
     module: cache-wave
     action: "缓存波更新: 更新Ω/∇E/dθ'/dt"
 
@@ -111,3 +127,5 @@ branch_conditions:
     action: "加载证据补充空间"
   - condition: "子任务B_T不同"
     action: "各子任务独立执行步骤4-6, 合成时取并集"
+  - condition: "用户明确要求查看框架、机器表示或审计过程"
+    action: "在reader_deliverable之后附独立审计块; 不得用审计块替代自然语言结果"
