@@ -37,6 +37,9 @@ module_lifecycle:
     - validation-framework-pitfalls
   experimental:
     - extension-yijing-coupling-matrix
+    - extension-multi-norm-diagnosis
+    - extension-frozen-definitions
+    - extension-double-observation-space
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -265,6 +268,24 @@ extensions:
     path: references/yijing-coupling-matrix.md
     version: 0.1.0
     module_id: extension-yijing-coupling-matrix
+  multi_norm_diagnosis:
+    id: multi-norm-diagnosis
+    name: 多重归一化诊断
+    path: references/multi-norm-diagnosis.md
+    version: 0.1.0
+    module_id: extension-multi-norm-diagnosis
+  frozen_definitions:
+    id: v3-frozen-definitions
+    name: V3.2.0 冻结定义参考
+    path: references/v3-frozen-definitions.md
+    version: 0.1.0
+    module_id: extension-frozen-definitions
+  double_observation_space:
+    id: v32-double-observation-space
+    name: 元-互双观测空间架构
+    path: references/v32-double-observation-space.md
+    version: 0.1.0
+    module_id: extension-double-observation-space
 
 validation:
   output_contract: references/output-contract.md
