@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Validate the installable consciousness-bus skill bundle."""
+"""Validate deterministic structure for the installable consciousness-bus bundle.
+
+This script deliberately does not claim semantic understanding. Frozen meanings and
+reader-facing behavior require review plus independent forward tests.
+"""
 
 from __future__ import annotations
 
@@ -7,6 +11,7 @@ import json
 import re
 import sys
 from pathlib import Path
+from typing import Iterator
 
 import yaml
 
@@ -15,6 +20,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "SKILL.md"
 MANIFEST = ROOT / "references" / "project-manifest.yaml"
 ACCEPTANCE = ROOT / "references" / "acceptance-tests.yaml"
+SEMVER = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
+REPO_PATH_PREFIXES = ("references/", "assets/", "scripts/", ".github/")
 
 
 def fail(message: str, failures: list[str]) -> None:
@@ -31,33 +38,114 @@ def frontmatter(text: str) -> dict:
     return value
 
 
-def iter_paths(value: object, parent_key: str = ""):
+def walk(value: object) -> Iterator[object]:
+    yield value
     if isinstance(value, dict):
-        for key, child in value.items():
-            yield from iter_paths(child, str(key))
+        for child in value.values():
+            yield from walk(child)
     elif isinstance(value, list):
         for child in value:
-            yield from iter_paths(child, parent_key)
-    elif isinstance(value, str) and parent_key in {
-        "root",
-        "research",
-        "fast_filter",
-        "path",
-        "entrypoint",
-        "encoder",
-        "normalizer",
-        "total",
-        "sancai",
-        "santi",
-        "flow",
-        "meta_hu",
-        "provenance",
-    }:
-        yield value
+            yield from walk(child)
+
+
+def manifest_paths(manifest: dict) -> set[str]:
+    paths: set[str] = set()
+    for value in walk(manifest):
+        if not isinstance(value, str):
+            continue
+        if value == "SKILL.md" or value.startswith(REPO_PATH_PREFIXES):
+            paths.add(value.split("#", 1)[0])
+    return paths
+
+
+def registered_modules(manifest: dict) -> dict[str, dict]:
+    modules: dict[str, dict] = {}
+    for value in walk(manifest):
+        if not isinstance(value, dict) or "module_id" not in value:
+            continue
+        module_id = value["module_id"]
+        if not isinstance(module_id, str):
+            raise ValueError("module_id must be a string")
+        if module_id in modules:
+            raise ValueError(f"duplicate module_id: {module_id}")
+        modules[module_id] = value
+    return modules
+
+
+def check_markdown_links(failures: list[str]) -> None:
+    markdown_files = [SKILL, ROOT / "README.md", ROOT / "CONTRIBUTING.md"]
+    markdown_files.extend(sorted((ROOT / "references").glob("*.md")))
+    for path in markdown_files:
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", text):
+            if "://" in link or link.startswith("#"):
+                continue
+            relative = link.split("#", 1)[0]
+            target = (path.parent / relative).resolve()
+            try:
+                target.relative_to(ROOT.resolve())
+            except ValueError:
+                fail(f"link escapes repository: {path.relative_to(ROOT)} -> {link}", failures)
+                continue
+            if not target.exists():
+                fail(f"broken link: {path.relative_to(ROOT)} -> {link}", failures)
+
+
+def check_recipe(failures: list[str]) -> None:
+    try:
+        recipe = yaml.safe_load(
+            (ROOT / "references" / "research-recipe.yaml").read_text(encoding="utf-8")
+        )
+        sequence = recipe["sequence"]
+        numbers = [item["step"] for item in sequence]
+        if numbers != sorted(numbers) or len(numbers) != len(set(numbers)):
+            fail("research recipe steps must be unique and ascending", failures)
+        steps = {item.get("module"): item["step"] for item in sequence if "module" in item}
+        boundary = steps["task-boundary-compiler"]
+        if not boundary < steps["meta-normalization"]:
+            fail("task boundary must precede meta normalization", failures)
+        if not boundary < steps["hu-normalization"]:
+            fail("task boundary must precede hu normalization", failures)
+        synthesis = next(
+            item["step"]
+            for item in sequence
+            if item.get("action", "").startswith("内部结果合成")
+        )
+        if not synthesis < steps["reader-facing-analysis"] < steps["cache-wave"]:
+            fail("reader-facing analysis must follow synthesis and precede cache update", failures)
+    except Exception as exc:
+        fail(f"research recipe: {exc}", failures)
+
+
+def check_acceptance(failures: list[str]) -> None:
+    try:
+        acceptance = yaml.safe_load(ACCEPTANCE.read_text(encoding="utf-8"))
+        cases = acceptance.get("cases")
+        if not isinstance(cases, list) or not cases:
+            raise ValueError("cases must be a non-empty list")
+        ids: list[str] = []
+        for index, case in enumerate(cases):
+            if not isinstance(case, dict):
+                raise ValueError(f"case {index} must be a mapping")
+            for key in ("id", "prompt", "expected_mode", "must", "must_not"):
+                if key not in case:
+                    raise ValueError(f"case {index} missing {key}")
+            if not isinstance(case["id"], str) or not case["id"]:
+                raise ValueError(f"case {index} has invalid id")
+            if not isinstance(case["must"], list) or not isinstance(case["must_not"], list):
+                raise ValueError(f"case {case['id']} must use list assertions")
+            ids.append(case["id"])
+        if len(ids) != len(set(ids)):
+            fail("acceptance case IDs must be unique", failures)
+    except Exception as exc:
+        fail(f"acceptance tests: {exc}", failures)
 
 
 def main() -> int:
     failures: list[str] = []
+    repository_context = (ROOT / ".git").exists() or (ROOT / "README.md").exists()
 
     try:
         skill_text = SKILL.read_text(encoding="utf-8")
@@ -68,123 +156,101 @@ def main() -> int:
             fail("unexpected skill name", failures)
     except Exception as exc:
         fail(f"SKILL.md: {exc}", failures)
-        skill_text = ""
 
-    for link in re.findall(r"\[[^\]]+\]\(([^)]+)\)", skill_text):
-        if "://" in link or link.startswith("#"):
-            continue
-        if not (ROOT / link).exists():
-            fail(f"broken SKILL.md link: {link}", failures)
+    try:
+        architecture = frontmatter(
+            (ROOT / "references" / "architecture.md").read_text(encoding="utf-8")
+        )
+        if architecture.get("authority") != "frozen-ontology":
+            fail("architecture must declare frozen-ontology authority", failures)
+    except Exception as exc:
+        fail(f"architecture: {exc}", failures)
 
     try:
         manifest = yaml.safe_load(MANIFEST.read_text(encoding="utf-8"))
-        if manifest["project"]["version"] != "3.2.0":
-            fail("manifest project version must be 3.2.0", failures)
-        for relative in iter_paths(manifest):
+        if not isinstance(manifest, dict):
+            raise ValueError("manifest must be a mapping")
+        project_version = str(manifest["project"]["version"])
+        if not SEMVER.fullmatch(project_version):
+            fail("project.version must use semantic versioning", failures)
+
+        paths = manifest_paths(manifest)
+        for relative in sorted(paths):
             if relative.startswith("reference/"):
+                continue
+            if relative.startswith(".github/") and not repository_context:
                 continue
             if not (ROOT / relative).exists():
                 fail(f"missing manifest path: {relative}", failures)
+
+        reference_files = {
+            path.relative_to(ROOT).as_posix()
+            for path in (ROOT / "references").iterdir()
+            if path.is_file()
+        }
+        unregistered = sorted(reference_files - paths)
+        if unregistered:
+            fail(f"unregistered reference files: {unregistered}", failures)
+
+        modules = registered_modules(manifest)
+        for module_id, module in modules.items():
+            if "version" in module and not SEMVER.fullmatch(str(module["version"])):
+                fail(f"module {module_id} has non-semver version", failures)
+
+        lifecycle = manifest.get("module_lifecycle", {})
+        assigned: dict[str, str] = {}
+        for status, module_ids in lifecycle.items():
+            if status not in manifest.get("lifecycle_definitions", {}):
+                fail(f"undefined lifecycle status: {status}", failures)
+            if not isinstance(module_ids, list):
+                fail(f"lifecycle {status} must be a list", failures)
+                continue
+            for module_id in module_ids:
+                if module_id in assigned:
+                    fail(f"module {module_id} appears in multiple lifecycles", failures)
+                assigned[module_id] = status
+        missing_lifecycle = sorted(set(modules) - set(assigned))
+        unknown_lifecycle = sorted(set(assigned) - set(modules))
+        if missing_lifecycle:
+            fail(f"modules missing lifecycle: {missing_lifecycle}", failures)
+        if unknown_lifecycle:
+            fail(f"lifecycle lists unknown modules: {unknown_lifecycle}", failures)
+
+        allowed_version_duplicates = {MANIFEST, ROOT / "references" / "version-provenance.md"}
+        for path in ROOT.rglob("*"):
+            if not path.is_file() or ".git" in path.parts or path in allowed_version_duplicates:
+                continue
+            if path.suffix.lower() not in {".md", ".yaml", ".yml", ".py"}:
+                continue
+            if project_version in path.read_text(encoding="utf-8"):
+                fail(
+                    f"project version duplicated outside manifest/provenance: {path.relative_to(ROOT)}",
+                    failures,
+                )
     except Exception as exc:
         fail(f"project manifest: {exc}", failures)
 
-    required_invariants = {
-        "architecture.md": [
-            "天才 = 规律",
-            "地才 = 环境",
-            "人才 = 实践",
-            "天题 = 信息的本来样貌",
-            "地题 = 读取方式",
-            "人题 = 读取记录",
-            "FlowEvent ⊂ 互",
-            "ρ+θ=1",
-            "调用时O(1)查表",
-            "不另设“天元/地元/人元”分类",
-        ],
-        "task-boundary.md": ["B_T", "F_T", "forbidden_loss", "epsilon_T"],
-        "hu-observation-space.md": ["互 ≠ 信息论中的 mutual information", "FlowEvent ⊂ 互"],
-        "n-focus.md": ["offline", "O(1)"],
-        "reader-facing-analysis.md": [
-            "内部推理层",
-            "读者交付层",
-            "2—4 句",
-            "正文应以连续段落为主",
-            "不得把工作层的压缩表示直接复制为最终回答",
-        ],
-        "output-contract.md": [
-            "内部推理层负责保存节点、关系、路径和校验状态",
-            "不要把“节点—箭头—节点”",
-            "只有用户明确要求查看过程、框架、机器表示或验证 Skill 时",
-        ],
-    }
-    for filename, needles in required_invariants.items():
-        text = (ROOT / "references" / filename).read_text(encoding="utf-8")
-        for needle in needles:
-            if needle not in text:
-                fail(f"{filename} missing invariant: {needle}", failures)
+    check_markdown_links(failures)
+    check_recipe(failures)
+    check_acceptance(failures)
 
-    forbidden_active = {
-        "architecture.md": ["三思而后行 -> 多重归一化过滤", "> 版本: 3.1.0"],
-        "task-boundary.md": ["预处理/多重归一化过滤/SKILL.md"],
-        "output-contract.md": ["复杂任务可在结果后附一个最小审计块"],
-    }
-    for filename, needles in forbidden_active.items():
-        text = (ROOT / "references" / filename).read_text(encoding="utf-8")
-        for needle in needles:
-            if needle in text:
-                fail(f"{filename} retains obsolete active text: {needle}", failures)
-
-    try:
-        recipe = yaml.safe_load(
-            (ROOT / "references" / "research-recipe.yaml").read_text(encoding="utf-8")
-        )
-        sequence = recipe["sequence"]
-        steps = {item.get("module"): item["step"] for item in sequence if "module" in item}
-        if not (
-            steps["task-boundary-compiler"]
-            < steps["meta-normalization"]
-            and steps["task-boundary-compiler"] < steps["hu-normalization"]
-        ):
-            fail("task boundary must precede both normalizers", failures)
-        synthesis_step = next(
-            item["step"]
-            for item in sequence
-            if item.get("action", "").startswith("内部结果合成")
-        )
-        if not (
-            synthesis_step
-            < steps["reader-facing-analysis"]
-            < steps["cache-wave"]
-        ):
-            fail(
-                "reader-facing analysis must follow internal synthesis and precede cache update",
-                failures,
-            )
-    except Exception as exc:
-        fail(f"research recipe: {exc}", failures)
-
-    try:
-        acceptance = yaml.safe_load(ACCEPTANCE.read_text(encoding="utf-8"))
-        cases = acceptance.get("cases", [])
-        if len(cases) < 8:
-            fail("acceptance suite must contain at least eight cases", failures)
-        if len({case["id"] for case in cases}) != len(cases):
-            fail("acceptance case IDs must be unique", failures)
-        required_cases = {"literature-readable-delivery", "explicit-audit-after-result"}
-        missing_cases = required_cases - {case["id"] for case in cases}
-        if missing_cases:
-            fail(
-                f"acceptance suite missing delivery cases: {sorted(missing_cases)}",
-                failures,
-            )
-    except Exception as exc:
-        fail(f"acceptance tests: {exc}", failures)
-
-    for schema in sorted((ROOT / "references").glob("*.yaml")):
+    for yaml_path in sorted((ROOT / "references").glob("*.yaml")):
         try:
-            yaml.safe_load(schema.read_text(encoding="utf-8"))
+            yaml.safe_load(yaml_path.read_text(encoding="utf-8"))
         except Exception as exc:
-            fail(f"invalid YAML {schema.name}: {exc}", failures)
+            fail(f"invalid YAML {yaml_path.name}: {exc}", failures)
+
+    try:
+        agent = yaml.safe_load((ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8"))
+        if not set(agent).issubset({"interface", "dependencies", "policy"}):
+            fail("agents/openai.yaml has unsupported top-level fields", failures)
+        if "products" in agent.get("policy", {}):
+            fail("agents/openai.yaml must not claim unverified products", failures)
+        default_prompt = agent.get("interface", {}).get("default_prompt", "")
+        if "$consciousness-bus" not in default_prompt:
+            fail("default_prompt must mention $consciousness-bus", failures)
+    except Exception as exc:
+        fail(f"agents/openai.yaml: {exc}", failures)
 
     for canvas in sorted((ROOT / "assets" / "canvas").glob("*.canvas")):
         try:
@@ -196,13 +262,24 @@ def main() -> int:
         except Exception as exc:
             fail(f"invalid Canvas {canvas.name}: {exc}", failures)
 
+    if repository_context:
+        for required in (
+            "LICENSE",
+            "README.md",
+            "CONTRIBUTING.md",
+            ".github/workflows/validate.yml",
+        ):
+            if not (ROOT / required).exists():
+                fail(f"missing repository file: {required}", failures)
+
     if failures:
         for item in failures:
             print(f"FAIL: {item}")
         print(f"{len(failures)} validation failure(s)")
         return 1
 
-    print("PASS: consciousness-bus bundle is internally consistent")
+    print("PASS: deterministic bundle structure is internally consistent")
+    print("NOTE: semantic invariants require review and independent forward tests")
     return 0
 
 

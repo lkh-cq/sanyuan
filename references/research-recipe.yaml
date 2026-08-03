@@ -1,5 +1,5 @@
 # 科研深度分析配方
-# v3.2.0: 任务边界优先, 元互双空间独立归一化, 跨空间一致性检查, 内外输出分层
+# 项目版本读取 project-manifest.yaml；本配方保持任务边界优先、元互独立归一化与内外输出分层。
 
 recipe_id: research-deep
 name: 科研深度分析
@@ -69,18 +69,25 @@ sequence:
     action: "三题归: 按H_T的endpoint_refs提取ReadNode"
 
   - step: 9
+    action: "耦合态登记: 引用StoreNode、MutualNode与可选ReadNode形成可检索事务"
+    output: coupling_state
+    description: |
+      保持内容节点、关系节点和读取节点分离。
+      保存来源、成立条件、证据边界与observed/hypothesized/disputed/incomplete状态。
+
+  - step: 10
     module: deep-conscious
     action: "n位聚焦: O(1)查表, 聚焦当前任务n位"
 
-  - step: 10
+  - step: 11
     module: conscious-rho
     action: "ρ收束: 注意力收束到任务方向"
 
-  - step: 11
+  - step: 12
     module: unconscious-theta
     action: "θ边界检查: 场景边界稳定性"
 
-  - step: 12
+  - step: 13
     action: "功能贞验: 验证任务功能F_T是否满足"
     description: |
       检查项:
@@ -90,7 +97,7 @@ sequence:
         - 跨空间一致性
         - F_T.test_cases通过
 
-  - step: 13
+  - step: 14
     action: "内部结果合成: 生成Z_T任务特定表示"
     output: Z_T
     description: |
@@ -102,7 +109,7 @@ sequence:
         - 补充空间视图(时间/证据/来源)
         - loss_vector
 
-  - step: 14
+  - step: 15
     module: reader-facing-analysis
     action: "读者端转译: 将Z_T编译为简明、连贯、可独立阅读的自然语言结果"
     input: Z_T + B_T.output_contract
@@ -116,7 +123,7 @@ sequence:
       仅当用户明确要求审计时:
         - 在主要结果之后追加独立audit_appendix
 
-  - step: 15
+  - step: 16
     module: cache-wave
     action: "缓存波更新: 更新Ω/∇E/dθ'/dt"
 

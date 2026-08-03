@@ -123,6 +123,10 @@ mutual_node:
 `via_role` 只在 FlowEvent 子类型中强制为 `di`(地居中)。
 一般 MutualNode 的 via_role 为 null 或指定其他中介角色。
 
+### MutualNode 与耦合态
+
+MutualNode 是互空间的关系记录单元；CouplingState 是写入与检索封套，引用 StoreNode、MutualNode 和可选 ReadNode。二者不得等同。耦合态不会把互降格为内容字段，也不会新增第四本体实体。具体写入规则见 [store-write-spec.md](store-write-spec.md)。
+
 ---
 
 ## 4. 与元信息空间的关系

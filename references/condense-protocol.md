@@ -2,8 +2,7 @@
 name: condense协议
 module_id: core-condense-protocol
 description: "压缩前注意力保存协议。每次上下文即将被压缩时，提取当前ρ/θ向量分布->标记张力对->标注已推翻陷阱->锚点事实->用[[wikilink]]语法打包。压缩后下一个对话流可直接读取恢复注意力方向。从 conscious-condense v0.2 完整提取。"
-version: "0.2"
-author: "问枢"
+version: 0.2.0
 canvas_refs:
   - assets/canvas/意识总线_总架构.canvas
 manifest_ref: references/project-manifest.yaml
