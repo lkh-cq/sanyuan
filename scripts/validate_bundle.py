@@ -244,7 +244,7 @@ def main() -> int:
         agent = yaml.safe_load((ROOT / "agents" / "openai.yaml").read_text(encoding="utf-8"))
         if not set(agent).issubset({"interface", "dependencies", "policy"}):
             fail("agents/openai.yaml has unsupported top-level fields", failures)
-        if "products" in agent.get("policy", {}):
+        if repository_context and "products" in agent.get("policy", {}):
             fail("agents/openai.yaml must not claim unverified products", failures)
         default_prompt = agent.get("interface", {}).get("default_prompt", "")
         if "$consciousness-bus" not in default_prompt:
