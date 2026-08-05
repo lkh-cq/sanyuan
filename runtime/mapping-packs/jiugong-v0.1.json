@@ -1,0 +1,19 @@
+{
+  "id": "palindrome-jiugong-v0.1",
+  "status": "experimental",
+  "storage": {
+    "language": "PAL",
+    "write_order": "bilateral-inward",
+    "tail_materialization": "complement(reverse(head))"
+  },
+  "compute": {
+    "carrier": "jiugong",
+    "shape": [3,3],
+    "expand_order": "center-outward"
+  },
+  "state_order": ["A","B","C","D","center"],
+  "invariants": {
+    "round_trip_required": true,
+    "matrix_must_close_before_store": true
+  }
+}
