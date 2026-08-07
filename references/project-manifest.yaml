@@ -1,7 +1,7 @@
 project:
   id: consciousness-bus
   name: 意识总线
-  version: 3.2.1
+  version: 3.2.2
 
 version_policy:
   project_version_source: references/project-manifest.yaml#project.version
@@ -40,6 +40,7 @@ module_lifecycle:
     - extension-multi-norm-diagnosis
     - extension-frozen-definitions
     - extension-double-observation-space
+    - extension-endoscopic-code-actuation
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -286,6 +287,19 @@ extensions:
     path: references/v32-double-observation-space.md
     version: 0.1.0
     module_id: extension-double-observation-space
+  endoscopic_code_actuation:
+    id: endoscopic-code-actuation
+    name: Endoscope / Bloodtesting 代码风险干预
+    path: references/endoscopic-code-actuation.md
+    version: 0.1.0
+    module_id: extension-endoscopic-code-actuation
+    depends_on:
+      - conscious-rho
+      - task-boundary-compiler
+    bloodtesting:
+      path: references/endoscope-bloodtesting.yaml
+    controller:
+      path: scripts/endoscope.py
 
 validation:
   output_contract: references/output-contract.md
