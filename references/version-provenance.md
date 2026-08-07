@@ -83,6 +83,17 @@
 5. Endoscope 向 ρ 收束提供的是 `code_risk_event` 场景事件，不伪造新的 ρ 数值；该场景的 ρ 在 Bloodtesting 实测前保持 unknown。
 6. 新增 `scripts/endoscope.py` 作为最小无外部依赖控制器，负责探测风险信号并输出 `continue / cut_and_review / stop_generation` 决策；真正的流式取消由上层 Agent/controller 实现。
 
+## 2026-08-07 V3.2.3 Endoscope 三闸门小版本
+
+本次是 Endoscope 0.1.1 的非本体小版本，来源于首轮 PDE/Lasso 试水中暴露出的“计算可继续但结论不应立即交付”情形。
+
+1. 将原先粗粒度 `CUT_OUTPUT` 拆为三个独立控制面：Execution Gate、State Gate、Output Gate。
+2. 允许 `E=OPEN / S=QUARANTINED / O=BLOCKED`：安全计算继续，疑似污染的中间状态进入隔离区，最终输出暂不放行。
+3. 只有运算本身会触发不可逆副作用时，Execution Gate 才提升为 `PAUSE_BEFORE_SIDE_EFFECT` 或 `STOP`；不再把“发现解释风险”误当成“必须停止计算”。
+4. 新增 `tainted` 状态和 `CONTINUE_DIAGNOSTIC` 路径，用于共线性、支持集不稳定、截断污染等“程序仍成功但解释可能错误”的出血类型。
+5. `scripts/endoscope.py gate` 现在分别返回 `execution_gate`、`state_gate`、`output_gate`，并支持 `--tainted`。
+6. 项目版本升至 3.2.3，Endoscope 模块版本升至 0.1.1；冻结 `architecture.md` 继续不变。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
