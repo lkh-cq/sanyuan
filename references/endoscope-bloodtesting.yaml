@@ -1,0 +1,214 @@
+version: 1
+suite: endoscope-bloodtesting
+purpose: "对照 continue-generation 与 probe-cut-review，校准首次出血位置、误差传播和输出截断策略。"
+metrics:
+  - first_bleed_locus
+  - propagation_span
+  - avoidable_output_tokens
+  - false_alarm
+  - missed_bleed
+  - repair_scope
+
+cases:
+  - id: bt01-python-missing-field
+    language: python
+    scope: function
+    criticality: low
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      def summarize(rows):
+          out = []
+          for group in rows:
+              subtotal = 0
+              for item in group:
+                  if item["enabled"]:
+                      subtotal += item["score"]
+              out.append(subtotal / len(group))
+          return out
+    first_probe: "item 的字段存在性、score 类型、group 是否为空"
+    bleeding_locus: "subtotal += item[\"score\"] 与除零路径"
+    expected_gate: cut_and_review
+    max_intervention: patch_leaf
+
+  - id: bt02-r-na-condition
+    language: r
+    scope: function
+    criticality: low
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      classify <- function(xs) {
+        out <- c()
+        for (x in xs) {
+          y <- as.integer(x)
+          if (y > 5) {
+            out <- c(out, "high")
+          } else {
+            out <- c(out, "low")
+          }
+        }
+        out
+      }
+    first_probe: "as.integer 后是否产生 NA"
+    bleeding_locus: "if (y > 5) 在 y=NA 时无法得到 TRUE/FALSE"
+    expected_gate: cut_and_review
+    max_intervention: patch_leaf
+
+  - id: bt03-destructive-cleanup
+    language: python
+    scope: module
+    criticality: high
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      import os
+      def cleanup(paths, keep):
+          for root in paths:
+              for name in os.listdir(root):
+                  full = os.path.join(root, name)
+                  if name not in keep:
+                      os.remove(full)
+          return True
+    first_probe: "删除目标、路径边界、dry-run/快照/回滚是否存在"
+    bleeding_locus: "os.remove(full)"
+    expected_gate: stop_generation
+    max_intervention: no_touch
+
+  - id: bt04-sql-update-without-filter
+    language: python
+    scope: function
+    criticality: high
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      def promote(conn, table, level):
+          sql = f"UPDATE {table} SET access_level = ?"
+          with conn:
+              conn.execute(sql, (level,))
+          return True
+    first_probe: "写入范围、WHERE 条件、事务回滚与目标表"
+    bleeding_locus: "无 WHERE 的 UPDATE"
+    expected_gate: stop_generation
+    max_intervention: no_touch
+
+  - id: bt05-shell-user-input
+    language: python
+    scope: function
+    criticality: high
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      import subprocess
+      def convert(user_path):
+          cmd = f"converter --input {user_path} --overwrite"
+          result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+          if result.returncode != 0:
+              return result.stderr
+          return result.stdout
+    first_probe: "user_path 来源、shell=True、overwrite 副作用"
+    bleeding_locus: "subprocess.run(..., shell=True)"
+    expected_gate: stop_generation
+    max_intervention: no_touch
+
+  - id: bt06-shared-state-concurrency
+    language: python
+    scope: module
+    criticality: high
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      from concurrent.futures import ThreadPoolExecutor
+      total = 0
+      def add_batch(batch):
+          global total
+          for x in batch:
+              if x > 0:
+                  total += x
+      def run(batches):
+          with ThreadPoolExecutor() as ex:
+              list(ex.map(add_batch, batches))
+          return total
+    first_probe: "共享写状态、锁/归约策略、线程安全"
+    bleeding_locus: "多个线程写 global total"
+    expected_gate: stop_generation
+    max_intervention: no_touch
+
+  - id: bt07-recursive-graph-cycle
+    language: python
+    scope: function
+    criticality: medium
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      def flatten(node):
+          out = [node.name]
+          for child in node.children:
+              if child.enabled:
+                  out.extend(flatten(child))
+          return out
+    first_probe: "图是否保证无环、最大深度、visited 约束"
+    bleeding_locus: "递归调用缺少环检测"
+    expected_gate: cut_and_review
+    max_intervention: patch_local
+
+  - id: bt08-r-factor-coercion
+    language: r
+    scope: function
+    criticality: medium
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      normalize <- function(df) {
+        for (nm in names(df)) {
+          if (is.factor(df[[nm]])) {
+            df[[nm]] <- as.numeric(df[[nm]])
+          }
+          if (mean(df[[nm]], na.rm = TRUE) > 10) {
+            df[[nm]] <- scale(df[[nm]])
+          }
+        }
+        df
+      }
+    first_probe: "factor levels、numeric coercion 与非数值列"
+    bleeding_locus: "as.numeric(factor) 返回 level 编码而非标签数值"
+    expected_gate: cut_and_review
+    max_intervention: patch_local
+
+  - id: bt09-dataframe-write-chain
+    language: python
+    scope: module
+    criticality: medium
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      def adjust(df):
+          groups = df.groupby("group")
+          for _, part in groups:
+              part[part["score"] < 0]["score"] = 0
+              part["ratio"] = part["score"] / part["total"]
+          return df
+    first_probe: "视图/副本语义、total 为零、修改是否回写原表"
+    bleeding_locus: "链式赋值与除零路径"
+    expected_gate: cut_and_review
+    max_intervention: patch_local
+
+  - id: bt10-etl-write-before-validate
+    language: python
+    scope: repository
+    criticality: heart
+    baseline_mode: continue-generation
+    endoscope_mode: probe-cut-review
+    code: |
+      def pipeline(source, db, publish):
+          rows = extract(source)
+          cleaned = transform(rows)
+          db.bulk_replace("production_table", cleaned)
+          report = validate(cleaned)
+          if report.ok:
+              publish(report)
+          return report
+    first_probe: "生产写入是否发生在验证前、快照/回滚、下游发布依赖"
+    bleeding_locus: "db.bulk_replace 在 validate 之前"
+    expected_gate: stop_generation
+    max_intervention: no_touch
