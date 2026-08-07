@@ -72,6 +72,19 @@
 2. GPT 安装上下文允许平台协调器向 `agents/openai.yaml` 写入平台管理的产品字段。
 3. 确定性校验继续覆盖运行文件；平台生成的展示元数据不作为本体或能力证据。
 
+## 2026-08-07 V3.2.2 Endoscope / Bloodtesting 实验扩展
+
+本次新增实验性代码风险干预层，不修改冻结 `architecture.md`，也不把代码控制逻辑提升为三元三才本体定义。
+
+1. 新增 `Endoscopic Code Actuation`：把代码任务拆成探针观察、输出截断、审核、局部干预、验证与回滚。
+2. 新增 `Bloodtesting` 10 组嵌套复合代码对照样本，用 continue-generation 与 probe-cut-review 比较首次出血位置、误差传播、多余输出和误报。
+3. 用 `S/B/U/D`（范围、影响半径、不确定性、依赖深度）定义未校准的初始风险启发式，并明确禁止把该分数解释成真实错误概率。
+4. 高风险或不可逆写入触发 `CUT_OUTPUT`；心脏级路径默认 `NO_TOUCH`，只有具备快照、回滚、依赖图、验证计划和明确授权后才允许降低限制。
+5. Endoscope 向 ρ 收束提供的是 `code_risk_event` 场景事件，不伪造新的 ρ 数值；该场景的 ρ 在 Bloodtesting 实测前保持 unknown。
+6. 新增 `scripts/endoscope.py` 作为最小无外部依赖控制器，负责探测风险信号并输出 `continue / cut_and_review / stop_generation` 决策；真正的流式取消由上层 Agent/controller 实现。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
+
+Endoscope 的 10 组 Bloodtesting 也只是初始校准集，不是通用代码 benchmark；只有在真实 Agent 运行中记录了误报、漏报、首次出血点、错误传播和输出节省，才可据此更新风险权重或新增 ρ 场景向量。
