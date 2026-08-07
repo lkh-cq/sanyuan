@@ -22,6 +22,7 @@
 | 科研深度分析与多材料整合 | [`references/research-recipe.yaml`](references/research-recipe.yaml) |
 | 分析论文写作逻辑与证据缺口 | [`references/reading-topology.md`](references/reading-topology.md) |
 | 输出可读的文献逻辑段落 | [`references/reader-facing-analysis.md`](references/reader-facing-analysis.md) |
+| 在代码生成中探测高危点、截断输出并限制修改层级 | [`references/endoscopic-code-actuation.md`](references/endoscopic-code-actuation.md) |
 | 理解用户原始设计动机 | [`references/original-anchors.md`](references/original-anchors.md) |
 | 阅读八卷二十八章理论来源浓缩 | [`references/sanyuan-daobian-framework.md`](references/sanyuan-daobian-framework.md) |
 | 修改模块、本体、Schema 或版本 | [`references/project-manifest.yaml`](references/project-manifest.yaml) + [`references/version-provenance.md`](references/version-provenance.md) |
@@ -37,11 +38,18 @@
 | 互信息空间 | 保存关系、流止、转换、反馈与路径残差 |
 | 藏归与耦合态 | 分开保存内容节点和关系节点，再用耦合态组成可检索事务 |
 | 注意力控制 | 以 ρ/θ、缓存波和 n 位聚焦控制收束与切换 |
+| 代码风险干预 | Endoscope 以探针和 Bloodtesting 校准控制继续生成、截断、审核、局部修改或 NO_TOUCH |
 | 读者端交付 | 将内部拓扑转译为连贯、简明、可独立阅读的自然语言 |
 
 最短理解方式：
 
 > 先限定任务边界，再分离内容与关系，最后只读取当前任务真正需要的上下文。
+
+## Endoscope / Bloodtesting
+
+Endoscope 是实验性代码干预扩展，不修改冻结本体。它把“继续生成完整源码”变成一个可被风险事件打断的动作：先用最小探针定位数据、依赖和副作用层面的首次“出血点”，再由输出闸门决定继续、`CUT_OUTPUT -> REVIEW` 或 `NO_TOUCH`。
+
+仓库提供 [`references/endoscope-bloodtesting.yaml`](references/endoscope-bloodtesting.yaml) 的 10 组嵌套复合代码对照夹具，以及轻量控制器 `scripts/endoscope.py`。风险权重仍是待实测校准的启发式，不解释成真实错误概率，也不伪造 ρ 数值。
 
 ## 三元语法与文献分析
 
@@ -57,7 +65,7 @@
 ├── agents/                  # GPT/Codex 界面元数据
 ├── assets/                  # 图标、吉祥物与 5 张 Canvas
 ├── references/              # 本体、协议、配方、来源、扩展与 Schema
-├── scripts/                 # 确定性结构校验
+├── scripts/                 # 确定性结构校验与轻量 Endoscope 控制器
 ├── CONTRIBUTING.md          # 提交、评审与发布规范
 ├── LICENSE                  # 权利声明
 ├── README.md                # 人类读者入口
@@ -70,6 +78,7 @@
 - 任务与控制：任务边界、拆分、ρ/θ、n 位聚焦、缓存波；
 - 藏归与关系：三才、三题、互、流止、耦合态、写入与读取；
 - 分析与交付：阅读拓扑、读者端分析、多模态边界、输出契约；
+- 实验扩展：Endoscope/Bloodtesting、八卦耦合矩阵、多重归一化诊断等；
 - 机器约束：项目清单、配方、验收用例与全部 Schema。
 
 所有模块路径都登记在 [`project-manifest.yaml`](references/project-manifest.yaml)，校验脚本会检查断链、孤儿文件、YAML、Canvas、配方顺序、版本生命周期与验收用例结构。
