@@ -21,7 +21,7 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 
 不要为了展示框架而把简单问题复杂化。用户明确调用某个子模块时，只加载该模块及其必需依赖。
 
-代码干预模式不是独立 Agent：先编译任务边界，再让 Endoscope 使用最小探针确认风险位置；当继续生成只会扩大未知假设或机械展开源码时，允许 `CUT_OUTPUT` 转入审核。心脏级路径默认 `NO_TOUCH`，不得因为模型“看起来有把握”就自动降低权限。
+代码干预模式不是独立 Agent：先编译任务边界，再让 Endoscope 使用最小探针确认风险位置，并分别控制 Execution / State / Output 三个闸门。发现解释层或中间状态“出血”时，可以保持安全诊断计算继续、隔离可疑状态并阻断最终交付；只有不可逆副作用才默认暂停执行本身。心脏级路径仍默认 `NO_TOUCH`，不得因为模型“看起来有把握”就自动降低权限。
 
 ## 执行主流程
 
@@ -34,7 +34,7 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 7. **按需藏归。** 需要跨材料或文件化状态时，运行 [zang-gui-orchestrator.md](references/zang-gui-orchestrator.md)。写入前读取 [store-write-spec.md](references/store-write-spec.md)，把可检索事务登记为耦合态；不要把内容节点与关系节点压成同一字段。
 8. **限制工作集。** 按 [n-focus.md](references/n-focus.md) 只加载当前交互命中的 `b_n`。离线重建地址表，调用时只查表。
 9. **控制收束与切换。** 用 [rho-convergence.md](references/rho-convergence.md) 管收束方向，用 [theta-switching.md](references/theta-switching.md) 管边界切换。
-10. **代码风险干预（按需）。** 涉及代码生成/修改且存在嵌套、未知依赖、外部写入或高影响半径时，读取 [endoscopic-code-actuation.md](references/endoscopic-code-actuation.md)。先 `PROBE`，再依据 `S/B/U/D` 和实际副作用决定继续、`CUT_OUTPUT -> REVIEW` 或 `NO_TOUCH`；不要把启发式风险分数伪装成错误概率或 ρ。
+10. **代码风险干预（按需）。** 涉及代码生成/修改且存在嵌套、未知依赖、外部写入或高影响半径时，读取 [endoscopic-code-actuation.md](references/endoscopic-code-actuation.md)。先 `PROBE`，再依据 `S/B/U/D`、tainted 状态和实际副作用分别设置 `execution_gate`、`state_gate`、`output_gate`；安全诊断可继续，未经审核的状态与输出可隔离或阻断。不要把启发式风险分数伪装成错误概率或 ρ。
 11. **合成、转译并校验。** 先在内部检查禁止损失、证据边界和冲突，再按 [reader-facing-analysis.md](references/reader-facing-analysis.md) 转译为自然语言结果。
 12. **更新缓存相位。** 按 [cache-wave.md](references/cache-wave.md) 判断涨潮、退潮或深睡；压缩前使用 [condense-protocol.md](references/condense-protocol.md) 保存注意力状态。
 
@@ -53,7 +53,7 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 
 默认先给任务结果，并把内部节点、边、路径和证据判断编译为简明、连贯、可独立阅读的自然语言。文献分析正文优先使用连续的段落级分析句，展开“作者写了什么—如何承接或推进—证据支持到哪里”。
 
-代码干预模式下，完整源码不是默认交付协议。若模型已经给出足够的修改意图、目标节点和约束，且剩余生成主要是机械序列化，可由外部流式控制器执行 `CUT_OUTPUT`，转交 AST/LSP/运行时工具完成局部动作与验证。只有真正取消尚未生成的输出才计为 output 成本节省；隐藏已经生成的文本不算。
+代码干预模式下，完整源码不是默认交付协议。Endoscope 把执行、状态和输出分开控制：`E=OPEN` 不代表 `O=OPEN`。如果结果仍需诊断，可继续安全计算，同时令 `S=QUARANTINED`、`O=BLOCKED`；只有审核或修复完成后才 `RELEASE_OUTPUT`。若模型已经给出足够的修改意图、目标节点和约束，且剩余生成主要是机械序列化，可由外部流式控制器取消尚未生成的输出。隐藏已经生成的文本不算 output 成本节省。
 
 不要在默认交付中直接展示内部变量、节点编号、关系代码、裸箭头、YAML 账本或未注释简图。图表只有在显著提升理解时才作为补充，并写全名称、关系含义、证据来源和必要图例。
 
