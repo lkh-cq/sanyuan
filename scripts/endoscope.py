@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Lightweight Endoscope controller for code-risk probing and output gating.
+"""Lightweight Endoscope controller for code-risk probing and three-way gating.
 
-This is deliberately heuristic. It emits observations and intervention ceilings;
-it does not claim error probabilities and does not modify high-risk code.
+This is deliberately heuristic. It emits observations and independent execution,
+state, and output gates; it does not claim error probabilities and does not modify
+high-risk code.
 """
 
 from __future__ import annotations
@@ -89,60 +90,110 @@ def probe(path: Path) -> dict[str, Any]:
     }
 
 
-def gate(scope: int, blast: int, uncertainty: int, dependency: int, irreversible: bool) -> dict[str, Any]:
+def gate(
+    scope: int,
+    blast: int,
+    uncertainty: int,
+    dependency: int,
+    irreversible: bool,
+    tainted: bool,
+) -> dict[str, Any]:
     values = {"S": scope, "B": blast, "U": uncertainty, "D": dependency}
     if any(value < 0 or value > 3 for value in values.values()):
         raise ValueError("S/B/U/D must each be in 0..3")
 
     score = 0.25 * scope + 0.35 * blast + 0.25 * uncertainty + 0.15 * dependency
 
-    # Irreversible writes always force at least the review band. This is a guardrail,
+    # Irreversible writes force a side-effect pause. This is a guardrail,
     # not a calibrated probability adjustment.
     if irreversible:
         score = max(score, 1.51)
 
     if score <= 0.75:
-        decision, ceiling = "continue", "patch_leaf"
+        decision = "continue"
+        ceiling = "patch_leaf"
+        execution_gate = "OPEN"
+        state_gate = "OPEN"
+        output_gate = "OPEN"
     elif score <= 1.50:
-        decision, ceiling = "probe_then_continue", "patch_local"
+        decision = "probe_then_continue"
+        ceiling = "patch_local"
+        execution_gate = "OPEN"
+        state_gate = "FILTERED"
+        output_gate = "OPEN"
     elif score <= 2.25:
-        decision, ceiling = "cut_and_review", "patch_leaf"
+        decision = "quarantine_and_review"
+        ceiling = "patch_leaf"
+        execution_gate = "CONTINUE_DIAGNOSTIC"
+        state_gate = "QUARANTINED"
+        output_gate = "BLOCKED"
     else:
-        decision, ceiling = "stop_generation", "no_touch"
-
-    if irreversible and decision == "cut_and_review":
+        decision = "quarantine_no_touch"
         ceiling = "no_touch"
+        execution_gate = "CONTINUE_DIAGNOSTIC"
+        state_gate = "QUARANTINED"
+        output_gate = "BLOCKED"
+
+    # A tainted result may still be safe to compute further. Block delivery and
+    # quarantine state without unnecessarily stopping diagnostic computation.
+    if tainted:
+        state_gate = "QUARANTINED"
+        output_gate = "BLOCKED"
+        if execution_gate == "OPEN":
+            decision = "continue_diagnostic_output_blocked"
+
+    if irreversible:
+        decision = "pause_before_side_effect"
+        ceiling = "no_touch"
+        execution_gate = "PAUSE_BEFORE_SIDE_EFFECT"
+        state_gate = "QUARANTINED"
+        output_gate = "BLOCKED"
 
     return {
         "risk_axes": values,
         "heuristic_R": round(score, 3),
         "calibrated_probability": None,
         "irreversible_write": irreversible,
+        "tainted_state": tainted,
         "decision": decision,
         "max_intervention": ceiling,
-        "output_gate": "CUT_OUTPUT" if decision in {"cut_and_review", "stop_generation"} else "OPEN",
+        "execution_gate": execution_gate,
+        "state_gate": state_gate,
+        "output_gate": output_gate,
     }
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Endoscope code probe and output gate")
+    parser = argparse.ArgumentParser(description="Endoscope code probe and E/S/O gates")
     sub = parser.add_subparsers(dest="command", required=True)
 
     p_probe = sub.add_parser("probe", help="Inspect a source file without modifying it")
     p_probe.add_argument("path", type=Path)
 
-    p_gate = sub.add_parser("gate", help="Choose output/intervention ceiling from S/B/U/D")
+    p_gate = sub.add_parser("gate", help="Choose execution/state/output gates from S/B/U/D")
     p_gate.add_argument("--scope", type=int, required=True, help="S: 0..3")
     p_gate.add_argument("--blast", type=int, required=True, help="B: 0..3")
     p_gate.add_argument("--uncertainty", type=int, required=True, help="U: 0..3")
     p_gate.add_argument("--dependency", type=int, required=True, help="D: 0..3")
     p_gate.add_argument("--irreversible", action="store_true")
+    p_gate.add_argument(
+        "--tainted",
+        action="store_true",
+        help="Result may be numerically valid but unsafe to interpret or deliver",
+    )
 
     args = parser.parse_args()
     if args.command == "probe":
         result = probe(args.path)
     else:
-        result = gate(args.scope, args.blast, args.uncertainty, args.dependency, args.irreversible)
+        result = gate(
+            args.scope,
+            args.blast,
+            args.uncertainty,
+            args.dependency,
+            args.irreversible,
+            args.tainted,
+        )
 
     print(json.dumps(result, ensure_ascii=False, indent=2))
     return 0
