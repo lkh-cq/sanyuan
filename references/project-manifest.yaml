@@ -1,7 +1,7 @@
 project:
   id: consciousness-bus
   name: 意识总线
-  version: 3.2.2
+  version: 3.2.3
 
 version_policy:
   project_version_source: references/project-manifest.yaml#project.version
@@ -291,7 +291,7 @@ extensions:
     id: endoscopic-code-actuation
     name: Endoscope / Bloodtesting 代码风险干预
     path: references/endoscopic-code-actuation.md
-    version: 0.1.0
+    version: 0.1.1
     module_id: extension-endoscopic-code-actuation
     depends_on:
       - conscious-rho
