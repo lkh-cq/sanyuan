@@ -20,10 +20,21 @@ jobs:
           python-version: "3.12"
       - run: python -m pip install --disable-pip-version-check PyYAML
       - run: python scripts/validate_bundle.py
+      - run: python scripts/validate_endoscope.py
+      - run: python scripts/endoscope.py selftest
+
+  endoscope-r:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+      - run: Rscript scripts/endoscope_r.R selftest
 
   tag:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: validate
+    needs:
+      - validate
+      - endoscope-r
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -76,7 +87,9 @@ jobs:
 
   cleanup-merged-agent-branches:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: validate
+    needs:
+      - validate
+      - endoscope-r
     runs-on: ubuntu-latest
     permissions:
       contents: write
