@@ -40,6 +40,7 @@ module_lifecycle:
     - extension-multi-norm-diagnosis
     - extension-frozen-definitions
     - extension-double-observation-space
+    - extension-process-transparency
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -286,6 +287,16 @@ extensions:
     path: references/v32-double-observation-space.md
     version: 0.1.0
     module_id: extension-double-observation-space
+  process_transparency:
+    id: process-transparency
+    name: 过程透明与决策防污染
+    path: extensions/process-transparency/SKILL.md
+    version: 0.1.0
+    module_id: extension-process-transparency
+    depends_on:
+      - archive-ingestion
+      - meta-normalization
+      - hu-normalization
 
 validation:
   output_contract: references/output-contract.md
