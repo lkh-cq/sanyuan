@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sanyuan/endoscope-shadow.schema.json",
+  "title": "Endoscope Normalization Shadow Ledger",
+  "type": "object",
+  "required": ["protocol_version", "ledger_id", "boundary_id", "items"],
+  "properties": {
+    "protocol_version": {"const": "0.2.0"},
+    "ledger_id": {"type": "string", "minLength": 1},
+    "boundary_id": {"type": "string", "minLength": 1},
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["shadow_id", "boundary_id", "space", "stage", "feature", "omitted_reason", "recovery_cost", "status"],
+        "properties": {
+          "shadow_id": {"type": "string", "minLength": 1},
+          "boundary_id": {"type": "string", "minLength": 1},
+          "space": {"enum": ["meta", "hu", "focus", "condense", "output"]},
+          "stage": {"type": "string", "minLength": 1},
+          "feature": {"type": "string", "minLength": 1},
+          "source_ref": {"type": ["string", "null"]},
+          "recovery_ref": {"type": ["string", "null"]},
+          "omitted_reason": {"enum": ["indifferent", "redundant", "insufficient", "conflicting", "out_of_boundary", "compressed", "focus_limit", "not_delivered"]},
+          "relation_to_active": {"type": "array", "items": {"type": "string"}},
+          "recovery_cost": {"enum": ["cheap", "medium", "expensive", "unknown"]},
+          "sensitivity": {"enum": ["normal", "restricted"]},
+          "status": {"enum": ["shadow", "candidate", "revived", "retired"]}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

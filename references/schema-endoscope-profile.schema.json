@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sanyuan/endoscope-profile.schema.json",
+  "title": "Endoscope TaskProfile Registry",
+  "type": "object",
+  "required": ["schema_version", "profiles"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "status": {"enum": ["experimental", "stable", "deprecated"]},
+    "default_profile": {"type": "string"},
+    "profiles": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "object",
+        "required": ["description", "protected_functions", "shadow_watch", "trigger_signals", "risk_defaults", "recovery"],
+        "properties": {
+          "description": {"type": "string", "minLength": 1},
+          "languages": {"type": "array", "items": {"type": "string"}},
+          "protected_functions": {"type": "array", "items": {"type": "string"}},
+          "shadow_watch": {"type": "object", "additionalProperties": {"type": "array", "items": {"type": "string"}}},
+          "trigger_signals": {"type": "array", "items": {"type": "string"}},
+          "risk_defaults": {"type": "object", "required": ["S", "B", "U", "D"], "properties": {"S": {"type": "integer", "minimum": 0, "maximum": 3}, "B": {"type": "integer", "minimum": 0, "maximum": 3}, "U": {"type": "integer", "minimum": 0, "maximum": 3}, "D": {"type": "integer", "minimum": 0, "maximum": 3}}, "additionalProperties": false},
+          "recovery": {"type": "object", "required": ["max_items", "max_cost"], "properties": {"max_items": {"type": "integer", "minimum": 1}, "max_cost": {"enum": ["cheap", "medium", "expensive"]}}, "additionalProperties": false}
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true
+}

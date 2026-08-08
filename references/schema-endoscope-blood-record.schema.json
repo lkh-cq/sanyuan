@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sanyuan/endoscope-blood-record.schema.json",
+  "title": "Endoscope Bloodtesting Record",
+  "type": "object",
+  "required": ["record_id", "task_family", "signals", "probe_flagged", "true_bleed", "gate_expected", "gate_actual", "recovery", "metrics"],
+  "properties": {
+    "record_id": {"type": "string", "minLength": 1},
+    "task_family": {"type": "string", "minLength": 1},
+    "signals": {"type": "array", "items": {"type": "string"}},
+    "probe_flagged": {"type": "boolean"},
+    "true_bleed": {"type": "boolean"},
+    "first_bleed_locus": {"type": ["string", "null"]},
+    "propagation_span": {"type": ["string", "integer", "null"]},
+    "gate_expected": {"$ref": "#/$defs/gate"},
+    "gate_actual": {"$ref": "#/$defs/gate"},
+    "recovery": {"type": "object", "required": ["recovered_items", "effective_items"], "properties": {"recovered_items": {"type": "integer", "minimum": 0}, "effective_items": {"type": "integer", "minimum": 0}}, "additionalProperties": true},
+    "metrics": {"type": "object", "properties": {"avoidable_output_tokens": {"type": "number", "minimum": 0}, "diagnostic_cost": {"type": ["number", "null"], "minimum": 0}}, "additionalProperties": true}
+  },
+  "$defs": {"gate": {"type": "object", "required": ["execution", "state", "output"], "properties": {"execution": {"enum": ["OPEN", "CONTINUE_DIAGNOSTIC", "PAUSE_BEFORE_SIDE_EFFECT", "STOP"]}, "state": {"enum": ["OPEN", "FILTERED", "QUARANTINED", "DISCARD"]}, "output": {"enum": ["OPEN", "REVIEW_REQUIRED", "BLOCKED", "REPLACE"]}}, "additionalProperties": false}},
+  "additionalProperties": true
+}

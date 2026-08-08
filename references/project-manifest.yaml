@@ -1,7 +1,7 @@
 project:
   id: consciousness-bus
   name: 意识总线
-  version: 3.2.2
+  version: 3.2.3
 
 version_policy:
   project_version_source: references/project-manifest.yaml#project.version
@@ -41,6 +41,7 @@ module_lifecycle:
     - extension-frozen-definitions
     - extension-double-observation-space
     - extension-process-transparency
+    - extension-endoscopic-code-actuation
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -225,6 +226,11 @@ schemas:
   task_boundary: references/schema-task-boundary.schema.yaml
   meta_normalization: references/schema-meta-normalization.schema.yaml
   hu_normalization: references/schema-hu-normalization.schema.yaml
+  endoscope_shadow: references/schema-endoscope-shadow.schema.json
+  endoscope_event: references/schema-endoscope-event.schema.json
+  endoscope_gate: references/schema-endoscope-gate.schema.json
+  endoscope_profile: references/schema-endoscope-profile.schema.json
+  endoscope_blood_record: references/schema-endoscope-blood-record.schema.json
 
 sources:
   original_anchors:
@@ -297,6 +303,27 @@ extensions:
       - archive-ingestion
       - meta-normalization
       - hu-normalization
+  endoscopic_code_actuation:
+    id: endoscopic-code-actuation
+    name: Endoscope / Bloodtesting 归一化阴影审计
+    path: references/endoscopic-code-actuation.md
+    version: 0.2.0
+    module_id: extension-endoscopic-code-actuation
+    depends_on:
+      - conscious-rho
+      - task-boundary-compiler
+      - meta-normalization
+      - hu-normalization
+    optional_integrations:
+      - process-transparency
+    profiles:
+      path: references/endoscope-task-profiles.json
+    bloodtesting:
+      path: references/endoscope-bloodtesting.yaml
+    controller:
+      path: scripts/endoscope.py
+    r_adapter:
+      path: scripts/endoscope_r.R
 
 validation:
   output_contract: references/output-contract.md
@@ -306,6 +333,7 @@ validation:
     version: 0.1.0
     module_id: validation-framework-pitfalls
   bundle_validator: scripts/validate_bundle.py
+  endoscope_validator: scripts/validate_endoscope.py
   ci_workflow: .github/workflows/validate.yml
 
 canvas:

@@ -72,6 +72,30 @@
 2. GPT 安装上下文允许平台协调器向 `agents/openai.yaml` 写入平台管理的产品字段。
 3. 确定性校验继续覆盖运行文件；平台生成的展示元数据不作为本体或能力证据。
 
+## 2026-08-07 V3.2.2 过程透明实验扩展
+
+本次登记 `process-transparency` 实验模块，不修改冻结本体。
+
+1. 探索性任务采用“结论—证据—假设—验证”四字段决策日志，降低事后自圆其说污染。
+2. 同一决策点反复翻转时逐级预警并允许冻结当前决策。
+3. 该扩展与元/互归一化、archive-ingestion 互补，但不替代 ρ/θ 或冻结本体。
+
+## 2026-08-08 V3.2.3 Endoscope 全链路实验实现
+
+本次将 Endoscope 从单一代码风险脚本升级为三元归一化阴影驱动的实验运行时，不修改 `references/architecture.md`。
+
+1. Endoscope 模块升级至 0.2.0，完整链路为 `B_T → TaskProfile → M/H normalization → NSL → Probe/Event → minimal revival → E/S/O → BloodRecord → calibration candidate`。
+2. 正式复用元/互归一化的 `omitted_features + recovery_refs` 生成 Normalization Shadow Ledger；不把旧 SVD 低方差方向复活为门控依据，也不复制第二份完整上下文。
+3. 新增 11 类任务 TaskProfile；Probe 从属于任务场景，TaskProfile watch 只能加权已经由事件/关系证据命中的 shadow，不能单独触发复活。
+4. Python 3.10+ 标准库作为控制面；base R 零包依赖 adapter 负责 `parse()` 与低成本 R 静态信号。R/Tree-sitter/LSP/torch/C++ 均为可选增强，缺失时必须显式降级。
+5. Execution / State / Output 三闸门独立；解释污染可以继续安全诊断而阻断最终输出，不可逆副作用必须 `PAUSE_BEFORE_SIDE_EFFECT + NO_TOUCH`。
+6. 新增 NSL/Event/Gate/Profile/BloodRecord JSON Schema，以及 12 组 Bloodtesting 夹具（包含 PDE 截断污染与 Lasso 支持集替代）。
+7. Bloodtesting 校准只生成 candidate 状态，固定 `auto_promote=false`；禁止自动写回 ρ、模型权重或稳定策略，必须经过 shadow replay、A/B 与显式 promotion。
+8. Endoscope 与 `process-transparency` 互补：Observation Event 可作为决策日志 evidence，推断必须保留在 assumption 层。
+9. GitHub CI 增加 Python Endoscope 验证和独立 base R adapter 自测；只有两者与 bundle validator 都通过才允许默认分支发布标签。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
+
+Endoscope 的 Bloodtesting 夹具同样只是协议校准起点，不是通用 coding benchmark。工程自测通过只证明合同与参考实现自洽；真实 Agent 上的误报、漏报、首次出血、错误传播、恢复效率和 output 节省必须由前向运行数据支持。

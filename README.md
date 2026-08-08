@@ -22,6 +22,7 @@
 | 科研深度分析与多材料整合 | [`references/research-recipe.yaml`](references/research-recipe.yaml) |
 | 分析论文写作逻辑与证据缺口 | [`references/reading-topology.md`](references/reading-topology.md) |
 | 输出可读的文献逻辑段落 | [`references/reader-facing-analysis.md`](references/reader-facing-analysis.md) |
+| 运行代码/计算风险审计与最小恢复 | [`references/endoscopic-code-actuation.md`](references/endoscopic-code-actuation.md) |
 | 理解用户原始设计动机 | [`references/original-anchors.md`](references/original-anchors.md) |
 | 阅读八卷二十八章理论来源浓缩 | [`references/sanyuan-daobian-framework.md`](references/sanyuan-daobian-framework.md) |
 | 修改模块、本体、Schema 或版本 | [`references/project-manifest.yaml`](references/project-manifest.yaml) + [`references/version-provenance.md`](references/version-provenance.md) |
@@ -37,11 +38,22 @@
 | 互信息空间 | 保存关系、流止、转换、反馈与路径残差 |
 | 藏归与耦合态 | 分开保存内容节点和关系节点，再用耦合态组成可检索事务 |
 | 注意力控制 | 以 ρ/θ、缓存波和 n 位聚焦控制收束与切换 |
+| Endoscope | 把归一化省略信息编译为 NSL，按 TaskProfile 探测复活并独立控制 E/S/O |
 | 读者端交付 | 将内部拓扑转译为连贯、简明、可独立阅读的自然语言 |
 
 最短理解方式：
 
 > 先限定任务边界，再分离内容与关系，最后只读取当前任务真正需要的上下文。
+
+## Endoscope / Bloodtesting
+
+Endoscope 是实验性代码与计算风险扩展，不修改冻结本体。它复用元/互归一化已经产生的 `omitted_features + recovery_refs`，形成轻量 Normalization Shadow Ledger（NSL）；只有新观测命中 shadow 或其与 active view 的关系时，才恢复最小集合。
+
+完整链路是：`B_T → TaskProfile → M/H normalization → NSL → Probe/Event → minimal revival → E/S/O → BloodRecord → calibration candidate`。执行、状态与最终交付彼此独立，因此安全诊断可以继续而可疑状态进入隔离区，最终输出保持阻断；不可逆副作用则必须停在执行闸门前。
+
+参考实现采用 **Python 标准库控制面 + 可选 base R 适配器**。没有 R 时仍能运行完整控制链和 Python AST/通用静态探针，但会明确报告 R 能力降级；R 可用时增加 `parse()` 与低成本 R 信号，不执行用户 R 代码。Tree-sitter、LSP、`data.table`、`igraph`、`torch` 和 C++ 后端均为未来可选增强，不是硬依赖。
+
+Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 支持集替代。校准脚本只产生候选策略，永不自动修改 ρ、模型权重或稳定策略。
 
 ## 三元语法与文献分析
 
@@ -56,8 +68,9 @@
 ├── .github/workflows/       # 自动校验与版本标签
 ├── agents/                  # GPT/Codex 界面元数据
 ├── assets/                  # 图标、吉祥物与 5 张 Canvas
+├── extensions/              # 实验扩展（如过程透明）
 ├── references/              # 本体、协议、配方、来源、扩展与 Schema
-├── scripts/                 # 确定性结构校验
+├── scripts/                 # 确定性校验、Endoscope 控制器与 R 适配器
 ├── CONTRIBUTING.md          # 提交、评审与发布规范
 ├── LICENSE                  # 权利声明
 ├── README.md                # 人类读者入口
@@ -70,6 +83,7 @@
 - 任务与控制：任务边界、拆分、ρ/θ、n 位聚焦、缓存波；
 - 藏归与关系：三才、三题、互、流止、耦合态、写入与读取；
 - 分析与交付：阅读拓扑、读者端分析、多模态边界、输出契约；
+- 实验接口：Endoscope TaskProfile、NSL、E/S/O、Bloodtesting；
 - 机器约束：项目清单、配方、验收用例与全部 Schema。
 
 所有模块路径都登记在 [`project-manifest.yaml`](references/project-manifest.yaml)，校验脚本会检查断链、孤儿文件、YAML、Canvas、配方顺序、版本生命周期与验收用例结构。
@@ -94,6 +108,10 @@
 
 ```bash
 python3 scripts/validate_bundle.py
+python3 scripts/validate_endoscope.py
+python3 scripts/endoscope.py selftest
+# 有 R 环境时：
+Rscript scripts/endoscope_r.R selftest
 ```
 
 确定性校验只检查结构与可执行约束，不宣称理解语义。涉及本体、交付行为或复杂任务流程的修改，还必须做独立前向测试。详细规则见 [`CONTRIBUTING.md`](CONTRIBUTING.md)。

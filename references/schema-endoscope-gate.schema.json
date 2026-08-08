@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sanyuan/endoscope-gate.schema.json",
+  "title": "Endoscope E/S/O Gate Decision",
+  "type": "object",
+  "required": ["protocol_version", "risk_axes", "execution_gate", "state_gate", "output_gate", "max_intervention", "final_decoder_allowed"],
+  "properties": {
+    "protocol_version": {"const": "0.2.0"},
+    "risk_axes": {"type": "object", "required": ["S", "B", "U", "D"], "properties": {"S": {"type": "integer", "minimum": 0, "maximum": 3}, "B": {"type": "integer", "minimum": 0, "maximum": 3}, "U": {"type": "integer", "minimum": 0, "maximum": 3}, "D": {"type": "integer", "minimum": 0, "maximum": 3}}},
+    "heuristic_R": {"type": "number"},
+    "calibrated_probability": {"type": "null"},
+    "execution_gate": {"enum": ["OPEN", "CONTINUE_DIAGNOSTIC", "PAUSE_BEFORE_SIDE_EFFECT", "STOP"]},
+    "state_gate": {"enum": ["OPEN", "FILTERED", "QUARANTINED", "DISCARD"]},
+    "output_gate": {"enum": ["OPEN", "REVIEW_REQUIRED", "BLOCKED", "REPLACE"]},
+    "max_intervention": {"enum": ["PATCH_LEAF", "PATCH_LOCAL", "NO_TOUCH"]},
+    "reasons": {"type": "array", "items": {"type": "string"}},
+    "final_decoder_allowed": {"type": "boolean"}
+  },
+  "additionalProperties": true
+}
