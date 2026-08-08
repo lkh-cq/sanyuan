@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/sanyuan/endoscope-event.schema.json",
+  "title": "Endoscope Observation Event",
+  "type": "object",
+  "required": ["event_id", "event_type"],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1},
+    "event_type": {"type": "string", "minLength": 1},
+    "signals": {"type": "array", "items": {"type": "string"}},
+    "features": {"type": "array", "items": {"type": "string"}},
+    "locus": {"type": ["string", "null"]},
+    "reason": {"type": ["string", "null"]},
+    "evidence_type": {"enum": ["observed_source", "parser_observation", "runtime_observation", "normalization_shadow", "bloodtested", "unknown"]},
+    "relation_mismatch": {"type": ["string", "array", "null"]}
+  },
+  "additionalProperties": true
+}
