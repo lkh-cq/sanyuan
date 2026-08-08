@@ -1,0 +1,106 @@
+{
+  "schema_version": "0.2.0",
+  "status": "experimental",
+  "default_profile": "code_general",
+  "profiles": {
+    "code_general": {
+      "description": "通用代码生成/修改；只做低成本结构与副作用探测。",
+      "languages": ["python", "r", "generic"],
+      "protected_functions": ["syntax_integrity", "local_semantics", "side_effect_boundary"],
+      "shadow_watch": {"meta": ["type", "input_shape", "environment", "source"], "hu": ["caller", "callee", "dependency", "write_target"]},
+      "trigger_signals": ["parse_error", "dependency_unknown", "external_write", "destructive_write"],
+      "risk_defaults": {"S": 1, "B": 1, "U": 1, "D": 1},
+      "recovery": {"max_items": 6, "max_cost": "medium"}
+    },
+    "small_completion": {
+      "description": "局部补全、单表达式或单函数小改动。",
+      "languages": ["python", "r", "generic"],
+      "protected_functions": ["syntax_integrity", "signature_compatibility"],
+      "shadow_watch": {"meta": ["type", "default_value", "nullability"], "hu": ["signature", "caller", "return_contract"]},
+      "trigger_signals": ["parse_error", "unknown_interface", "return_contract_mismatch"],
+      "risk_defaults": {"S": 0, "B": 0, "U": 1, "D": 0},
+      "recovery": {"max_items": 4, "max_cost": "cheap"}
+    },
+    "bug_fix": {
+      "description": "故障修复；保护真实因果链，避免只修症状。",
+      "languages": ["python", "r", "generic"],
+      "protected_functions": ["failure_cause", "caller_contract", "regression_boundary"],
+      "shadow_watch": {"meta": ["input_state", "type", "environment", "error_context"], "hu": ["upstream_cause", "caller", "callee", "state_transition"]},
+      "trigger_signals": ["parse_error", "broad_exception", "upstream_failure", "test_regression"],
+      "risk_defaults": {"S": 1, "B": 1, "U": 2, "D": 2},
+      "recovery": {"max_items": 8, "max_cost": "medium"}
+    },
+    "numerical_computation": {
+      "description": "数值算法、PDE、级数、优化；保护截断、边界与收敛条件。",
+      "languages": ["python", "r", "generic"],
+      "protected_functions": ["numerical_stability", "boundary_consistency", "residual_convergence"],
+      "shadow_watch": {"meta": ["precision", "tolerance", "boundary_condition", "truncation_order"], "hu": ["truncation_dependency", "recurrence_dependency", "residual", "convergence_path"]},
+      "trigger_signals": ["truncation_dependency", "residual_nonzero", "residual_not_decreasing", "boundary_mismatch"],
+      "risk_defaults": {"S": 1, "B": 1, "U": 2, "D": 2},
+      "recovery": {"max_items": 8, "max_cost": "medium"}
+    },
+    "statistical_modeling": {
+      "description": "统计建模与变量选择；区分预测拟合、支持集稳定性和解释可靠性。",
+      "languages": ["r", "python"],
+      "protected_functions": ["predictive_validity", "support_stability", "interpretability", "sampling_assumptions"],
+      "shadow_watch": {"meta": ["sample_size", "scaling", "variable_type", "missingness", "fold_assignment"], "hu": ["feature_correlation", "support_stability", "coefficient_substitution", "sample_dependency", "leakage"]},
+      "trigger_signals": ["support_instability", "feature_correlation", "coefficient_swap", "r_coercion_sensitive", "data_leakage"],
+      "risk_defaults": {"S": 1, "B": 1, "U": 2, "D": 1},
+      "recovery": {"max_items": 8, "max_cost": "medium"}
+    },
+    "scientific_computing": {
+      "description": "科研计算；保护单位、参数、批次、来源和证据边界。",
+      "languages": ["r", "python", "generic"],
+      "protected_functions": ["provenance", "units", "parameter_trace", "evidence_boundary"],
+      "shadow_watch": {"meta": ["unit", "batch", "parameter", "source", "sample_identity"], "hu": ["provenance_path", "evidence_relation", "transformation", "assumption"]},
+      "trigger_signals": ["unit_mismatch", "provenance_gap", "assumption_violation", "result_interpretation_gap"],
+      "risk_defaults": {"S": 1, "B": 1, "U": 2, "D": 2},
+      "recovery": {"max_items": 10, "max_cost": "medium"}
+    },
+    "data_etl": {
+      "description": "数据清洗与 ETL；保护 schema、键、缺失值和写入顺序。",
+      "languages": ["r", "python", "sql", "generic"],
+      "protected_functions": ["row_integrity", "schema_integrity", "write_order", "rollback"],
+      "shadow_watch": {"meta": ["schema", "type", "missingness", "primary_key", "source_table"], "hu": ["join_key", "row_lineage", "write_target", "validation_order"]},
+      "trigger_signals": ["external_write", "destructive_write", "row_loss", "type_coercion", "write_before_validate"],
+      "risk_defaults": {"S": 2, "B": 2, "U": 2, "D": 2},
+      "recovery": {"max_items": 10, "max_cost": "medium"}
+    },
+    "database_mutation": {
+      "description": "数据库持久化与迁移；默认高影响半径，写入前必须审核。",
+      "languages": ["sql", "python", "r", "generic"],
+      "protected_functions": ["transaction_boundary", "write_scope", "rollback", "schema_compatibility"],
+      "shadow_watch": {"meta": ["schema", "transaction", "target_table", "backup"], "hu": ["foreign_key", "downstream_consumer", "migration_order", "rollback_path"]},
+      "trigger_signals": ["external_write", "destructive_write", "unbounded_update", "schema_migration"],
+      "risk_defaults": {"S": 2, "B": 3, "U": 2, "D": 2},
+      "recovery": {"max_items": 12, "max_cost": "expensive"}
+    },
+    "cross_module_refactor": {
+      "description": "跨模块重构；保护公共接口和间接依赖。",
+      "languages": ["python", "r", "generic"],
+      "protected_functions": ["public_api", "dependency_topology", "backward_compatibility"],
+      "shadow_watch": {"meta": ["public_symbol", "version", "compatibility_contract"], "hu": ["caller", "implementation", "transitive_dependency", "test_coverage"]},
+      "trigger_signals": ["public_api_change", "dependency_unknown", "transitive_break", "test_regression"],
+      "risk_defaults": {"S": 3, "B": 2, "U": 2, "D": 3},
+      "recovery": {"max_items": 12, "max_cost": "expensive"}
+    },
+    "ci_deploy": {
+      "description": "CI/CD、发布、权限和基础设施；默认心脏级。",
+      "languages": ["yaml", "shell", "python", "r", "generic"],
+      "protected_functions": ["deployment_target", "credentials", "rollback", "environment_parity"],
+      "shadow_watch": {"meta": ["environment", "secret", "permission", "deployment_target", "artifact"], "hu": ["workflow_dependency", "release_order", "rollback_path", "production_effect"]},
+      "trigger_signals": ["credential_or_permission", "external_write", "shell", "production_change"],
+      "risk_defaults": {"S": 2, "B": 3, "U": 2, "D": 3},
+      "recovery": {"max_items": 12, "max_cost": "expensive"}
+    },
+    "long_running_compute": {
+      "description": "训练、大规模仿真和长任务；优先不中断安全计算，但默认阻断未审核结论。",
+      "languages": ["r", "python", "generic"],
+      "protected_functions": ["checkpoint", "trajectory", "resource_budget", "result_validity"],
+      "shadow_watch": {"meta": ["checkpoint", "seed", "hardware", "precision", "resource_budget"], "hu": ["drift", "trajectory", "resume_path", "validation_checkpoint"]},
+      "trigger_signals": ["drift", "checkpoint_gap", "resource_exhaustion", "result_interpretation_gap"],
+      "risk_defaults": {"S": 2, "B": 1, "U": 2, "D": 2},
+      "recovery": {"max_items": 8, "max_cost": "medium"}
+    }
+  }
+}
