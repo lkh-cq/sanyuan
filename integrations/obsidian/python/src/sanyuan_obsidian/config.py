@@ -46,9 +46,16 @@ class EmbeddingConfig:
 
     @classmethod
     def from_env(cls) -> "EmbeddingConfig":
+        # 通用 OpenAI 兼容端点变量优先 (SANYUAN_EMBEDDING_*), 旧 DOUBAO_* 兼容回退
         return cls(
-            base_url=os.environ.get("DOUBAO_EMBEDDING_BASE_URL", ""),
-            api_key=os.environ.get("DOUBAO_EMBEDDING_API_KEY", ""),
-            model=os.environ.get("DOUBAO_EMBEDDING_MODEL", ""),
-            timeout_seconds=float(os.environ.get("DOUBAO_EMBEDDING_TIMEOUT", "30")),
+            base_url=os.environ.get("SANYUAN_EMBEDDING_BASE_URL")
+            or os.environ.get("DOUBAO_EMBEDDING_BASE_URL", ""),
+            api_key=os.environ.get("SANYUAN_EMBEDDING_API_KEY")
+            or os.environ.get("DOUBAO_EMBEDDING_API_KEY", ""),
+            model=os.environ.get("SANYUAN_EMBEDDING_MODEL")
+            or os.environ.get("DOUBAO_EMBEDDING_MODEL", ""),
+            timeout_seconds=float(
+                os.environ.get("SANYUAN_EMBEDDING_TIMEOUT")
+                or os.environ.get("DOUBAO_EMBEDDING_TIMEOUT", "30")
+            ),
         )

@@ -64,7 +64,7 @@ class ContextPipeline:
         if not candidates:
             return
         vectors = self.embedder.embed(
-            [candidate.content[:6000] for candidate in candidates]
+            [candidate.content[:600] for candidate in candidates]
         )
         for candidate, vector in zip(candidates, vectors):
             candidate.vector_score = cosine_similarity(query_vector, vector)
