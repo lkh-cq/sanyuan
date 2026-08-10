@@ -1,0 +1,9 @@
+{
+  "id": "sanyuan-context-router",
+  "name": "Sanyuan Context Router",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Retrieve local vault context through a Sanyuan-compatible sidecar.",
+  "author": "lkh-cq",
+  "isDesktopOnly": true
+}

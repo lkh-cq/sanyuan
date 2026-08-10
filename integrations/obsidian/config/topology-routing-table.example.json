@@ -1,0 +1,10 @@
+{
+  "version": "0.1.0",
+  "routes": {
+    "periodontitis|pnpla8|fibroblast": {
+      "n_position": "bn:periodontitis/fibroblast/pnpla8",
+      "topology_level": "task",
+      "source": "offline-example-only"
+    }
+  }
+}

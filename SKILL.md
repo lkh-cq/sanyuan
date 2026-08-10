@@ -17,6 +17,7 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 | 快筛模式 | 需要筛选、比较或压缩，但任务边界清楚 | [fast-filter-recipe.yaml](references/fast-filter-recipe.yaml) |
 | 深度模式 | 多材料、多阶段、多证据关系、长期项目或用户明确调用本框架 | [research-recipe.yaml](references/research-recipe.yaml) |
 | 代码干预模式 | 代码/计算任务存在归一化信息损失、解释污染、未知依赖、外部写入或用户明确调用 Endoscope/Bloodtesting | [endoscopic-code-actuation.md](references/endoscopic-code-actuation.md) |
+| Obsidian 集成模式 | Obsidian/FTS5/向量检索/上下文注入接口的实现、测试或维护 | [Obsidian integration](integrations/obsidian/README.md) |
 | 维护模式 | 修改本体、公式、模块、配方、Schema 或版本 | 架构、清单、来源、相关模块与 [version-provenance.md](references/version-provenance.md) |
 
 不要为了展示框架而把简单问题复杂化。用户明确调用某个子模块时，只加载该模块及其必需依赖。
@@ -84,6 +85,15 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 - Python 控制器：`scripts/endoscope.py`
 - base R 适配器：`scripts/endoscope_r.R`
 
+### Obsidian 检索与注入
+
+- 集成边界与运行说明：[Obsidian integration](integrations/obsidian/README.md)
+- 语言中立接口：[API contract](integrations/obsidian/docs/api-contract.md)
+- Python 核心：`integrations/obsidian/python/src/sanyuan_obsidian/pipeline.py`
+- Obsidian 第三方插件：`integrations/obsidian/plugin/`
+
+该适配器只生成临时 ReadProjection；缺少 MutualNode 引用时不得宣称完整 CouplingState。调用阶段只允许读取离线预计算路由表，不运行最短路径搜索。检索分数不得重命名为 ρ、θ 或证据强度。
+
 ### 阅读、交付与模态
 
 - 三元语法阅读拓扑：[reading-topology.md](references/reading-topology.md)
@@ -97,4 +107,4 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 - 状态协议：[state-protocol.schema.yaml](references/state-protocol.schema.yaml)
 - Schema：按清单 `schemas` 节读取；Endoscope 使用清单登记的 NSL/Event/Gate/Profile/BloodRecord 合同。
 
-修改任何本体、模块路径、配方或 Schema 后，运行 `python3 scripts/validate_bundle.py` 与 `python3 scripts/validate_endoscope.py`，并用独立任务前向测试语义行为；确定性脚本不冒充语义证明。
+修改任何本体、模块路径、配方或 Schema 后，运行 `python3 scripts/validate_bundle.py`、`python3 scripts/validate_endoscope.py` 与相关集成校验；Obsidian 分支还须运行 `python3 scripts/validate_obsidian.py` 和插件构建。涉及语义行为时执行独立前向测试；确定性脚本不冒充语义证明。

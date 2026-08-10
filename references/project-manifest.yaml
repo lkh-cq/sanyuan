@@ -42,6 +42,7 @@ module_lifecycle:
     - extension-double-observation-space
     - extension-process-transparency
     - extension-endoscopic-code-actuation
+    - integration-obsidian-context-router
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -324,6 +325,23 @@ extensions:
       path: scripts/endoscope.py
     r_adapter:
       path: scripts/endoscope_r.R
+  obsidian_context_router:
+    id: obsidian-context-router
+    name: Obsidian 检索与注入适配器
+    path: integrations/obsidian/README.md
+    version: 0.1.0
+    module_id: integration-obsidian-context-router
+    depends_on:
+      - branch-zang-gui
+      - core-deep-conscious
+    python_entrypoint:
+      path: integrations/obsidian/python/src/sanyuan_obsidian/pipeline.py
+    rest_entrypoint:
+      path: integrations/obsidian/python/src/sanyuan_obsidian/server.py
+    plugin_manifest:
+      path: integrations/obsidian/plugin/manifest.json
+    optional_routing_table:
+      path: integrations/obsidian/config/topology-routing-table.example.json
 
 validation:
   output_contract: references/output-contract.md
@@ -334,6 +352,7 @@ validation:
     module_id: validation-framework-pitfalls
   bundle_validator: scripts/validate_bundle.py
   endoscope_validator: scripts/validate_endoscope.py
+  obsidian_validator: scripts/validate_obsidian.py
   ci_workflow: .github/workflows/validate.yml
 
 canvas:

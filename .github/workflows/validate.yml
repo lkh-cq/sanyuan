@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - integration/obsidian
   workflow_dispatch:
 
 permissions:
@@ -21,7 +22,23 @@ jobs:
       - run: python -m pip install --disable-pip-version-check PyYAML
       - run: python scripts/validate_bundle.py
       - run: python scripts/validate_endoscope.py
+      - run: python scripts/validate_obsidian.py
       - run: python scripts/endoscope.py selftest
+
+  obsidian-plugin:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: integrations/obsidian/plugin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: integrations/obsidian/plugin/package-lock.json
+      - run: npm ci
+      - run: npm run build
 
   endoscope-r:
     runs-on: ubuntu-latest
@@ -35,6 +52,7 @@ jobs:
     needs:
       - validate
       - endoscope-r
+      - obsidian-plugin
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -90,6 +108,7 @@ jobs:
     needs:
       - validate
       - endoscope-r
+      - obsidian-plugin
     runs-on: ubuntu-latest
     permissions:
       contents: write

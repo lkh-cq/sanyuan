@@ -1,0 +1,21 @@
+.sanyuan-context-result {
+  max-height: 60vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  user-select: text;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-s);
+  background: var(--background-secondary);
+  padding: var(--size-4-3);
+}
+
+.sanyuan-context-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--size-4-2);
+  margin-top: var(--size-4-3);
+}
+
+.sanyuan-context-warning {
+  color: var(--text-warning);
+}

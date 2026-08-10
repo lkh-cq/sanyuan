@@ -27,6 +27,12 @@ chore: remove stale platform metadata
 
 ```bash
 python3 scripts/validate_bundle.py
+python3 scripts/validate_endoscope.py
+python3 scripts/validate_obsidian.py
+
+cd integrations/obsidian/plugin
+npm ci
+npm run build
 ```
 
 确定性校验负责文件、链接、清单、YAML、Canvas、Schema 路径、配方顺序和测试结构。语义行为由独立前向测试验证，不用字符串存在性冒充语义正确性。

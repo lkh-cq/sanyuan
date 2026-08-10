@@ -99,3 +99,14 @@
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
 
 Endoscope 的 Bloodtesting 夹具同样只是协议校准起点，不是通用 coding benchmark。工程自测通过只证明合同与参考实现自洽；真实 Agent 上的误报、漏报、首次出血、错误传播、恢复效率和 output 节省必须由前向运行数据支持。
+
+## 2026-08-10 Obsidian 长期集成分支
+
+本次在独立 `integration/obsidian` 分支登记实验性检索适配器，不修改冻结本体，也不把分支状态作为默认分支正式发布。
+
+1. Python 核心提供 SQLite FTS5、可选 Doubao/Ark embeddings、sidecar 自有向量表、严格 G1/G2/G3 检索级联与透明启发式重排。
+2. REST sidecar 默认只绑定回环地址；API 密钥保留在 Python 进程环境，Obsidian 插件不保存 embedding 凭据。
+3. 插件是可独立迁移的 TypeScript 源包，不加载时联网、不后台扫描 Vault，只在显式命令中发送查询、当前路径与可选 `sanyuan_axes`。
+4. S5 生成临时 ReadProjection；缺少 MutualNode 时保持 `incomplete`，不得伪装成 Schema 完整的 CouplingState。
+5. 注入格式服从当前 `read-injection.md`，不复活把地题画成固有输出方向的旧式箭头表达。
+6. 路由只使用离线预计算表的 O(1) 精确查找；缺少路由表、解析器或 query axes 时显式降级，不在调用路径运行最短路搜索。

@@ -23,6 +23,7 @@
 | 分析论文写作逻辑与证据缺口 | [`references/reading-topology.md`](references/reading-topology.md) |
 | 输出可读的文献逻辑段落 | [`references/reader-facing-analysis.md`](references/reader-facing-analysis.md) |
 | 运行代码/计算风险审计与最小恢复 | [`references/endoscopic-code-actuation.md`](references/endoscopic-code-actuation.md) |
+| 连接 Obsidian FTS5、向量检索与上下文注入 | [`integrations/obsidian/README.md`](integrations/obsidian/README.md) |
 | 理解用户原始设计动机 | [`references/original-anchors.md`](references/original-anchors.md) |
 | 阅读八卷二十八章理论来源浓缩 | [`references/sanyuan-daobian-framework.md`](references/sanyuan-daobian-framework.md) |
 | 修改模块、本体、Schema 或版本 | [`references/project-manifest.yaml`](references/project-manifest.yaml) + [`references/version-provenance.md`](references/version-provenance.md) |
@@ -39,6 +40,7 @@
 | 藏归与耦合态 | 分开保存内容节点和关系节点，再用耦合态组成可检索事务 |
 | 注意力控制 | 以 ρ/θ、缓存波和 n 位聚焦控制收束与切换 |
 | Endoscope | 把归一化省略信息编译为 NSL，按 TaskProfile 探测复活并独立控制 E/S/O |
+| Obsidian 适配器 | 以 Python sidecar 连接 FTS5/可选向量索引，并由独立 TypeScript 插件消费读取注入结果 |
 | 读者端交付 | 将内部拓扑转译为连贯、简明、可独立阅读的自然语言 |
 
 最短理解方式：
@@ -61,6 +63,12 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 
 无注释简图不能替代文字分析。图表只有在显著提升理解时使用，并写全名称、关系含义、证据来源和图例。
 
+## Obsidian 检索分支
+
+`integration/obsidian` 是长期实验分支，不替换默认分支的冻结架构。它包含零运行依赖的 Python 检索核心、只绑定本机回环地址的 REST sidecar，以及一个可独立迁移到第三方仓库的 Obsidian TypeScript 插件。
+
+插件只在用户执行检索命令时发送查询或选中文本，不后台扫描 Vault；Embedding API 密钥只存在 Python 进程环境。缺少向量配置、路由表或 MutualNode 时，管线必须显式报告降级，不能把相似度冒充证据，也不能把临时读取投影冒充完整耦合态。
+
 ## 仓库结构
 
 ```text
@@ -69,6 +77,7 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 ├── agents/                  # GPT/Codex 界面元数据
 ├── assets/                  # 图标、吉祥物与 5 张 Canvas
 ├── extensions/              # 实验扩展（如过程透明）
+├── integrations/            # 第三方工具适配器（Obsidian Python sidecar + 插件）
 ├── references/              # 本体、协议、配方、来源、扩展与 Schema
 ├── scripts/                 # 确定性校验、Endoscope 控制器与 R 适配器
 ├── CONTRIBUTING.md          # 提交、评审与发布规范
@@ -109,6 +118,7 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 ```bash
 python3 scripts/validate_bundle.py
 python3 scripts/validate_endoscope.py
+python3 scripts/validate_obsidian.py
 python3 scripts/endoscope.py selftest
 # 有 R 环境时：
 Rscript scripts/endoscope_r.R selftest
