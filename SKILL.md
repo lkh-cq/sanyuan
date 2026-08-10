@@ -19,6 +19,7 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 | 代码干预模式 | 代码/计算任务存在归一化信息损失、解释污染、未知依赖、外部写入或用户明确调用 Endoscope/Bloodtesting | [endoscopic-code-actuation.md](references/endoscopic-code-actuation.md) |
 | Obsidian 集成模式 | Obsidian/FTS5/向量检索/上下文注入接口的实现、测试或维护 | [Obsidian integration](integrations/obsidian/README.md) |
 | 维护模式 | 修改本体、公式、模块、配方、Schema 或版本 | 架构、清单、来源、相关模块与 [version-provenance.md](references/version-provenance.md) |
+| 持续工作流模式 | 需要跨 agent/多轮保持协议，或批量审计代码风险 | [AGENTS.md](AGENTS.md)、[harness-continuous](extensions/harness-continuous/SKILL.md) |
 
 不要为了展示框架而把简单问题复杂化。用户明确调用某个子模块时，只加载该模块及其必需依赖。
 

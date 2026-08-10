@@ -43,6 +43,7 @@ module_lifecycle:
     - extension-process-transparency
     - extension-endoscopic-code-actuation
     - integration-obsidian-context-router
+    - extension-harness-continuous
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -342,6 +343,21 @@ extensions:
       path: integrations/obsidian/plugin/manifest.json
     optional_routing_table:
       path: integrations/obsidian/config/topology-routing-table.example.json
+  harness_continuous:
+    id: harness-continuous
+    name: Harness 持续工作流（跨 agent）
+    path: extensions/harness-continuous/SKILL.md
+    version: 0.1.0
+    module_id: extension-harness-continuous
+    depends_on:
+      - task-boundary-compiler
+      - endoscopic-code-actuation
+    state_machine:
+      path: scripts/harness_state.py
+    audit_script:
+      path: scripts/harness_audit.sh
+    mcp_server:
+      path: extensions/harness-continuous/mcp/server.py
 
 validation:
   output_contract: references/output-contract.md

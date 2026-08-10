@@ -110,3 +110,13 @@ Endoscope 的 Bloodtesting 夹具同样只是协议校准起点，不是通用 c
 4. S5 生成临时 ReadProjection；缺少 MutualNode 时保持 `incomplete`，不得伪装成 Schema 完整的 CouplingState。
 5. 注入格式服从当前 `read-injection.md`，不复活把地题画成固有输出方向的旧式箭头表达。
 6. 路由只使用离线预计算表的 O(1) 精确查找；缺少路由表、解析器或 query axes 时显式降级，不在调用路径运行最短路搜索。
+
+## 2026-08-10 workflow/continuous 分支
+
+本次在 `workflow/continuous` 分支登记 `harness-continuous` 实验模块，把 sanyuan 仓库改造为跨 agent 的持续工作流；不修改冻结本体，也不以分支状态作为默认分支正式发布。
+
+1. 根级 `AGENTS.md` 作为跨 agent 常驻前门（Claude Code / Codex / Gemini CLI / Hermes 通用读取），替代对单次 skill 注入的依赖；不另建 `CLAUDE.md` 专属副本。
+2. 状态机 `scripts/harness_state.py` 维护 `armed → deep|direct`，状态落盘于运行时 `reference/flow/active-state.json`（`.gitignore` 忽略，不提交），对话压缩不丢。
+3. 批量审计 `scripts/harness_audit.sh` 对文件列表逐个跑 `endoscope.py probe`（只读）并合成按闸门严重度排序的 JSON 报告；只依赖 bash + python3 stdlib。
+4. MCP 适配器 `extensions/harness-continuous/mcp/server.py`（stdio）暴露 `mode_status` / `set_mode` / `run_pipeline` / `probe_source`；MCP 为多 agent 通用协议，`mcp` 包是仓库首次引入的外部依赖，仅限该适配器。
+5. 本扩展只负责"规则常驻 + 深度按需"，不替代 SKILL.md 主流程，不改变 endoscope.py 的确定性协议，不写回 ρ、权重或稳定策略。

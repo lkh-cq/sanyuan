@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "sanyuan-harness": {
+      "command": "python",
+      "args": ["extensions/harness-continuous/mcp/server.py"],
+      "cwd": "."
+    }
+  }
+}

@@ -1,0 +1,15 @@
+# sanyuan harness 运行时状态（不提交）
+reference/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# 各 agent 本地设置
+.claude/settings.local.json
+.codex/settings.local.json
