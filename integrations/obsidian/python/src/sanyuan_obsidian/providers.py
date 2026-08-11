@@ -12,7 +12,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Protocol
 
-from .config import EmbeddingConfig, PipelineConfig
+from .config import EmbeddingConfig, PipelineConfig, RerankConfig
 from .models import Candidate
 
 
@@ -409,12 +409,73 @@ def semantic_tokens(text: str) -> set[str]:
     return words
 
 
+class APIReranker:
+    """Minimal OpenAI-compatible rerank client (e.g. SiliconFlow /v1/rerank)."""
+
+    def __init__(self, config: RerankConfig):
+        self.config = config
+
+    @property
+    def enabled(self) -> bool:
+        return self.config.enabled
+
+    def rerank(self, query: str, documents: Sequence[str], top_n: int) -> list[float]:
+        """Call the rerank endpoint and return relevance scores (same order as documents).
+
+        Raises on failure; callers fall back to the local heuristic.
+        """
+        if not self.enabled:
+            raise RuntimeError("rerank provider is not configured")
+        if not documents:
+            return []
+        payload = json.dumps(
+            {
+                "model": self.config.model,
+                "query": query,
+                "documents": list(documents),
+                "top_n": min(top_n, len(documents)),
+            },
+            ensure_ascii=False,
+        ).encode("utf-8")
+        request = urllib.request.Request(
+            self.config.base_url,
+            data=payload,
+            method="POST",
+            headers={
+                "Authorization": f"Bearer {self.config.api_key}",
+                "Content-Type": "application/json",
+                "User-Agent": "sanyuan-obsidian/0.1",
+            },
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=self.config.timeout) as response:
+                body = json.loads(response.read().decode("utf-8"))
+        except urllib.error.HTTPError as exc:
+            raise RuntimeError(f"rerank endpoint returned HTTP {exc.code}") from exc
+        except (urllib.error.URLError, TimeoutError, json.JSONDecodeError) as exc:
+            raise RuntimeError("rerank endpoint request failed") from exc
+
+        results = body.get("results")
+        if not isinstance(results, list):
+            raise RuntimeError("rerank endpoint response has no results array")
+        scores = [0.0] * len(documents)
+        for item in results:
+            try:
+                index = int(item.get("index", 0))
+            except (TypeError, ValueError):
+                continue
+            if 0 <= index < len(documents):
+                scores[index] = float(item.get("relevance_score", 0.0))
+        return scores
+
+
 def rerank_candidates(
     query: str,
     candidates: Sequence[Candidate],
     top_k: int,
     mode: str,
     current_path: str | None = None,
+    reranker: APIReranker | None = None,
 ) -> tuple[list[Candidate], dict[str, int]]:
     """Strict retrieval cascade; scores are not rho/theta or evidence strength."""
 
@@ -436,6 +497,22 @@ def rerank_candidates(
             survivors[dedupe_key] = candidate
     gated = list(survivors.values())
     stage_counts["g2_survivors"] = len(gated)
+
+    if reranker is not None and gated:
+        try:
+            documents = [
+                candidate.title + "\n" + candidate.content[:600]
+                for candidate in gated
+            ]
+            scores = reranker.rerank(query, documents, top_k)
+            for candidate, score in zip(gated, scores):
+                candidate.rerank_score = score
+            gated.sort(key=lambda candidate: candidate.rerank_score, reverse=True)
+            ranked = gated[:top_k]
+            stage_counts["g3_api_rerank"] = len(ranked)
+            return ranked, stage_counts
+        except Exception:
+            pass  # 降级到本地启发式
 
     for candidate in gated:
         candidate_tokens = semantic_tokens(candidate.title + "\n" + candidate.content[:6000])

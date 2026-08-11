@@ -4,9 +4,10 @@ import time
 from collections.abc import Sequence
 from typing import Any
 
-from .config import EmbeddingConfig, PipelineConfig
+from .config import EmbeddingConfig, PipelineConfig, RerankConfig
 from .models import Candidate, InjectionItem, InjectionResult
 from .providers import (
+    APIReranker,
     DoubaoEmbedder,
     EmbeddingProvider,
     NullEmbedder,
@@ -25,6 +26,7 @@ class ContextPipeline:
         *,
         store: SQLiteKnowledgeStore | None = None,
         embedder: EmbeddingProvider | None = None,
+        reranker: APIReranker | None = None,
     ):
         self.config = config or PipelineConfig.from_env()
         self.store = store or SQLiteKnowledgeStore(self.config)
@@ -36,6 +38,13 @@ class ContextPipeline:
                 DoubaoEmbedder(embedding_config)
                 if embedding_config.enabled
                 else NullEmbedder()
+            )
+        if reranker is not None:
+            self.reranker = reranker
+        else:
+            rerank_config = RerankConfig.from_env()
+            self.reranker = (
+                APIReranker(rerank_config) if rerank_config.enabled else None
             )
         self.routing = RoutingTable(self.config.routing_table_path)
 
@@ -101,7 +110,11 @@ class ContextPipeline:
         diagnostics: dict[str, Any] = {
             "trigger": {"policy": trigger_policy, "reason": intent_reason},
             "embedding_provider": self.embedder.name,
-            "reranker": "transparent-hybrid-heuristic",
+            "reranker": (
+                f"api:{self.reranker.config.model}"
+                if self.reranker is not None
+                else "transparent-hybrid-heuristic"
+            ),
             "degraded": [],
             "stage_counts": {},
         }
@@ -146,12 +159,16 @@ class ContextPipeline:
             int(top_k),
             mode,
             current_path=current_path,
+            reranker=self.reranker,
         )
         diagnostics["stage_counts"] = stage_counts
         method_parts = ["SQLite FTS5"]
         if query_vector is not None:
             method_parts.append("embedding cosine")
-        method_parts.append("transparent heuristic rerank")
+        method_parts.append(
+            "API rerank" if "g3_api_rerank" in stage_counts
+            else "transparent heuristic rerank"
+        )
         method = " + ".join(method_parts)
         items = [
             InjectionItem(
@@ -194,6 +211,10 @@ class ContextPipeline:
             "embedding_enabled": self.embedder.enabled,
             "routing_loaded": bool(self.routing.routes),
             "routing_degradation": self.routing.degradation,
+            "capabilities": {
+                "embedding": self.embedder.enabled,
+                "rerank": self.reranker is not None,
+            },
         }
 
 

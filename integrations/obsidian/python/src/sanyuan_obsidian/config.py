@@ -59,3 +59,30 @@ class EmbeddingConfig:
                 or os.environ.get("DOUBAO_EMBEDDING_TIMEOUT", "30")
             ),
         )
+
+
+@dataclass(frozen=True, slots=True)
+class RerankConfig:
+    base_url: str = "https://api.siliconflow.cn/v1/rerank"
+    api_key: str = ""
+    model: str = "BAAI/bge-reranker-v2-m3"
+    timeout: int = 30
+
+    @property
+    def enabled(self) -> bool:
+        # base_url + api_key 都有才 True
+        return bool(self.base_url and self.api_key)
+
+    @classmethod
+    def from_env(cls) -> "RerankConfig":
+        return cls(
+            base_url=os.environ.get(
+                "SANYUAN_RERANK_BASE_URL",
+                "https://api.siliconflow.cn/v1/rerank",
+            ),
+            api_key=os.environ.get("SANYUAN_RERANK_API_KEY", ""),
+            model=os.environ.get(
+                "SANYUAN_RERANK_MODEL", "BAAI/bge-reranker-v2-m3"
+            ),
+            timeout=int(os.environ.get("SANYUAN_RERANK_TIMEOUT", "30")),
+        )
