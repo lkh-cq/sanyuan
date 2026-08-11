@@ -96,6 +96,12 @@ class ResultModal extends Modal {
           new Notice("Clipboard access failed. Select the preview text instead.", 7000);
         });
     });
+    if (this.editor) {
+      new ButtonComponent(actions).setButtonText("Insert as frontmatter").onClick(() => {
+        this.writeContextFrontmatter();
+        this.close();
+      });
+    }
     if (this.editor && this.result.triggered) {
       new ButtonComponent(actions).setButtonText("Insert").setCta().onClick(() => {
         this.editor?.replaceSelection(`\n\n${this.result.injection}\n`);
@@ -106,6 +112,32 @@ class ResultModal extends Modal {
 
   onClose(): void {
     this.contentEl.empty();
+  }
+
+  private writeContextFrontmatter(): void {
+    const editor = this.editor;
+    if (!editor) {
+      return;
+    }
+    const context = [
+      "sanyuan_context:",
+      `  query: ${this.result.query}`,
+      `  retrieved_at: ${new Date().toISOString()}`
+    ].join("\n");
+    const lineCount = editor.lineCount();
+    if (lineCount > 0 && editor.getLine(0).trim() === "---") {
+      // Note already has frontmatter: append the field before the closing delimiter.
+      for (let i = 1; i < lineCount; i++) {
+        if (editor.getLine(i).trim() === "---") {
+          editor.replaceRange(`${context}\n`, { line: i, ch: 0 });
+          new Notice("Frontmatter updated.");
+          return;
+        }
+      }
+    }
+    // No frontmatter: create a new block at the top of the note.
+    editor.replaceRange(`---\n${context}\n---\n`, { line: 0, ch: 0 });
+    new Notice("Frontmatter added.");
   }
 }
 
@@ -240,6 +272,11 @@ export default class SanyuanContextRouter extends Plugin {
         void this.checkHealth();
       }
     });
+    this.addCommand({
+      id: "browse-sanyuan-nodes",
+      name: "Browse Sanyuan nodes",
+      callback: () => { void this.browseNodes(); }
+    });
   }
 
   async loadSettings(): Promise<void> {
@@ -305,6 +342,20 @@ export default class SanyuanContextRouter extends Plugin {
       );
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "Sidecar health check failed";
+      new Notice(message, 8000);
+    }
+  }
+
+  private async browseNodes(): Promise<void> {
+    const client = new SanyuanClient(this.settings);
+    try {
+      const result = await client.retrieve({ query: "latest", top_k: this.settings.topK, mode: this.settings.mode, trigger_policy: "always" });
+      const candidates = result.diagnostics?.candidates;
+      const count = Array.isArray(candidates) ? candidates.length : 0;
+      new Notice("Browse: retrieved " + count + " candidates", 5000);
+      new ResultModal(this, result).open();
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : "Browse failed";
       new Notice(message, 8000);
     }
   }
