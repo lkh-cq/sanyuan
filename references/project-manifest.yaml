@@ -42,6 +42,8 @@ module_lifecycle:
     - extension-double-observation-space
     - extension-process-transparency
     - extension-endoscopic-code-actuation
+    - extension-mirror-bus
+    - extension-soul-echo
   source:
     - source-original-anchors
     - source-sanyuan-daobian
