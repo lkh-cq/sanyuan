@@ -42,6 +42,7 @@ module_lifecycle:
     - extension-double-observation-space
     - extension-process-transparency
     - extension-endoscopic-code-actuation
+    - extension-index-naming-norm
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -303,6 +304,14 @@ extensions:
       - archive-ingestion
       - meta-normalization
       - hu-normalization
+  index_naming:
+    id: index-naming
+    name: 知识库索引命名规范 v2.0
+    path: extensions/index-naming/SKILL.md
+    version: 0.1.0
+    module_id: extension-index-naming-norm
+    depends_on:
+      - archive-ingestion
   endoscopic_code_actuation:
     id: endoscopic-code-actuation
     name: Endoscope / Bloodtesting 归一化阴影审计
