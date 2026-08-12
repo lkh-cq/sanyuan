@@ -68,7 +68,7 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 ├── .github/workflows/       # 自动校验与版本标签
 ├── agents/                  # GPT/Codex 界面元数据
 ├── assets/                  # 图标、吉祥物与 5 张 Canvas
-├── extensions/              # 实验扩展（如过程透明）
+├── extensions/              # 可选子模块（process-transparency、index-naming-norm）
 ├── references/              # 本体、协议、配方、来源、扩展与 Schema
 ├── scripts/                 # 确定性校验、Endoscope 控制器与 R 适配器
 ├── CONTRIBUTING.md          # 提交、评审与发布规范
@@ -87,6 +87,31 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 - 机器约束：项目清单、配方、验收用例与全部 Schema。
 
 所有模块路径都登记在 [`project-manifest.yaml`](references/project-manifest.yaml)，校验脚本会检查断链、孤儿文件、YAML、Canvas、配方顺序、版本生命周期与验收用例结构。
+
+## 扩展（extensions/ 与协议文档）
+
+2026-08-12 新增两个扩展（已合并进 main，均通过独立并行门控测试）：
+
+### index-naming-norm（extensions/index-naming/）
+
+知识库目录索引的命名、分层与拓扑审计规范（v2.0，2026-08-12 用户冻结）：
+
+- **层级 = 上游目录的文件夹个数**：0=根目录总 INDEX，1=根文件夹 main branch，2=次级文件夹，依此类推。
+- **main branch index（层级 1）**：按内容命名或编号（语义名须以 `_index` 结尾），文件第一行加小标题标引该目录具体内容，供下一级索引引用。
+- **子分支（层级 ≥2）**：严格 `index.<date>.<内容>.<层级>` 三段式（YYYYMMDD + 主题短词 + 数字）。
+- 仅根目录 `_index.md` 保留；层级 ≥1 的 `_index.md` 一律改造。`COLOR_INDEX.md`/`GEO_ROOT_INDEX.md`/CSV 索引不参与。
+- **校验**：`python3 extensions/index-naming/scripts/validate_index_naming.py --dry <目录>`（只读预览不合规清单）。
+- **约束**：只治理 Markdown 目录索引；node_modules/.git/dist 等程序索引不进入知识图谱。来源：hermes_memory 全盘索引拓扑审计（2026-08-12，367 个 index 路径）。
+
+### mirror-bus-spec + soul-echo-spec（references/）
+
+Hermes 本地跨窗口/跨模型观察总线（传入神经）的**协议文档化**：
+
+- `references/mirror-bus-spec.md`：命名空间结构、命令语义（read/watch/offline/status/start/stop=归档/skill load/list/diff）、canary 上下文压缩检测、bus.jsonl 条目字段、操作铁律（手动控制、read 优先、用户是整合者、stop=归档）。
+- `references/soul-echo-spec.md`：主题回声协议（soul_echo.jsonl JSONL 追加、只记一词、追加不覆盖）。
+- **约束**：运行时（~/.hermes/mirror/）**不并入**，留在 Hermes 本地；当前**已停用（用户冻结，勿重启运行时）**。sanyuan 只持有协议规范，供语言无关重写。
+
+两个模块已登记 `project-manifest.yaml`（extensions 段 + experimental lifecycle），`validate_bundle.py` 必须 PASS。
 
 ## 版本与成熟度
 
