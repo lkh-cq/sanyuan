@@ -1,84 +1,84 @@
 {
-  "nodes": [
-    {
-      "id": "grp-flow",
-      "type": "group",
-      "x": 0,
-      "y": 0,
-      "width": 800,
-      "height": 300,
-      "color": "5",
-      "label": "运行时流止 (FlowEvent ⊂ 互)"
-    },
-    {
-      "id": "f-hu-space",
-      "type": "file",
-      "file": "references/hu-observation-space.md",
-      "x": 20,
-      "y": 40,
-      "width": 240,
-      "height": 60,
-      "color": "2"
-    },
-    {
-      "id": "f-topo",
-      "type": "file",
-      "file": "references/flow-topology.md",
-      "x": 290,
-      "y": 40,
-      "width": 240,
-      "height": 60,
-      "color": "4"
-    },
-    {
-      "id": "f-flow-schema",
-      "type": "file",
-      "file": "references/schema-flow-event.schema.yaml",
-      "x": 560,
-      "y": 40,
-      "width": 240,
-      "height": 60,
-      "color": "3"
-    },
-    {
-      "id": "t-flow-types",
-      "type": "text",
-      "text": "## FlowEvent类型\nflow | stop | filter | buffer\ntransform | feedback | merge\nconflict | loss | restore\n\nrepresentation_space: hu\nrepresentation_subtype: flow_event",
-      "x": 20,
-      "y": 130,
-      "width": 340,
-      "height": 140,
-      "color": "5"
-    },
-    {
-      "id": "t-rule",
-      "type": "text",
-      "text": "## 冻结约束\n\n1. FlowEvent ⊂ 互, 不等于互\n2. via_role=di 仅flow_event子类型强制\n3. 地居天与人之间\n4. 地不携带固有方向\n5. 互≠信息论mutual information",
-      "x": 380,
-      "y": 130,
-      "width": 360,
-      "height": 140,
-      "color": "1"
-    }
-  ],
-  "edges": [
-    {
-      "id": "e1",
-      "fromNode": "f-hu-space",
-      "toNode": "f-topo",
-      "label": "互⊃FlowEvent"
-    },
-    {
-      "id": "e2",
-      "fromNode": "f-topo",
-      "toNode": "f-flow-schema",
-      "label": "schema"
-    },
-    {
-      "id": "e3",
-      "fromNode": "f-hu-space",
-      "toNode": "t-rule",
-      "label": "定义互"
-    }
-  ]
+ "nodes": [
+  {
+   "id": "grp-flow",
+   "type": "group",
+   "x": 60,
+   "y": 60,
+   "width": 1250,
+   "height": 340,
+   "color": "5",
+   "label": "运行时流止 (FlowEvent ⊂ 互)"
+  },
+  {
+   "id": "f-hu-space",
+   "type": "file",
+   "file": "references/hu-observation-space.md",
+   "x": 80,
+   "y": 80,
+   "width": 240,
+   "height": 60,
+   "color": "2"
+  },
+  {
+   "id": "f-topo",
+   "type": "file",
+   "file": "references/flow-topology.md",
+   "x": 370,
+   "y": 80,
+   "width": 240,
+   "height": 60,
+   "color": "4"
+  },
+  {
+   "id": "f-flow-schema",
+   "type": "file",
+   "file": "references/schema-flow-event.schema.yaml",
+   "x": 660,
+   "y": 80,
+   "width": 240,
+   "height": 60,
+   "color": "3"
+  },
+  {
+   "id": "t-flow-types",
+   "type": "text",
+   "text": "## FlowEvent类型\nflow | stop | filter | buffer\ntransform | feedback | merge\nconflict | loss | restore\n\nrepresentation_space: hu\nrepresentation_subtype: flow_event",
+   "x": 950,
+   "y": 80,
+   "width": 340,
+   "height": 140,
+   "color": "5"
+  },
+  {
+   "id": "t-rule",
+   "type": "text",
+   "text": "## 冻结约束\n\n1. FlowEvent ⊂ 互, 不等于互\n2. via_role=di 仅flow_event子类型强制\n3. 地居天与人之间\n4. 地不携带固有方向\n5. 互≠信息论mutual information",
+   "x": 80,
+   "y": 240,
+   "width": 360,
+   "height": 140,
+   "color": "1"
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "fromNode": "f-hu-space",
+   "toNode": "f-topo",
+   "label": "互⊃FlowEvent"
+  },
+  {
+   "id": "e2",
+   "fromNode": "f-topo",
+   "toNode": "f-flow-schema",
+   "label": "schema"
+  },
+  {
+   "id": "e3",
+   "fromNode": "f-hu-space",
+   "toNode": "t-rule",
+   "label": "定义互"
+  }
+ ]
 }

@@ -1,352 +1,352 @@
 {
-  "nodes": [
-    {
-      "id": "grp-boundary",
-      "type": "group",
-      "x": 0,
-      "y": 0,
-      "width": 900,
-      "height": 120,
-      "color": "4",
-      "label": "G0｜任务边界与观测空间选择"
-    },
-    {
-      "id": "t-input",
-      "type": "text",
-      "text": "## 任务输入\n原始问题、材料集合、当前上下文",
-      "x": 20,
-      "y": 30,
-      "width": 200,
-      "height": 60,
-      "color": "5"
-    },
-    {
-      "id": "t-bt",
-      "type": "text",
-      "text": "## B_T 任务边界\n- 目标 F_T\n- 禁止损失\n- 误差预算 ε_T\n- 必需空间: meta + hu\n- 可选空间",
-      "x": 240,
-      "y": 30,
-      "width": 240,
-      "height": 80,
-      "color": "4"
-    },
-    {
-      "id": "f-boundary",
-      "type": "file",
-      "file": "references/task-boundary.md",
-      "x": 500,
-      "y": 30,
-      "width": 200,
-      "height": 60,
-      "color": "4"
-    },
-    {
-      "id": "grp-meta",
-      "type": "group",
-      "x": 0,
-      "y": 150,
-      "width": 420,
-      "height": 250,
-      "color": "1",
-      "label": "G1-M｜元信息空间 M (必选)"
-    },
-    {
-      "id": "f-sancai",
-      "type": "file",
-      "file": "references/sancai-store.md",
-      "x": 20,
-      "y": 190,
-      "width": 180,
-      "height": 60,
-      "color": "1"
-    },
-    {
-      "id": "f-meta-norm",
-      "type": "file",
-      "file": "references/meta-normalization.md",
-      "x": 220,
-      "y": 190,
-      "width": 180,
-      "height": 60,
-      "color": "1"
-    },
-    {
-      "id": "f-sch-meta",
-      "type": "file",
-      "file": "references/schema-meta-normalization.schema.yaml",
-      "x": 20,
-      "y": 270,
-      "width": 180,
-      "height": 40,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-store",
-      "type": "file",
-      "file": "references/schema-store-node.schema.yaml",
-      "x": 220,
-      "y": 270,
-      "width": 180,
-      "height": 40,
-      "color": "3"
-    },
-    {
-      "id": "t-meta-output",
-      "type": "text",
-      "text": "## M_T 元信息视图\n- axes: 三才轴\n- route_code: q_M\n- preserved/omitted features\n- loss: structural + functional",
-      "x": 20,
-      "y": 320,
-      "width": 380,
-      "height": 70,
-      "color": "1"
-    },
-    {
-      "id": "grp-mutual",
-      "type": "group",
-      "x": 480,
-      "y": 150,
-      "width": 420,
-      "height": 250,
-      "color": "2",
-      "label": "G1-H｜互信息空间 H (必选)"
-    },
-    {
-      "id": "f-hu-space",
-      "type": "file",
-      "file": "references/hu-observation-space.md",
-      "x": 500,
-      "y": 190,
-      "width": 180,
-      "height": 60,
-      "color": "2"
-    },
-    {
-      "id": "f-hu-norm",
-      "type": "file",
-      "file": "references/hu-normalization.md",
-      "x": 700,
-      "y": 190,
-      "width": 180,
-      "height": 60,
-      "color": "2"
-    },
-    {
-      "id": "f-sch-mutual",
-      "type": "file",
-      "file": "references/schema-mutual-node.schema.yaml",
-      "x": 500,
-      "y": 270,
-      "width": 180,
-      "height": 40,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-hu",
-      "type": "file",
-      "file": "references/schema-hu-normalization.schema.yaml",
-      "x": 700,
-      "y": 270,
-      "width": 180,
-      "height": 40,
-      "color": "3"
-    },
-    {
-      "id": "t-hu-output",
-      "type": "text",
-      "text": "## H_T 互信息视图\n- axes: direct/composite/path_residual\n- route_code: q_H\n- path_residual (特殊保护)\n- FlowEvent ⊂ 互",
-      "x": 500,
-      "y": 320,
-      "width": 380,
-      "height": 70,
-      "color": "2"
-    },
-    {
-      "id": "grp-validation",
-      "type": "group",
-      "x": 0,
-      "y": 430,
-      "width": 900,
-      "height": 150,
-      "color": "5",
-      "label": "G2/G3/G4｜跨空间一致性、压缩与贞验"
-    },
-    {
-      "id": "t-cross-check",
-      "type": "text",
-      "text": "## 跨空间一致性检查\n路线A: M -> 压缩M -> 从M提取H'\n路线B: H -> 压缩H\n若 |H'-H| > ε_T: 恢复被删特征",
-      "x": 20,
-      "y": 470,
-      "width": 280,
-      "height": 80,
-      "color": "5"
-    },
-    {
-      "id": "t-functional",
-      "type": "text",
-      "text": "## G4 功能贞验\n- 特征覆盖(M_T)\n- 关系覆盖(H_T)\n- 路径完整性(H_T)\n- F_T.test_cases",
-      "x": 320,
-      "y": 470,
-      "width": 260,
-      "height": 80,
-      "color": "5"
-    },
-    {
-      "id": "t-loss",
-      "type": "text",
-      "text": "## 损失向量\nmeta_loss\nmutual_loss\nstructural_loss\nfunctional_loss",
-      "x": 600,
-      "y": 470,
-      "width": 280,
-      "height": 80,
-      "color": "5"
-    },
-    {
-      "id": "grp-output",
-      "type": "group",
-      "x": 0,
-      "y": 610,
-      "width": 900,
-      "height": 120,
-      "color": "6",
-      "label": "任务视图与运行时调用"
-    },
-    {
-      "id": "t-zt",
-      "type": "text",
-      "text": "## Z_T 任务特定表示\n必含: M_T + H_T\n选含: 补充空间视图\n      loss_vector",
-      "x": 20,
-      "y": 650,
-      "width": 240,
-      "height": 60,
-      "color": "6"
-    },
-    {
-      "id": "f-deep",
-      "type": "file",
-      "file": "references/n-focus.md",
-      "x": 280,
-      "y": 650,
-      "width": 200,
-      "height": 50,
-      "color": "1"
-    },
-    {
-      "id": "f-recipe",
-      "type": "file",
-      "file": "references/research-recipe.yaml",
-      "x": 500,
-      "y": 650,
-      "width": 200,
-      "height": 50,
-      "color": "2"
-    },
-    {
-      "id": "f-fast",
-      "type": "file",
-      "file": "references/fast-filter-recipe.yaml",
-      "x": 720,
-      "y": 650,
-      "width": 160,
-      "height": 50,
-      "color": "2"
-    }
-  ],
-  "edges": [
-    {
-      "id": "e1",
-      "fromNode": "t-input",
-      "toNode": "t-bt",
-      "label": "输入"
-    },
-    {
-      "id": "e2",
-      "fromNode": "t-bt",
-      "toNode": "f-boundary",
-      "label": "编译"
-    },
-    {
-      "id": "e3",
-      "fromNode": "f-boundary",
-      "toNode": "f-meta-norm",
-      "label": "B_T -> M"
-    },
-    {
-      "id": "e4",
-      "fromNode": "f-boundary",
-      "toNode": "f-hu-norm",
-      "label": "B_T -> H"
-    },
-    {
-      "id": "e5",
-      "fromNode": "f-meta-norm",
-      "toNode": "f-hu-norm",
-      "label": "并行(互不依赖)"
-    },
-    {
-      "id": "e6",
-      "fromNode": "f-sancai",
-      "toNode": "f-meta-norm",
-      "label": "三才编码器"
-    },
-    {
-      "id": "e7",
-      "fromNode": "f-hu-space",
-      "toNode": "f-hu-norm",
-      "label": "互编码"
-    },
-    {
-      "id": "e8",
-      "fromNode": "f-meta-norm",
-      "toNode": "t-meta-output",
-      "label": "输出 M_T"
-    },
-    {
-      "id": "e9",
-      "fromNode": "f-hu-norm",
-      "toNode": "t-hu-output",
-      "label": "输出 H_T"
-    },
-    {
-      "id": "e10",
-      "fromNode": "t-meta-output",
-      "toNode": "t-cross-check",
-      "label": "M_T"
-    },
-    {
-      "id": "e11",
-      "fromNode": "t-hu-output",
-      "toNode": "t-cross-check",
-      "label": "H_T"
-    },
-    {
-      "id": "e12",
-      "fromNode": "t-cross-check",
-      "toNode": "t-functional",
-      "label": "一致性通过"
-    },
-    {
-      "id": "e13",
-      "fromNode": "t-functional",
-      "toNode": "t-zt",
-      "label": "贞验通过"
-    },
-    {
-      "id": "e14",
-      "fromNode": "t-zt",
-      "toNode": "f-deep",
-      "label": "n位聚焦"
-    },
-    {
-      "id": "e15",
-      "fromNode": "f-hu-space",
-      "toNode": "f-sch-mutual",
-      "label": "schema"
-    },
-    {
-      "id": "e16",
-      "fromNode": "f-sancai",
-      "toNode": "f-sch-store",
-      "label": "schema"
-    }
-  ]
+ "nodes": [
+  {
+   "id": "grp-boundary",
+   "type": "group",
+   "x": 60,
+   "y": 60,
+   "width": 780,
+   "height": 120,
+   "color": "4",
+   "label": "G0｜任务边界与观测空间选择"
+  },
+  {
+   "id": "t-input",
+   "type": "text",
+   "text": "## 任务输入\n原始问题、材料集合、当前上下文",
+   "x": 80,
+   "y": 80,
+   "width": 200,
+   "height": 60,
+   "color": "5"
+  },
+  {
+   "id": "t-bt",
+   "type": "text",
+   "text": "## B_T 任务边界\n- 目标 F_T\n- 禁止损失\n- 误差预算 ε_T\n- 必需空间: meta + hu\n- 可选空间",
+   "x": 330,
+   "y": 80,
+   "width": 240,
+   "height": 80,
+   "color": "4"
+  },
+  {
+   "id": "f-boundary",
+   "type": "file",
+   "file": "references/task-boundary.md",
+   "x": 620,
+   "y": 80,
+   "width": 200,
+   "height": 60,
+   "color": "4"
+  },
+  {
+   "id": "grp-meta",
+   "type": "group",
+   "x": 60,
+   "y": 210,
+   "width": 1340,
+   "height": 110,
+   "color": "1",
+   "label": "G1-M｜元信息空间 M (必选)"
+  },
+  {
+   "id": "f-sancai",
+   "type": "file",
+   "file": "references/sancai-store.md",
+   "x": 80,
+   "y": 380,
+   "width": 180,
+   "height": 60,
+   "color": "1"
+  },
+  {
+   "id": "f-meta-norm",
+   "type": "file",
+   "file": "references/meta-normalization.md",
+   "x": 310,
+   "y": 380,
+   "width": 180,
+   "height": 60,
+   "color": "1"
+  },
+  {
+   "id": "f-sch-meta",
+   "type": "file",
+   "file": "references/schema-meta-normalization.schema.yaml",
+   "x": 540,
+   "y": 380,
+   "width": 180,
+   "height": 40,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-store",
+   "type": "file",
+   "file": "references/schema-store-node.schema.yaml",
+   "x": 770,
+   "y": 380,
+   "width": 180,
+   "height": 40,
+   "color": "3"
+  },
+  {
+   "id": "t-meta-output",
+   "type": "text",
+   "text": "## M_T 元信息视图\n- axes: 三才轴\n- route_code: q_M\n- preserved/omitted features\n- loss: structural + functional",
+   "x": 1000,
+   "y": 380,
+   "width": 380,
+   "height": 70,
+   "color": "1"
+  },
+  {
+   "id": "grp-mutual",
+   "type": "group",
+   "x": 60,
+   "y": 350,
+   "width": 1340,
+   "height": 110,
+   "color": "2",
+   "label": "G1-H｜互信息空间 H (必选)"
+  },
+  {
+   "id": "f-hu-space",
+   "type": "file",
+   "file": "references/hu-observation-space.md",
+   "x": 80,
+   "y": 660,
+   "width": 180,
+   "height": 60,
+   "color": "2"
+  },
+  {
+   "id": "f-hu-norm",
+   "type": "file",
+   "file": "references/hu-normalization.md",
+   "x": 310,
+   "y": 660,
+   "width": 180,
+   "height": 60,
+   "color": "2"
+  },
+  {
+   "id": "f-sch-mutual",
+   "type": "file",
+   "file": "references/schema-mutual-node.schema.yaml",
+   "x": 540,
+   "y": 660,
+   "width": 180,
+   "height": 40,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-hu",
+   "type": "file",
+   "file": "references/schema-hu-normalization.schema.yaml",
+   "x": 770,
+   "y": 660,
+   "width": 180,
+   "height": 40,
+   "color": "3"
+  },
+  {
+   "id": "t-hu-output",
+   "type": "text",
+   "text": "## H_T 互信息视图\n- axes: direct/composite/path_residual\n- route_code: q_H\n- path_residual (特殊保护)\n- FlowEvent ⊂ 互",
+   "x": 1000,
+   "y": 660,
+   "width": 380,
+   "height": 70,
+   "color": "2"
+  },
+  {
+   "id": "grp-validation",
+   "type": "group",
+   "x": 60,
+   "y": 490,
+   "width": 960,
+   "height": 120,
+   "color": "5",
+   "label": "G2/G3/G4｜跨空间一致性、压缩与贞验"
+  },
+  {
+   "id": "t-cross-check",
+   "type": "text",
+   "text": "## 跨空间一致性检查\n路线A: M -> 压缩M -> 从M提取H'\n路线B: H -> 压缩H\n若 |H'-H| > ε_T: 恢复被删特征",
+   "x": 80,
+   "y": 940,
+   "width": 280,
+   "height": 80,
+   "color": "5"
+  },
+  {
+   "id": "t-functional",
+   "type": "text",
+   "text": "## G4 功能贞验\n- 特征覆盖(M_T)\n- 关系覆盖(H_T)\n- 路径完整性(H_T)\n- F_T.test_cases",
+   "x": 410,
+   "y": 940,
+   "width": 260,
+   "height": 80,
+   "color": "5"
+  },
+  {
+   "id": "t-loss",
+   "type": "text",
+   "text": "## 损失向量\nmeta_loss\nmutual_loss\nstructural_loss\nfunctional_loss",
+   "x": 720,
+   "y": 940,
+   "width": 280,
+   "height": 80,
+   "color": "5"
+  },
+  {
+   "id": "grp-output",
+   "type": "group",
+   "x": 60,
+   "y": 640,
+   "width": 990,
+   "height": 100,
+   "color": "6",
+   "label": "任务视图与运行时调用"
+  },
+  {
+   "id": "t-zt",
+   "type": "text",
+   "text": "## Z_T 任务特定表示\n必含: M_T + H_T\n选含: 补充空间视图\n      loss_vector",
+   "x": 80,
+   "y": 1240,
+   "width": 240,
+   "height": 60,
+   "color": "6"
+  },
+  {
+   "id": "f-deep",
+   "type": "file",
+   "file": "references/n-focus.md",
+   "x": 370,
+   "y": 1240,
+   "width": 200,
+   "height": 50,
+   "color": "1"
+  },
+  {
+   "id": "f-recipe",
+   "type": "file",
+   "file": "references/research-recipe.yaml",
+   "x": 620,
+   "y": 1240,
+   "width": 200,
+   "height": 50,
+   "color": "2"
+  },
+  {
+   "id": "f-fast",
+   "type": "file",
+   "file": "references/fast-filter-recipe.yaml",
+   "x": 870,
+   "y": 1240,
+   "width": 160,
+   "height": 50,
+   "color": "2"
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "fromNode": "t-input",
+   "toNode": "t-bt",
+   "label": "输入"
+  },
+  {
+   "id": "e2",
+   "fromNode": "t-bt",
+   "toNode": "f-boundary",
+   "label": "编译"
+  },
+  {
+   "id": "e3",
+   "fromNode": "f-boundary",
+   "toNode": "f-meta-norm",
+   "label": "B_T -> M"
+  },
+  {
+   "id": "e4",
+   "fromNode": "f-boundary",
+   "toNode": "f-hu-norm",
+   "label": "B_T -> H"
+  },
+  {
+   "id": "e5",
+   "fromNode": "f-meta-norm",
+   "toNode": "f-hu-norm",
+   "label": "并行(互不依赖)"
+  },
+  {
+   "id": "e6",
+   "fromNode": "f-sancai",
+   "toNode": "f-meta-norm",
+   "label": "三才编码器"
+  },
+  {
+   "id": "e7",
+   "fromNode": "f-hu-space",
+   "toNode": "f-hu-norm",
+   "label": "互编码"
+  },
+  {
+   "id": "e8",
+   "fromNode": "f-meta-norm",
+   "toNode": "t-meta-output",
+   "label": "输出 M_T"
+  },
+  {
+   "id": "e9",
+   "fromNode": "f-hu-norm",
+   "toNode": "t-hu-output",
+   "label": "输出 H_T"
+  },
+  {
+   "id": "e10",
+   "fromNode": "t-meta-output",
+   "toNode": "t-cross-check",
+   "label": "M_T"
+  },
+  {
+   "id": "e11",
+   "fromNode": "t-hu-output",
+   "toNode": "t-cross-check",
+   "label": "H_T"
+  },
+  {
+   "id": "e12",
+   "fromNode": "t-cross-check",
+   "toNode": "t-functional",
+   "label": "一致性通过"
+  },
+  {
+   "id": "e13",
+   "fromNode": "t-functional",
+   "toNode": "t-zt",
+   "label": "贞验通过"
+  },
+  {
+   "id": "e14",
+   "fromNode": "t-zt",
+   "toNode": "f-deep",
+   "label": "n位聚焦"
+  },
+  {
+   "id": "e15",
+   "fromNode": "f-hu-space",
+   "toNode": "f-sch-mutual",
+   "label": "schema"
+  },
+  {
+   "id": "e16",
+   "fromNode": "f-sancai",
+   "toNode": "f-sch-store",
+   "label": "schema"
+  }
+ ]
 }

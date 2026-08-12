@@ -1,448 +1,448 @@
 {
-  "nodes": [
-    {
-      "id": "grp-core",
-      "type": "group",
-      "x": -400,
-      "y": -200,
-      "width": 900,
-      "height": 300,
-      "color": "6",
-      "label": "核心层(数学模块, 独立)"
-    },
-    {
-      "id": "f-rho",
-      "type": "file",
-      "file": "references/rho-convergence.md",
-      "x": -380,
-      "y": -160,
-      "width": 200,
-      "height": 100,
-      "color": "1"
-    },
-    {
-      "id": "f-theta",
-      "type": "file",
-      "file": "references/theta-switching.md",
-      "x": -160,
-      "y": -160,
-      "width": 200,
-      "height": 100,
-      "color": "1"
-    },
-    {
-      "id": "f-deep",
-      "type": "file",
-      "file": "references/n-focus.md",
-      "x": 60,
-      "y": -160,
-      "width": 200,
-      "height": 100,
-      "color": "1"
-    },
-    {
-      "id": "f-cache",
-      "type": "file",
-      "file": "references/cache-wave.md",
-      "x": 280,
-      "y": -160,
-      "width": 200,
-      "height": 100,
-      "color": "1"
-    },
-    {
-      "id": "f-condense",
-      "type": "file",
-      "file": "references/condense-protocol.md",
-      "x": 280,
-      "y": -40,
-      "width": 200,
-      "height": 60,
-      "color": "5"
-    },
-    {
-      "id": "grp-pre",
-      "type": "group",
-      "x": -400,
-      "y": 150,
-      "width": 900,
-      "height": 200,
-      "color": "4",
-      "label": "预处理层(门控, 任务边界优先)"
-    },
-    {
-      "id": "f-tbr",
-      "type": "file",
-      "file": "references/think-before-responding.md",
-      "x": -380,
-      "y": 190,
-      "width": 160,
-      "height": 60,
-      "color": "4"
-    },
-    {
-      "id": "f-boundary",
-      "type": "file",
-      "file": "references/task-boundary.md",
-      "x": -200,
-      "y": 190,
-      "width": 160,
-      "height": 60,
-      "color": "4"
-    },
-    {
-      "id": "f-meta-norm",
-      "type": "file",
-      "file": "references/meta-normalization.md",
-      "x": -20,
-      "y": 190,
-      "width": 160,
-      "height": 60,
-      "color": "3"
-    },
-    {
-      "id": "f-hu-norm",
-      "type": "file",
-      "file": "references/hu-normalization.md",
-      "x": 160,
-      "y": 190,
-      "width": 160,
-      "height": 60,
-      "color": "3"
-    },
-    {
-      "id": "f-task",
-      "type": "file",
-      "file": "references/task-decomposition.md",
-      "x": 340,
-      "y": 190,
-      "width": 160,
-      "height": 60,
-      "color": "4"
-    },
-    {
-      "id": "grp-obs",
-      "type": "group",
-      "x": -400,
-      "y": 380,
-      "width": 900,
-      "height": 100,
-      "color": "3",
-      "label": "观测空间层(独立编码, 独立归一化)"
-    },
-    {
-      "id": "f-hu-space",
-      "type": "file",
-      "file": "references/hu-observation-space.md",
-      "x": -380,
-      "y": 420,
-      "width": 200,
-      "height": 50,
-      "color": "3"
-    },
-    {
-      "id": "f-sancai",
-      "type": "file",
-      "file": "references/sancai-store.md",
-      "x": -160,
-      "y": 420,
-      "width": 200,
-      "height": 50,
-      "color": "3"
-    },
-    {
-      "id": "t-supplementary",
-      "type": "text",
-      "text": "## 补充空间\n时间/证据/来源/不确定性\n按任务提升为强制维度",
-      "x": 60,
-      "y": 420,
-      "width": 200,
-      "height": 50,
-      "color": "5"
-    },
-    {
-      "id": "grp-zg",
-      "type": "group",
-      "x": -400,
-      "y": 510,
-      "width": 900,
-      "height": 200,
-      "color": "5",
-      "label": "藏归层(可插拔认知分支)"
-    },
-    {
-      "id": "f-zg-orch",
-      "type": "file",
-      "file": "references/zang-gui-orchestrator.md",
-      "x": -380,
-      "y": 550,
-      "width": 200,
-      "height": 60,
-      "color": "5"
-    },
-    {
-      "id": "f-santi",
-      "type": "file",
-      "file": "references/santi-read.md",
-      "x": -160,
-      "y": 550,
-      "width": 200,
-      "height": 60,
-      "color": "3"
-    },
-    {
-      "id": "f-topo",
-      "type": "file",
-      "file": "references/flow-topology.md",
-      "x": 60,
-      "y": 550,
-      "width": 200,
-      "height": 60,
-      "color": "3"
-    },
-    {
-      "id": "f-cycle",
-      "type": "file",
-      "file": "references/zang-gui-cycle.md",
-      "x": 280,
-      "y": 550,
-      "width": 200,
-      "height": 60,
-      "color": "3"
-    },
-    {
-      "id": "grp-recipe",
-      "type": "group",
-      "x": -400,
-      "y": 740,
-      "width": 900,
-      "height": 100,
-      "color": "2",
-      "label": "配方层"
-    },
-    {
-      "id": "f-recipe-research",
-      "type": "file",
-      "file": "references/research-recipe.yaml",
-      "x": -380,
-      "y": 780,
-      "width": 250,
-      "height": 50,
-      "color": "2"
-    },
-    {
-      "id": "f-recipe-fast",
-      "type": "file",
-      "file": "references/fast-filter-recipe.yaml",
-      "x": -100,
-      "y": 780,
-      "width": 250,
-      "height": 50,
-      "color": "2"
-    },
-    {
-      "id": "grp-schema",
-      "type": "group",
-      "x": 550,
-      "y": -200,
-      "width": 300,
-      "height": 500,
-      "color": "3",
-      "label": "Schema"
-    },
-    {
-      "id": "f-sch-attn",
-      "type": "file",
-      "file": "references/schema-attention-state.schema.yaml",
-      "x": 570,
-      "y": -160,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-store",
-      "type": "file",
-      "file": "references/schema-store-node.schema.yaml",
-      "x": 570,
-      "y": -120,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-read",
-      "type": "file",
-      "file": "references/schema-read-node.schema.yaml",
-      "x": 570,
-      "y": -80,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-flow",
-      "type": "file",
-      "file": "references/schema-flow-event.schema.yaml",
-      "x": 570,
-      "y": -40,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-cycle",
-      "type": "file",
-      "file": "references/schema-cycle-link.schema.yaml",
-      "x": 570,
-      "y": 0,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-tb",
-      "type": "file",
-      "file": "references/schema-task-boundary.schema.yaml",
-      "x": 570,
-      "y": 40,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-meta",
-      "type": "file",
-      "file": "references/schema-meta-normalization.schema.yaml",
-      "x": 570,
-      "y": 80,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-hu",
-      "type": "file",
-      "file": "references/schema-hu-normalization.schema.yaml",
-      "x": 570,
-      "y": 120,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    },
-    {
-      "id": "f-sch-mutual",
-      "type": "file",
-      "file": "references/schema-mutual-node.schema.yaml",
-      "x": 570,
-      "y": 160,
-      "width": 260,
-      "height": 35,
-      "color": "3"
-    }
-  ],
-  "edges": [
-    {
-      "id": "e1",
-      "fromNode": "f-rho",
-      "toNode": "f-theta",
-      "label": "ρ+θ=1"
-    },
-    {
-      "id": "e2",
-      "fromNode": "f-theta",
-      "toNode": "f-cache",
-      "label": "θ'↑/退潮"
-    },
-    {
-      "id": "e3",
-      "fromNode": "f-cache",
-      "toNode": "f-deep",
-      "label": "深睡->重建"
-    },
-    {
-      "id": "e4",
-      "fromNode": "f-cache",
-      "toNode": "f-condense",
-      "label": "退潮->condense"
-    },
-    {
-      "id": "e5",
-      "fromNode": "f-tbr",
-      "toNode": "f-boundary",
-      "label": "先思考再编译"
-    },
-    {
-      "id": "e6",
-      "fromNode": "f-boundary",
-      "toNode": "f-meta-norm",
-      "label": "B_T"
-    },
-    {
-      "id": "e7",
-      "fromNode": "f-boundary",
-      "toNode": "f-hu-norm",
-      "label": "B_T"
-    },
-    {
-      "id": "e8",
-      "fromNode": "f-meta-norm",
-      "toNode": "f-hu-norm",
-      "label": "并行"
-    },
-    {
-      "id": "e9",
-      "fromNode": "f-meta-norm",
-      "toNode": "f-sancai",
-      "label": "三才编码"
-    },
-    {
-      "id": "e10",
-      "fromNode": "f-hu-norm",
-      "toNode": "f-hu-space",
-      "label": "互编码"
-    },
-    {
-      "id": "e11",
-      "fromNode": "f-hu-space",
-      "toNode": "f-topo",
-      "label": "FlowEvent⊂互"
-    },
-    {
-      "id": "e12",
-      "fromNode": "f-zg-orch",
-      "toNode": "f-sancai",
-      "label": "调用藏"
-    },
-    {
-      "id": "e13",
-      "fromNode": "f-zg-orch",
-      "toNode": "f-santi",
-      "label": "调用归"
-    },
-    {
-      "id": "e14",
-      "fromNode": "f-sancai",
-      "toNode": "f-santi",
-      "label": "藏->归"
-    },
-    {
-      "id": "e15",
-      "fromNode": "f-santi",
-      "toNode": "f-cycle",
-      "label": "归->新藏"
-    },
-    {
-      "id": "e16",
-      "fromNode": "f-deep",
-      "toNode": "f-rho",
-      "label": "ρ当边权"
-    },
-    {
-      "id": "e17",
-      "fromNode": "f-recipe-research",
-      "toNode": "f-boundary",
-      "label": "先编译边界"
-    }
-  ]
+ "nodes": [
+  {
+   "id": "grp-core",
+   "type": "group",
+   "x": 60,
+   "y": 60,
+   "width": 1208,
+   "height": 148,
+   "color": "6",
+   "label": "核心层(数学模块, 独立)"
+  },
+  {
+   "id": "f-rho",
+   "type": "file",
+   "file": "references/rho-convergence.md",
+   "x": 84,
+   "y": 84,
+   "width": 200,
+   "height": 100,
+   "color": "1"
+  },
+  {
+   "id": "f-theta",
+   "type": "file",
+   "file": "references/theta-switching.md",
+   "x": 324,
+   "y": 84,
+   "width": 200,
+   "height": 100,
+   "color": "1"
+  },
+  {
+   "id": "f-deep",
+   "type": "file",
+   "file": "references/n-focus.md",
+   "x": 564,
+   "y": 84,
+   "width": 200,
+   "height": 100,
+   "color": "1"
+  },
+  {
+   "id": "f-cache",
+   "type": "file",
+   "file": "references/cache-wave.md",
+   "x": 804,
+   "y": 84,
+   "width": 200,
+   "height": 100,
+   "color": "1"
+  },
+  {
+   "id": "f-condense",
+   "type": "file",
+   "file": "references/condense-protocol.md",
+   "x": 1044,
+   "y": 84,
+   "width": 200,
+   "height": 60,
+   "color": "5"
+  },
+  {
+   "id": "grp-pre",
+   "type": "group",
+   "x": 60,
+   "y": 238,
+   "width": 1008,
+   "height": 108,
+   "color": "4",
+   "label": "预处理层(门控, 任务边界优先)"
+  },
+  {
+   "id": "f-tbr",
+   "type": "file",
+   "file": "references/think-before-responding.md",
+   "x": 84,
+   "y": 262,
+   "width": 160,
+   "height": 60,
+   "color": "4"
+  },
+  {
+   "id": "f-boundary",
+   "type": "file",
+   "file": "references/task-boundary.md",
+   "x": 284,
+   "y": 262,
+   "width": 160,
+   "height": 60,
+   "color": "4"
+  },
+  {
+   "id": "f-meta-norm",
+   "type": "file",
+   "file": "references/meta-normalization.md",
+   "x": 484,
+   "y": 262,
+   "width": 160,
+   "height": 60,
+   "color": "3"
+  },
+  {
+   "id": "f-hu-norm",
+   "type": "file",
+   "file": "references/hu-normalization.md",
+   "x": 684,
+   "y": 262,
+   "width": 160,
+   "height": 60,
+   "color": "3"
+  },
+  {
+   "id": "f-task",
+   "type": "file",
+   "file": "references/task-decomposition.md",
+   "x": 884,
+   "y": 262,
+   "width": 160,
+   "height": 60,
+   "color": "4"
+  },
+  {
+   "id": "grp-obs",
+   "type": "group",
+   "x": 60,
+   "y": 376,
+   "width": 728,
+   "height": 98,
+   "color": "3",
+   "label": "观测空间层(独立编码, 独立归一化)"
+  },
+  {
+   "id": "f-hu-space",
+   "type": "file",
+   "file": "references/hu-observation-space.md",
+   "x": 84,
+   "y": 400,
+   "width": 200,
+   "height": 50,
+   "color": "3"
+  },
+  {
+   "id": "f-sancai",
+   "type": "file",
+   "file": "references/sancai-store.md",
+   "x": 324,
+   "y": 400,
+   "width": 200,
+   "height": 50,
+   "color": "3"
+  },
+  {
+   "id": "t-supplementary",
+   "type": "text",
+   "text": "## 补充空间\n时间/证据/来源/不确定性\n按任务提升为强制维度",
+   "x": 564,
+   "y": 400,
+   "width": 200,
+   "height": 50,
+   "color": "5"
+  },
+  {
+   "id": "grp-zg",
+   "type": "group",
+   "x": 60,
+   "y": 504,
+   "width": 968,
+   "height": 108,
+   "color": "5",
+   "label": "藏归层(可插拔认知分支)"
+  },
+  {
+   "id": "f-zg-orch",
+   "type": "file",
+   "file": "references/zang-gui-orchestrator.md",
+   "x": 84,
+   "y": 528,
+   "width": 200,
+   "height": 60,
+   "color": "5"
+  },
+  {
+   "id": "f-santi",
+   "type": "file",
+   "file": "references/santi-read.md",
+   "x": 324,
+   "y": 528,
+   "width": 200,
+   "height": 60,
+   "color": "3"
+  },
+  {
+   "id": "f-topo",
+   "type": "file",
+   "file": "references/flow-topology.md",
+   "x": 564,
+   "y": 528,
+   "width": 200,
+   "height": 60,
+   "color": "3"
+  },
+  {
+   "id": "f-cycle",
+   "type": "file",
+   "file": "references/zang-gui-cycle.md",
+   "x": 804,
+   "y": 528,
+   "width": 200,
+   "height": 60,
+   "color": "3"
+  },
+  {
+   "id": "grp-recipe",
+   "type": "group",
+   "x": 60,
+   "y": 642,
+   "width": 588,
+   "height": 98,
+   "color": "2",
+   "label": "配方层"
+  },
+  {
+   "id": "f-recipe-research",
+   "type": "file",
+   "file": "references/research-recipe.yaml",
+   "x": 84,
+   "y": 666,
+   "width": 250,
+   "height": 50,
+   "color": "2"
+  },
+  {
+   "id": "f-recipe-fast",
+   "type": "file",
+   "file": "references/fast-filter-recipe.yaml",
+   "x": 374,
+   "y": 666,
+   "width": 250,
+   "height": 50,
+   "color": "2"
+  },
+  {
+   "id": "grp-schema",
+   "type": "group",
+   "x": 60,
+   "y": 770,
+   "width": 1208,
+   "height": 201,
+   "color": "3",
+   "label": "Schema"
+  },
+  {
+   "id": "f-sch-attn",
+   "type": "file",
+   "file": "references/schema-attention-state.schema.yaml",
+   "x": 84,
+   "y": 794,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-store",
+   "type": "file",
+   "file": "references/schema-store-node.schema.yaml",
+   "x": 384,
+   "y": 794,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-read",
+   "type": "file",
+   "file": "references/schema-read-node.schema.yaml",
+   "x": 684,
+   "y": 794,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-flow",
+   "type": "file",
+   "file": "references/schema-flow-event.schema.yaml",
+   "x": 984,
+   "y": 794,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-cycle",
+   "type": "file",
+   "file": "references/schema-cycle-link.schema.yaml",
+   "x": 84,
+   "y": 853,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-tb",
+   "type": "file",
+   "file": "references/schema-task-boundary.schema.yaml",
+   "x": 384,
+   "y": 853,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-meta",
+   "type": "file",
+   "file": "references/schema-meta-normalization.schema.yaml",
+   "x": 684,
+   "y": 853,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-hu",
+   "type": "file",
+   "file": "references/schema-hu-normalization.schema.yaml",
+   "x": 984,
+   "y": 853,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  },
+  {
+   "id": "f-sch-mutual",
+   "type": "file",
+   "file": "references/schema-mutual-node.schema.yaml",
+   "x": 84,
+   "y": 912,
+   "width": 260,
+   "height": 35,
+   "color": "3"
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "fromNode": "f-rho",
+   "toNode": "f-theta",
+   "label": "ρ+θ=1"
+  },
+  {
+   "id": "e2",
+   "fromNode": "f-theta",
+   "toNode": "f-cache",
+   "label": "θ'↑/退潮"
+  },
+  {
+   "id": "e3",
+   "fromNode": "f-cache",
+   "toNode": "f-deep",
+   "label": "深睡->重建"
+  },
+  {
+   "id": "e4",
+   "fromNode": "f-cache",
+   "toNode": "f-condense",
+   "label": "退潮->condense"
+  },
+  {
+   "id": "e5",
+   "fromNode": "f-tbr",
+   "toNode": "f-boundary",
+   "label": "先思考再编译"
+  },
+  {
+   "id": "e6",
+   "fromNode": "f-boundary",
+   "toNode": "f-meta-norm",
+   "label": "B_T"
+  },
+  {
+   "id": "e7",
+   "fromNode": "f-boundary",
+   "toNode": "f-hu-norm",
+   "label": "B_T"
+  },
+  {
+   "id": "e8",
+   "fromNode": "f-meta-norm",
+   "toNode": "f-hu-norm",
+   "label": "并行"
+  },
+  {
+   "id": "e9",
+   "fromNode": "f-meta-norm",
+   "toNode": "f-sancai",
+   "label": "三才编码"
+  },
+  {
+   "id": "e10",
+   "fromNode": "f-hu-norm",
+   "toNode": "f-hu-space",
+   "label": "互编码"
+  },
+  {
+   "id": "e11",
+   "fromNode": "f-hu-space",
+   "toNode": "f-topo",
+   "label": "FlowEvent⊂互"
+  },
+  {
+   "id": "e12",
+   "fromNode": "f-zg-orch",
+   "toNode": "f-sancai",
+   "label": "调用藏"
+  },
+  {
+   "id": "e13",
+   "fromNode": "f-zg-orch",
+   "toNode": "f-santi",
+   "label": "调用归"
+  },
+  {
+   "id": "e14",
+   "fromNode": "f-sancai",
+   "toNode": "f-santi",
+   "label": "藏->归"
+  },
+  {
+   "id": "e15",
+   "fromNode": "f-santi",
+   "toNode": "f-cycle",
+   "label": "归->新藏"
+  },
+  {
+   "id": "e16",
+   "fromNode": "f-deep",
+   "toNode": "f-rho",
+   "label": "ρ当边权"
+  },
+  {
+   "id": "e17",
+   "fromNode": "f-recipe-research",
+   "toNode": "f-boundary",
+   "label": "先编译边界"
+  }
+ ]
 }

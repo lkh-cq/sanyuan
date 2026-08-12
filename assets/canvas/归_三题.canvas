@@ -1,102 +1,102 @@
 {
-  "nodes": [
-    {
-      "id": "grp-gui",
-      "type": "group",
-      "x": 0,
-      "y": 0,
-      "width": 800,
-      "height": 300,
-      "color": "3",
-      "label": "三题归"
-    },
-    {
-      "id": "f-tianti",
-      "type": "file",
-      "file": "references/tianti.md",
-      "x": 20,
-      "y": 40,
-      "width": 220,
-      "height": 100,
-      "color": "1"
-    },
-    {
-      "id": "f-diti",
-      "type": "file",
-      "file": "references/diti.md",
-      "x": 290,
-      "y": 40,
-      "width": 220,
-      "height": 100,
-      "color": "4"
-    },
-    {
-      "id": "f-renti",
-      "type": "file",
-      "file": "references/renti.md",
-      "x": 560,
-      "y": 40,
-      "width": 220,
-      "height": 100,
-      "color": "5"
-    },
-    {
-      "id": "f-ontology",
-      "type": "file",
-      "file": "references/santi-read.md",
-      "x": 290,
-      "y": 170,
-      "width": 220,
-      "height": 60,
-      "color": "3"
-    },
-    {
-      "id": "f-inject",
-      "type": "file",
-      "file": "references/read-injection.md",
-      "x": 560,
-      "y": 170,
-      "width": 220,
-      "height": 60,
-      "color": "3"
-    }
-  ],
-  "edges": [
-    {
-      "id": "e1",
-      "fromNode": "f-tianti",
-      "toNode": "f-diti",
-      "label": "天↔地"
-    },
-    {
-      "id": "e2",
-      "fromNode": "f-diti",
-      "toNode": "f-renti",
-      "label": "地↔人"
-    },
-    {
-      "id": "e3",
-      "fromNode": "f-tianti",
-      "toNode": "f-ontology",
-      "label": "定义"
-    },
-    {
-      "id": "e4",
-      "fromNode": "f-diti",
-      "toNode": "f-ontology",
-      "label": "定义"
-    },
-    {
-      "id": "e5",
-      "fromNode": "f-renti",
-      "toNode": "f-ontology",
-      "label": "定义"
-    },
-    {
-      "id": "e6",
-      "fromNode": "f-renti",
-      "toNode": "f-inject",
-      "label": "读取记录->注入"
-    }
-  ]
+ "nodes": [
+  {
+   "id": "grp-gui",
+   "type": "group",
+   "x": 60,
+   "y": 60,
+   "width": 1340,
+   "height": 140,
+   "color": "3",
+   "label": "三题归"
+  },
+  {
+   "id": "f-tianti",
+   "type": "file",
+   "file": "references/tianti.md",
+   "x": 80,
+   "y": 80,
+   "width": 220,
+   "height": 100,
+   "color": "1"
+  },
+  {
+   "id": "f-diti",
+   "type": "file",
+   "file": "references/diti.md",
+   "x": 350,
+   "y": 80,
+   "width": 220,
+   "height": 100,
+   "color": "4"
+  },
+  {
+   "id": "f-renti",
+   "type": "file",
+   "file": "references/renti.md",
+   "x": 620,
+   "y": 80,
+   "width": 220,
+   "height": 100,
+   "color": "5"
+  },
+  {
+   "id": "f-ontology",
+   "type": "file",
+   "file": "references/santi-read.md",
+   "x": 890,
+   "y": 80,
+   "width": 220,
+   "height": 60,
+   "color": "3"
+  },
+  {
+   "id": "f-inject",
+   "type": "file",
+   "file": "references/read-injection.md",
+   "x": 1160,
+   "y": 80,
+   "width": 220,
+   "height": 60,
+   "color": "3"
+  }
+ ],
+ "edges": [
+  {
+   "id": "e1",
+   "fromNode": "f-tianti",
+   "toNode": "f-diti",
+   "label": "天↔地"
+  },
+  {
+   "id": "e2",
+   "fromNode": "f-diti",
+   "toNode": "f-renti",
+   "label": "地↔人"
+  },
+  {
+   "id": "e3",
+   "fromNode": "f-tianti",
+   "toNode": "f-ontology",
+   "label": "定义"
+  },
+  {
+   "id": "e4",
+   "fromNode": "f-diti",
+   "toNode": "f-ontology",
+   "label": "定义"
+  },
+  {
+   "id": "e5",
+   "fromNode": "f-renti",
+   "toNode": "f-ontology",
+   "label": "定义"
+  },
+  {
+   "id": "e6",
+   "fromNode": "f-renti",
+   "toNode": "f-inject",
+   "label": "读取记录->注入"
+  }
+ ]
 }
