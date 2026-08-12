@@ -6,7 +6,7 @@ description: "index 命名规范 v2.0 —— 知识库目录索引的命名、�
 # index 命名规范 (v2.0) 扩展
 
 > 模块: extension-index-naming-norm
-> 版本: 0.1.0 (experimental)
+> 版本: 0.1.0 (experimental) —— 扩展包版本;规范本体版本见标题 v2.0(两者独立:规范冻结 v2.0,skill 包迭代 0.1.0)
 > 日期: 2026-08-12 | 取代: 旧 `L0-001` 序号规范 (v1.0, 2026-08-07, 用于 master_index.csv 治理)
 > 来源: hermes_memory 全盘 index 拓扑审计 (见 [references/index-scan-audit-20260812.md](references/index-scan-audit-20260812.md)) + 规范冻结
 > 触发: 用户冻结 (2026-08-12): "我们需要一个新的规范, index 命名规范"
@@ -47,7 +47,7 @@ description: "index 命名规范 v2.0 —— 知识库目录索引的命名、�
 
 ### 规则 1: 根文件夹的 main branch index（层级 1）
 
-- 命名: **按内容命名或编号**（不用固定 `_INDEX.md`）
+- 命名: **按内容命名或编号**（不用固定 `_INDEX.md`）;按内容命名时语义名须以 `_index` 结尾（如 `memory_index.md`）,否则校验脚本判不合规
 - 结构: `index.<date>.<内容>.<层级>` 亦可，或直接内容语义名（如 `memory_index.md`）
 - 必须: 文件第一行(标题下)加**小标题**，标引该目录下具体内容，方便下一级 index 索引
 
@@ -69,7 +69,7 @@ description: "index 命名规范 v2.0 —— 知识库目录索引的命名、�
 
 ### 规则 3: 根目录总 INDEX（层级 0）
 
-- 文件名: 保留 `_index.md`（全库唯一总入口）
+- 文件名: 保留 `_index.md`（全库唯一总入口）。**仅根目录的 `_index.md` 保留;层级 ≥1 的 `_index.md` 一律按规则 1/2 改造**（校验脚本口径一致）
 - 内容: 登记全部层级 1 main index + 全库索引注册表
 
 ## 三、新旧规范过渡

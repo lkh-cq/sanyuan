@@ -2,7 +2,8 @@
 
 # index 目录映射表 (58 项, 2026-08-12)
 
-> 层级 = 上游目录文件夹个数。58 个目录索引参与 v2.0 改造。
+> 层级 = 上游目录文件夹个数。58 个目录索引参与 v2.0 改造（`_INDEX.md`/`_index.md` 且非保留项）。
+> 另有 5 项不入表：根 `_index.md`（保留）、`COLOR_INDEX.md`（保留）、`GEO_ROOT_INDEX.md`（保留）、`memory/040_oracle_bone_verification_index.md`（合规语义名）、`archive/chief/_index_v1.0.md`（旧版归档，脚本判违规但不属当前治理范围）。
 
 层级分布: 1×10, 2×19, 3×12, 4×4, 6×12, 8×1
 
