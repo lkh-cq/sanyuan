@@ -42,8 +42,6 @@ module_lifecycle:
     - extension-double-observation-space
     - extension-process-transparency
     - extension-endoscopic-code-actuation
-    - extension-mirror-bus
-    - extension-soul-echo
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -326,18 +324,6 @@ extensions:
       path: scripts/endoscope.py
     r_adapter:
       path: scripts/endoscope_r.R
-  mirror_bus:
-    id: mirror-bus
-    name: 跨窗口观察总线协议
-    path: references/mirror-bus-spec.md
-    version: 0.1.0
-    module_id: extension-mirror-bus
-  soul_echo:
-    id: soul-echo
-    name: 主题回声协议
-    path: references/soul-echo-spec.md
-    version: 0.1.0
-    module_id: extension-soul-echo
 
 validation:
   output_contract: references/output-contract.md

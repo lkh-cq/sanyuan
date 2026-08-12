@@ -103,15 +103,7 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 - **校验**：`python3 extensions/index-naming/scripts/validate_index_naming.py --dry <目录>`（只读预览不合规清单）。
 - **约束**：只治理 Markdown 目录索引；node_modules/.git/dist 等程序索引不进入知识图谱。来源：hermes_memory 全盘索引拓扑审计（2026-08-12，367 个 index 路径）。
 
-### mirror-bus-spec + soul-echo-spec（references/）
-
-Hermes 本地跨窗口/跨模型观察总线（传入神经）的**协议文档化**：
-
-- `references/mirror-bus-spec.md`：命名空间结构、命令语义（read/watch/offline/status/start/stop=归档/skill load/list/diff）、canary 上下文压缩检测、bus.jsonl 条目字段、操作铁律（手动控制、read 优先、用户是整合者、stop=归档）。
-- `references/soul-echo-spec.md`：主题回声协议（soul_echo.jsonl JSONL 追加、只记一词、追加不覆盖）。
-- **约束**：运行时（~/.hermes/mirror/）**不并入**，留在 Hermes 本地；当前**已停用（用户冻结，勿重启运行时）**。sanyuan 只持有协议规范，供语言无关重写。
-
-两个模块已登记 `project-manifest.yaml`（extensions 段 + experimental lifecycle），`validate_bundle.py` 必须 PASS。
+> 注：mirror 总线（跨窗口观察）是**独立功能**，协议与脚本已移出本仓库，见独立仓库 [lkh-cq/mirror-bus](https://github.com/lkh-cq/mirror-bus)（含 mirror-bus-spec、soul-echo-spec 与运行时脚本）。
 
 ## 版本与成熟度
 

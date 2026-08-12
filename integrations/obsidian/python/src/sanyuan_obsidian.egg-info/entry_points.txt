@@ -1,0 +1,2 @@
+[console_scripts]
+sanyuan-obsidian = sanyuan_obsidian.__main__:main
