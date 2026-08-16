@@ -23,6 +23,8 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 
 代码干预模式不是独立 Agent。先编译 `B_T`，再把当前任务映射为 TaskProfile；归一化阶段把 `omitted_features + recovery_refs` 编译为 NSL。Endoscope 只有在新观测命中 shadow 或其与 active view 的关系时才恢复最小集合，并分别控制 Execution / State / Output 三个闸门。发现解释层出血时可继续安全诊断但阻断最终交付；不可逆副作用必须停在执行闸门前。
 
+当任务明确研究“循环语义再注入、来源区分、快/慢状态、稠密/稀疏/广播路由或跨尺度注意力”时，可按需读取 [multiscale-reinjection-kernel.md](references/multiscale-reinjection-kernel.md)。该模块当前为 experimental，只提供组合协议和参考控制面，不修改冻结本体，也不默认替换现有研究/快筛配方。
+
 ## 执行主流程
 
 1. **冻结输入。** 区分用户原话、源材料、既有项目定义与当前推断。以用户最新明确表述覆盖旧定义，但记录覆盖关系。
@@ -75,6 +77,7 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 - 藏归：[sancai-store.md](references/sancai-store.md)、[santi-read.md](references/santi-read.md)、[zang-gui-orchestrator.md](references/zang-gui-orchestrator.md)
 - 关系与流止：[hu-observation-space.md](references/hu-observation-space.md)、[flow-topology.md](references/flow-topology.md)、[zang-gui-cycle.md](references/zang-gui-cycle.md)
 - 实验性矩阵：[yijing-coupling-matrix.md](references/yijing-coupling-matrix.md)
+- 实验性多时间尺度再注入：[multiscale-reinjection-kernel.md](references/multiscale-reinjection-kernel.md)
 
 ### Endoscope / Bloodtesting
 
@@ -95,6 +98,6 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 
 - 项目清单：[project-manifest.yaml](references/project-manifest.yaml)
 - 状态协议：[state-protocol.schema.yaml](references/state-protocol.schema.yaml)
-- Schema：按清单 `schemas` 节读取；Endoscope 使用清单登记的 NSL/Event/Gate/Profile/BloodRecord 合同。
+- Schema：按清单 `schemas` 节读取；Endoscope 使用清单登记的 NSL/Event/Gate/Profile/BloodRecord 合同；多时间尺度实验使用 SignalEnvelope/ReinjectionFrame 合同。
 
-修改任何本体、模块路径、配方或 Schema 后，运行 `python3 scripts/validate_bundle.py` 与 `python3 scripts/validate_endoscope.py`，并用独立任务前向测试语义行为；确定性脚本不冒充语义证明。
+修改任何本体、模块路径、配方或 Schema 后，运行 `python3 scripts/validate_bundle.py`、`python3 scripts/validate_endoscope.py` 与 `python3 scripts/validate_multiscale_reinjection.py`，并用独立任务前向测试语义行为；确定性脚本不冒充语义证明。
