@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lkh-cq/sanyuan/references/schema-signal-envelope.schema.json",
+  "title": "SignalEnvelope",
+  "description": "Experimental routing header for a source-aware, multi-timescale signal. The payload remains outside the header and is addressed by payload_ref.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "signal_id",
+    "payload_ref",
+    "source",
+    "modality",
+    "temporal",
+    "propagation",
+    "provenance",
+    "task_boundary_ref"
+  ],
+  "properties": {
+    "signal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "payload_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Reference to StoreNode, ReadNode, MutualNode, FlowEvent, tool output, file span, or another externally stored payload."
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Open source taxonomy. Domain adapters may use labels such as neural, metabolic, immune, endocrine, runtime, tool, document, user, or model without implying mechanism equivalence."
+        },
+        "channel": {
+          "type": "string"
+        },
+        "source_ref": {
+          "type": "string"
+        }
+      }
+    },
+    "modality": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Input form such as text, image, audio, table, sensor, runtime-event, or a domain-defined modality."
+    },
+    "temporal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observed_at", "timescale", "persistence"],
+      "properties": {
+        "observed_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "timescale": {
+          "type": "string",
+          "enum": ["fast", "intermediate", "slow", "static"]
+        },
+        "persistence": {
+          "type": "string",
+          "enum": ["transient", "session", "persistent"]
+        },
+        "ttl_ms": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        }
+      }
+    },
+    "propagation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["scope", "fanout"],
+      "properties": {
+        "scope": {
+          "type": "string",
+          "enum": ["local", "regional", "global"]
+        },
+        "fanout": {
+          "type": "string",
+          "enum": ["dense", "sparse", "broadcast"]
+        },
+        "hop_limit": {
+          "type": ["integer", "null"],
+          "minimum": 0
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["kind"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "minLength": 1
+        },
+        "ref": {
+          "type": "string"
+        }
+      }
+    },
+    "uncertainty": {
+      "type": ["number", "null"],
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Optional uncertainty supplied by an external calibrated process. It is not rho or theta."
+    },
+    "task_boundary_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "routing_class": {
+      "type": "string",
+      "enum": ["intra-fast", "intra-slow", "fast-to-slow", "slow-to-fast", "adapter-defined"]
+    },
+    "dependency_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tags": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
