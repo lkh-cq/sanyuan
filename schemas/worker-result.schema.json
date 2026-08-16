@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanyuan-hive/schemas/worker-result.schema.json",
+  "title": "Worker Result",
+  "description": "worker 结果合同: append-only 记录, 可重跑但不可原位覆盖",
+  "type": "object",
+  "required": ["hive_id", "worker_id", "shard_id", "attempt", "status", "content_sha256"],
+  "properties": {
+    "hive_id": {"type": "string", "pattern": "^hive_[0-9]{8}_[0-9]{6}$"},
+    "worker_id": {"type": "string", "pattern": "^worker_[0-9A-Za-z_]+$"},
+    "shard_id": {"type": "string", "pattern": "^shard_[0-9A-Za-z_]+$"},
+    "attempt": {"type": "integer", "minimum": 1},
+    "status": {"type": "string", "enum": ["completed", "failed", "blocked"]},
+    "result": {
+      "type": "object",
+      "properties": {
+        "summary": {"type": "string"},
+        "claims": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "assumptions": {"type": "array", "items": {"type": "string"}},
+    "gaps": {"type": "array", "items": {"type": "string"}},
+    "tests": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}, "passed": {"type": "boolean"}},
+        "required": ["id", "passed"]
+      }
+    },
+    "content_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "additionalProperties": false
+}

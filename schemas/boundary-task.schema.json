@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sanyuan-hive/schemas/boundary-task.schema.json",
+  "title": "Boundary Task (B_T)",
+  "description": "hive-main 任务边界合同: hive_id + B_T generation 为唯一计算身份",
+  "type": "object",
+  "required": ["hive_id", "boundary_id", "boundary_hash", "generation", "task_goal", "source_scope", "stop_condition"],
+  "properties": {
+    "hive_id": {"type": "string", "pattern": "^hive_[0-9]{8}_[0-9]{6}$"},
+    "boundary_id": {"type": "string", "pattern": "^bt_[0-9]{8}_[0-9]{6}$"},
+    "boundary_hash": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "generation": {"type": "integer", "minimum": 1},
+    "status": {"type": "string", "enum": ["active", "quiescing", "blocked", "completed", "archived", "expired"]},
+    "task_goal": {"type": "string", "minLength": 1},
+    "forbidden_loss": {"type": "array", "items": {"type": "string"}},
+    "source_scope": {"type": "array", "items": {"type": "string", "pattern": "^source://"}},
+    "stop_condition": {"type": "string", "minLength": 1},
+    "policy_version": {"type": "string", "default": "hive-policy/0.1"},
+    "created_at": {"type": "string", "format": "date-time"}
+  },
+  "additionalProperties": false
+}

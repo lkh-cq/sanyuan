@@ -1,0 +1,22 @@
+name: hive-ci
+on:
+  pull_request:
+    branches: [hive-main]
+  push:
+    branches: [hive-main]
+
+jobs:
+  isolation-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: install
+        run: pip install -e .
+      - name: schema validation (P0)
+        run: |
+          python3 -c "import json; [json.load(open(f)) for f in ['schemas/boundary-task.schema.json','schemas/worker-result.schema.json']]"
+      - name: unit tests (isolation)
+        run: python3 -m pytest tests/ -q

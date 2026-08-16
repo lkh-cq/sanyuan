@@ -1,0 +1,12 @@
+# hive-main 忽略规则
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+dist/
+build/
+.venv/
+hive-data/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm

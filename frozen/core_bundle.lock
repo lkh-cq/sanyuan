@@ -1,0 +1,7 @@
+core_bundle:
+  source: consciousness-bus
+  version: 3.3.0
+  commit: 875bda6
+  sha256: <bundle-digest>
+  immutable: true
+  runtime_state_shared: false
