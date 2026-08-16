@@ -1,0 +1,86 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lkh-cq/sanyuan/references/schema-reinjection-frame.schema.json",
+  "title": "ReinjectionFrame",
+  "description": "Minimal context recompilation frame. rho and theta are control allocations with the semantic invariant rho + theta = 1; JSON Schema alone does not enforce the sum constraint.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "frame_id",
+    "task_boundary_ref",
+    "delta_refs",
+    "persistent_refs",
+    "revived_refs",
+    "rho",
+    "theta",
+    "gate"
+  ],
+  "properties": {
+    "frame_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "task_boundary_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "delta_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Changed payload references eligible for this cycle."
+    },
+    "persistent_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Addresses of unchanged slow/static state. Their payloads are not implicitly replayed."
+    },
+    "revived_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "description": "Previously shadowed or persistent references explicitly reopened for the current frame."
+    },
+    "rho": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Current-direction convergence allocation. Not correctness probability."
+    },
+    "theta": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Allocation outside the current direction; theta = 1 - rho. Not error probability."
+    },
+    "gate": {
+      "type": "string",
+      "enum": ["CONVERGE", "REFRAME"]
+    },
+    "active_routes": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "enum": ["intra-fast", "intra-slow", "fast-to-slow", "slow-to-fast", "adapter-defined"]
+      }
+    },
+    "shadow_refs": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
