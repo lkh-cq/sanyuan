@@ -94,8 +94,23 @@
 8. Endoscope 与 `process-transparency` 互补：Observation Event 可作为决策日志 evidence，推断必须保留在 assumption 层。
 9. GitHub CI 增加 Python Endoscope 验证和独立 base R adapter 自测；只有两者与 bundle validator 都通过才允许默认分支发布标签。
 
+## 2026-08-16 V3.3.0 多时间尺度再注入实验组合
+
+本次把近期关于“ρ/θ 极小控制核、循环语义再注入、来源可区分的稠密/稀疏混合注意力、快/慢状态流”的讨论登记为**实验性组合层**，暂不修改 `references/architecture.md` 的冻结本体。
+
+1. 新增 `multiscale-reinjection-kernel`，把现有 `B_T → 元/互归一化 → 藏归 → n-focus/cache/condense → ρ/θ → Endoscope` 重新映射为同一个事件驱动循环中的策略，而非继续增加平级总线器官。
+2. 新增 `SignalEnvelope`：`payload_ref + routing header`，显式区分来源、模态、时间尺度、持久性、传播范围、fanout、证据来源、不确定性与任务边界；不把这些字段全部压成 embedding。
+3. 新增 fast/slow 状态容器；未变化的 persistent slow state 只保留引用，不在每一轮重复展开为完整 token。只有 delta、边界变化、跨尺度依赖命中或显式 revival 才进入 ReinjectionFrame。
+4. 稠密/稀疏/broadcast 被定义为传播权限，而不是“神经/免疫/代谢”等来源的固定身份；生物学只作为结构启发，不能未经证据直接升级为 AI 机制事实。
+5. 新增 ReinjectionFrame 合同，继续冻结 `ρ + θ = 1` 且禁止把 θ 当错误概率；ρ 由外部任务策略或观测过程提供，参考实现不通过模型自报估计正确性。
+6. `visualR` 保持 PAL/九宫/矩阵参考实现；`java-runtime` 继续执行“Java 不自行重定义语义”；`sanyuan-context-router` 继续作为薄客户端；已冻结 `mirror-bus` 不因本实验重启。
+7. 新增纯标准库 Python 参考实现和确定性 validator；它们只证明路由合同与 delta/persistent 行为自洽，不证明 learned attention 或领域因果有效。
+8. 晋升前必须完成跨模态前向测试、token/延迟基准、关键依赖漏失测试、θ 最小恢复效率测试，以及与 visualR/java-runtime 现有 ABI 的兼容验证。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
 
 Endoscope 的 Bloodtesting 夹具同样只是协议校准起点，不是通用 coding benchmark。工程自测通过只证明合同与参考实现自洽；真实 Agent 上的误报、漏报、首次出血、错误传播、恢复效率和 output 节省必须由前向运行数据支持。
+
+多时间尺度再注入参考实现同样只验证协议守恒、delta 检测与持久引用行为；任何稀疏/稠密路由权重、跨尺度 attention bias、真实多模态收益都必须由独立运行数据支持。
