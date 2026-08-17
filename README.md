@@ -19,10 +19,10 @@
 
 | Agent | 标识 | 接入方式 |
 | --- | --- | --- |
-| Hermes | **🟣 Hermes**<sup>技能宿主</sup> | 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载 |
-| Claude Code | **🟠 Claude Code**<sup>编码 worker</sup> | 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`） |
-| Codex / GPT | **🟢 Codex / GPT**<sup>界面元数据</sup> | OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)） |
-| DeepSeek Harness | **🔵 dsh**<sup>skill 适配</sup> | dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集） |
+| Hermes | <img src="https://github.com/nousresearch.png" width="18" height="18" alt="Nous Research"> **Hermes**<sup>技能宿主</sup> | 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载 |
+| Claude Code | <img src="https://github.com/anthropics.png" width="18" height="18" alt="Anthropic"> **Claude Code**<sup>编码 worker</sup> | 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`） |
+| Codex / GPT | <img src="https://github.com/openai.png" width="18" height="18" alt="OpenAI"> **Codex / GPT**<sup>界面元数据</sup> | OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)） |
+| DeepSeek Harness | <img src="https://github.com/deepseek-ai.png" width="18" height="18" alt="DeepSeek"> **dsh**<sup>skill 适配</sup> | dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集） |
 
 ## 从哪里开始
 
