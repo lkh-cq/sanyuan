@@ -13,6 +13,17 @@
 
 当前项目版本以 [`references/project-manifest.yaml`](references/project-manifest.yaml) 的 `project.version` 为唯一来源；正式版本由通过校验的 `v<version>` Git tag 标记。
 
+## 支持 Agent
+
+协议与 Skill 已适配以下 Agent 环境：
+
+| Agent | 标识 | 接入方式 |
+| --- | --- | --- |
+| Hermes | **🟣 Hermes**<sup>技能宿主</sup> | 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载 |
+| Claude Code | **🟠 Claude Code**<sup>编码 worker</sup> | 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`） |
+| Codex / GPT | **🟢 Codex / GPT**<sup>界面元数据</sup> | OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)） |
+| DeepSeek Harness | **🔵 dsh**<sup>skill 适配</sup> | dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集） |
+
 ## 从哪里开始
 
 | 你要做什么 | 读取入口 |
@@ -112,6 +123,10 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 - `stable` 表示已进入冻结运行链；`experimental` 表示接口已登记但仍需证据或使用经验。
 - 新方案先进入迁移或实验层，不直接覆盖冻结本体。
 - 每次默认分支发布必须先通过自动校验；相同版本不得指向两个不同提交。
+
+### 版本更新
+
+版本与变更历史以 [`references/version-provenance.md`](references/version-provenance.md) 为唯一记录（process-transparency 扩展 → Endoscope 全链路实验实现 → 多时间尺度再注入实验组合，版本演进见该文件）。仓库规则禁止版本号漂移到 manifest/provenance 之外，README 不重复登记。
 
 ## 资产与授权
 
