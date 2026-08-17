@@ -107,6 +107,14 @@
 7. 新增纯标准库 Python 参考实现和确定性 validator；它们只证明路由合同与 delta/persistent 行为自洽，不证明 learned attention 或领域因果有效。
 8. 晋升前必须完成跨模态前向测试、token/延迟基准、关键依赖漏失测试、θ 最小恢复效率测试，以及与 visualR/java-runtime 现有 ABI 的兼容验证。
 
+## 2026-08-17 V3.3.1 README 宣传与契约修正
+
+本次为 v3.3.0 之后的加固/宣传批次，不修改冻结本体。
+
+1. README 新增"支持 Agent"标识：Hermes / Claude Code / Codex·GPT / DeepSeek dsh，以品牌色 shields 徽章 + 接入方式呈现。
+2. README 新增"版本更新"入口，指向本文件（遵守"版本号不漂移到 manifest/provenance 之外"规则）。
+3. Endoscope 协议文档维持 0.2.0（履约全链路版本），修正一度误推的 0.1.1。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
