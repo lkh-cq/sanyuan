@@ -111,9 +111,13 @@
 
 本次为 v3.3.0 之后的加固/宣传批次，不修改冻结本体。
 
-1. README 新增"支持 Agent"标识：Hermes / Claude Code / Codex·GPT / DeepSeek dsh，以品牌色 shields 徽章 + 接入方式呈现。
+1. README 新增"支持 Agent"标识：Hermes / Claude Code / Codex·GPT / DeepSeek dsh（本批先以徽章/头像样式迭代，定稿见 V3.3.2）。
 2. README 新增"版本更新"入口，指向本文件（遵守"版本号不漂移到 manifest/provenance 之外"规则）。
 3. Endoscope 协议文档维持 0.2.0（履约全链路版本），修正一度误推的 0.1.1。
+
+## 2026-08-17 V3.3.2 支持 Agent 标识定稿
+
+README"支持 Agent"标识定为：**官方组织头像 + 加粗名称内联**，接于各 Agent 名称后方；去除独立"标识"列与徽章样式。头像走 `avatars.githubusercontent.com` 直链（GitHub README camo 代理对 `github.com/…png` 的 302 会拦成黑块，此方式已实测 200 可渲染）。
 
 ## 对验证材料的解释边界
 

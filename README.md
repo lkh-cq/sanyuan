@@ -17,12 +17,10 @@
 
 协议与 Skill 已适配以下 Agent 环境：
 
-| Agent | 标识 | 接入方式 |
-| --- | --- | --- |
-| Hermes | [![Hermes](https://img.shields.io/badge/Hermes-Host-8B5CF6?style=for-the-badge)](https://github.com/nousresearch) | 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载 |
-| Claude Code | [![Claude Code](https://img.shields.io/badge/Claude%20Code-Worker-D97757?style=for-the-badge&logo=anthropic&logoColor=white)](https://github.com/anthropics) | 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`） |
-| Codex / GPT | [![Codex/GPT](https://img.shields.io/badge/Codex%2FGPT-Meta-10A37F?style=for-the-badge&logo=openai&logoColor=white)](https://github.com/openai) | OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)） |
-| DeepSeek Harness | [![dsh](https://img.shields.io/badge/DeepSeek%20dsh-Skill-4D6BFE?style=for-the-badge)](https://github.com/deepseek-ai) | dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集） |
+- **Hermes** <img src="https://avatars.githubusercontent.com/nousresearch?s=32&v=4" width="20" height="20" alt="Nous Research"> — 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载
+- **Claude Code** <img src="https://avatars.githubusercontent.com/anthropics?s=32&v=4" width="20" height="20" alt="Anthropic"> — 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`）
+- **Codex / GPT** <img src="https://avatars.githubusercontent.com/openai?s=32&v=4" width="20" height="20" alt="OpenAI"> — OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)）
+- **dsh** <img src="https://avatars.githubusercontent.com/deepseek-ai?s=32&v=4" width="20" height="20" alt="DeepSeek"> — dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集）
 
 ## 从哪里开始
 
