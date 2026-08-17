@@ -12,5 +12,8 @@ dependencies = []
 [tool.setuptools.packages.find]
 where = ["src"]
 
+[tool.setuptools.package-data]
+sanyuan_hive = ["schemas/*.json"]
+
 [project.scripts]
 hive = "sanyuan_hive.cli:main"

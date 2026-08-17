@@ -17,6 +17,6 @@ jobs:
         run: pip install -e .
       - name: schema validation (P0)
         run: |
-          python3 -c "import json; [json.load(open(f)) for f in ['schemas/boundary-task.schema.json','schemas/worker-result.schema.json']]"
+          python3 -c "import json; [json.load(open(f)) for f in ['src/sanyuan_hive/schemas/boundary-task.schema.json','src/sanyuan_hive/schemas/worker-result.schema.json']]"
       - name: unit tests (isolation)
         run: python3 -m pytest tests/ -q
