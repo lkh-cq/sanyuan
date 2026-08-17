@@ -1,7 +1,7 @@
 # 三元三才·意识总线
 
 <p align="center">
-  <img src="assets/mascot-abigail.webp" alt="阿比盖尔，三元三才项目吉祥物" width="240">
+  <img src="assets/mascot-abigail.png" alt="阿比盖尔，三元三才项目吉祥物" width="240">
 </p>
 
 <p align="center">
@@ -17,10 +17,10 @@
 
 协议与 Skill 已适配以下 Agent 环境：
 
-- **Hermes** <img src="https://avatars.githubusercontent.com/nousresearch?s=32&v=4" width="20" height="20" alt="Nous Research"> — 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载
-- **Claude Code** <img src="https://avatars.githubusercontent.com/anthropics?s=32&v=4" width="20" height="20" alt="Anthropic"> — 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`）
-- **Codex / GPT** <img src="https://avatars.githubusercontent.com/openai?s=32&v=4" width="20" height="20" alt="OpenAI"> — OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)）
-- **dsh** <img src="https://avatars.githubusercontent.com/deepseek-ai?s=32&v=4" width="20" height="20" alt="DeepSeek"> — dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集）
+- **Hermes** <img src="assets/agent-icons/hermes.png" width="20" height="20" alt="Hermes 官方图标"> — 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载
+- **Claude Code** <img src="assets/agent-icons/claude-code.png" width="20" height="20" alt="Anthropic 官方图标"> — 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`）
+- **Codex / GPT** <img src="assets/agent-icons/codex.png" width="20" height="20" alt="Codex 官方图标"> — OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)）
+- **dsh** <img src="assets/agent-icons/dsh.svg" width="20" height="20" alt="dsh 官方图标"> — dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集）
 
 ## 从哪里开始
 
