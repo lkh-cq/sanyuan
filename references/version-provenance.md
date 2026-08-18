@@ -123,6 +123,10 @@ README"支持 Agent"标识定为：**官方组织头像 + 加粗名称内联**�
 
 V3.3.2 的 `avatars.githubusercontent.com/{org名}` 经实测对 Anthropic/OpenAI 返回灰色默认头像且受 camo 影响。本期改为：**官方仓库资源落盘到本仓库 `assets/agent-icons/`，README 用相对路径引用**，彻底脱离外部代理/头像别名。来源与采集锚点记录于 `assets/agent-icons/SOURCES.md`（Hermes=NousResearch 官方 PNG，Claude Code=Anthropic 官方组织头像，Codex=openai/codex 官方 PNG，dsh=deepseek-ai 官方 favicon）。吉祥物由 `mascot-abigail.webp` 无损转存为 `mascot-abigail.png`（README 改引 PNG 以兼容 GitHub 图片渲染），原 WebP 保留作源文件。
 
+## 2026-08-17 V3.3.4 Claude Code 图标换源
+
+V3.3.3 的 `claude-code.png` 取自 Anthropic 组织头像数值路径 `avatars.../u/76263028`，实测返回 GitHub 灰色/黑色默认占位（非品牌 logo）。本期改以 **simple-icons 的 `anthropic` A 字形**（填 Anthropic 官方橙 `#D97757`）落盘为 `claude-code.svg` 并替换引用；README 现全部图标均为本仓库相对路径资源。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。

@@ -18,7 +18,7 @@
 协议与 Skill 已适配以下 Agent 环境：
 
 - **Hermes** <img src="assets/agent-icons/hermes.png" width="20" height="20" alt="Hermes 官方图标"> — 意识总线技能宿主：`skill_view(conscious / unconscious / conscious-archive)` 上岗必载
-- **Claude Code** <img src="assets/agent-icons/claude-code.png" width="20" height="20" alt="Anthropic 官方图标"> — 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`）
+- **Claude Code** <img src="assets/agent-icons/claude-code.svg" width="20" height="20" alt="Anthropic 官方图标"> — 编码 worker 编排：Hermes 规划 + CC 落地（`claude -p ... --permission-mode acceptEdits`）
 - **Codex / GPT** <img src="assets/agent-icons/codex.png" width="20" height="20" alt="Codex 官方图标"> — OpenAI 界面元数据（[`agents/openai.yaml`](agents/openai.yaml)）
 - **dsh** <img src="assets/agent-icons/dsh.svg" width="20" height="20" alt="dsh 官方图标"> — dsh skill 兼容适配：`sanyuan-hive`（metadata.version `0.1.0-dsh.1`，单层 bundle + dsh 字段最小集）
 

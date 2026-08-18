@@ -5,7 +5,7 @@ README 的 Agent 图标均落盘为仓库内相对资源，避免 GitHub camo、
 | README 资源 | 官方来源 | 采集锚点 |
 | --- | --- | --- |
 | `hermes.png` | `https://github.com/NousResearch/hermes-agent` | `apps/desktop/public/hermes.png` @ `4323c67dcc6048fc8e311cdff7600d3d6a17807f` |
-| `claude-code.png` | `https://github.com/anthropics/claude-code` | 官方仓库没有独立 logo 文件；使用 Anthropic 官方组织头像数值路径 `https://avatars.githubusercontent.com/u/76263028?s=64&v=4` |
+| `claude-code.svg` | `https://github.com/simple-icons/simple-icons`（Anthropic 品牌 A 字形，填官方橙 `#D97757`） | `icons/anthropic.svg`（Anthropic 官方仓库无独立 logo 文件；组织头像数值路径 `avatars.../u/76263028` 实测返回 GitHub 灰色占位，弃用） |
 | `codex.png` | `https://github.com/openai/codex` | `codex-rs/skills/src/assets/samples/openai-docs/assets/openai.png` @ `21cfd369efca2df70c904c580b2e2e3eddb3c3` |
 | `dsh.svg` | `https://github.com/deepseek-ai/deepseek-harness` | `apps/web/public/favicon.svg` @ `99f6f02fecdb7dff40c3fbc9470f5907c29f74ca` |
 
