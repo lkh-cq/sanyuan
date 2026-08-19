@@ -1,0 +1,55 @@
+# 快速前端视图配方
+# 默认无损；不需要 FilterLease；只降低展开成本，不降低 source survival。
+
+recipe_id: fast-view
+name: 快速前端视图
+description: "简单任务的低成本 RAG 前端路径。保留全部来源引用，只减少展开深度并输出 RAGRequestFrame。"
+
+modules:
+  - task-boundary-compiler
+  - meta-normalization
+  - hu-normalization
+  - conscious-rho
+  - unconscious-theta
+
+sequence:
+  - step: 1
+    module: task-boundary-compiler
+    action: "生成 B_T；FilterLease 默认 CLOSED"
+    output: B_T
+
+  - step: 2
+    module: meta-normalization
+    action: "元信息保真对齐；可减少展开轴，但所有 source refs 保持可追溯"
+    input: B_T + raw_material
+    output: M_T
+
+  - step: 3
+    module: hu-normalization
+    action: "关系保真对齐；可优先 direct，但所有 relation refs 保持可追溯"
+    input: B_T + raw_relations
+    output: H_T
+
+  - step: 4
+    module: conscious-rho
+    action: "生成 rho 主注意力辅助提示；不得改变 source refs 或 FilterLease"
+
+  - step: 5
+    module: unconscious-theta
+    action: "生成 theta 次级注意力辅助提示；不得改变 source refs 或 FilterLease"
+
+  - step: 6
+    action: "编译 RAGRequestFrame"
+    output: RAGRequestFrame
+    constraints:
+      filter_applied: false
+      source_refs_preserved: true
+      retrieval_execution: external
+
+constraints:
+  - "默认 FilterLease=CLOSED"
+  - "快速只代表低展开成本，不代表高过滤"
+  - "不得产生 omitted_features / deleted_relations"
+  - "unmapped/unresolved 必须保留 source_ref"
+  - "rho/theta 只作为 advisory attention hints"
+  - "不实现 embedding/retrieval/rerank/generation"
