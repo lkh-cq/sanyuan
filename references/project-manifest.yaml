@@ -62,7 +62,6 @@ authority:
     module_id: root-architecture
   rag_frontend_guardrail:
     path: references/rag-frontend-governance.md
-    module_id: governance-rag-frontend-boundary
 
 governance:
   rag_frontend:
