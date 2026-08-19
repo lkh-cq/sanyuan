@@ -1,9 +1,9 @@
 # Meta Normalization Schema
-# 元信息归一化结果 M_T
+# 元信息归一化结果 M_T — lossless alignment view
 
 $schema: "https://json-schema.org/draft-07/schema#"
 title: MetaView
-description: "元信息任务视图: 元信息空间独立归一化结果"
+description: "元信息任务视图: 只做保真对齐与标注，不包含默认 omitted/delete/loss 权限。"
 
 type: object
 required:
@@ -13,20 +13,19 @@ required:
   - axes
   - route_code
   - continuous_signal
-  - preserved_features
-  - omitted_features
-  - recovery_refs
-  - loss
+  - source_item_refs
+  - aligned_features
+  - unmapped_features
+  - coverage
   - valid
 
 properties:
   representation_id:
     type: string
-    pattern: "^mt_\\d{8}_\\d{3}$"
+    pattern: "^mt_[A-Za-z0-9._:-]+$"
 
   boundary_id:
     type: string
-    description: "关联的任务边界ID"
 
   observation_system:
     type: string
@@ -34,7 +33,6 @@ properties:
 
   origin:
     type: string
-    description: "元空间原点描述"
 
   axes:
     type: array
@@ -45,12 +43,10 @@ properties:
 
   route_code:
     type: string
-    description: "离散路由码 q_M (元卦)"
-    pattern: "^[01]{3}$"
+    description: "离散路由码 q_M；只用于路由提示"
 
   continuous_signal:
     type: object
-    description: "连续信号分数 s_M"
     properties:
       tiancai:
         type: number
@@ -64,42 +60,63 @@ properties:
         type: number
         minimum: 0
         maximum: 1
+    additionalProperties: false
+
+  source_item_refs:
+    type: array
+    minItems: 1
+    uniqueItems: true
+    items:
+      type: string
 
   source_node_refs:
     type: array
-    description: "三才藏节点引用"
     items:
       type: string
 
-  preserved_features:
+  aligned_features:
     type: array
     items:
-      type: string
+      type: object
+      required: [feature_ref, source_ref]
+      properties:
+        feature_ref:
+          type: string
+        source_ref:
+          type: string
+        normalized_label:
+          type: [string, "null"]
+      additionalProperties: true
 
-  omitted_features:
+  unmapped_features:
     type: array
+    description: "无法完成对齐的特征必须显式保留，而不是 omitted"
     items:
-      type: string
+      type: object
+      required: [feature_ref, source_ref, reason]
+      properties:
+        feature_ref:
+          type: string
+        source_ref:
+          type: string
+        reason:
+          type: string
+      additionalProperties: false
 
-  recovery_refs:
-    type: array
-    description: "被删特征的恢复路径"
-    items:
-      type: string
-
-  loss:
+  coverage:
     type: object
-    required: [structural, functional]
+    required: [source_items_in, source_items_traceable_out]
     properties:
-      structural:
-        type: number
+      source_items_in:
+        type: integer
         minimum: 0
-        maximum: 1
-      functional:
-        type: number
+      source_items_traceable_out:
+        type: integer
         minimum: 0
-        maximum: 1
+    additionalProperties: false
 
   valid:
     type: boolean
-    description: "是否通过功能检查"
+    description: "是否通过来源可追溯与对齐检查"
+
+additionalProperties: false
