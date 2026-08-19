@@ -1,9 +1,9 @@
 ---
 name: hu-normalization
 module_id: preprocessor-hu-normalization
-description: "互信息空间独立归一化子skill。对信息之间的全部关系状态(直接互/复合互/路径残差/流止/转换/反馈)进行任务条件化归一化。不依赖元归一化或任何核心skill, 可独立运行。输出H_T互信息任务视图。"
+description: "互信息空间独立归一化。只负责关系保真对齐与标注，不拥有过滤、压缩或删除权限。输出可追溯的 H_T 关系视图。"
 category: preprocessor
-version: 0.1.0
+version: 0.2.0
 canvas_refs:
   - assets/canvas/意识总线_总架构.canvas
 manifest_ref: references/project-manifest.yaml
@@ -11,202 +11,192 @@ manifest_ref: references/project-manifest.yaml
 
 # 互信息空间归一化
 
-> 独立子skill。只处理互信息空间, 不处理元信息空间。
-> 输入: B_T(任务边界) + 原始关系材料 + (可选)M_T元信息视图
-> 输出: H_T(互信息任务视图)
+> 输入：`B_T + raw_relations`
+>
+> 输出：`H_T` 关系对齐视图。
+>
+> **Normalization changes representation, not relation survival.**
 
----
+## 1. 权限边界
 
-## 1. 冻结定义
+互归一化只允许：
 
-### 互信息空间
-对应信息之间的全部关系状态编码。包括:
+- 对直接互、复合互、路径残差、流止、转换、反馈、条件与时序关系做结构化对齐；
+- 统一 relation type、条件字段、端点引用与时间/来源表示；
+- 无法解析时标记 `unmapped_relations` / `unresolved_relations`；
+- 为下游 RAG 请求生成关系路由提示。
+
+互归一化禁止：
+
+- 根据任务相关性删除关系；
+- 把 `indifferent` 解释为“可删除”；
+- 用 `epsilon_T`、ρ/θ、n 位聚焦、SVD 或 Endoscope 自动压缩关系；
+- 因为只展开 direct 轴就让 composite/path residual 来源关系失去可追溯性；
+- 创建或激活 FilterLease。
+
+若需要大批次高过滤，必须进入独立 FilterLease 路径。
+
+## 2. 互信息空间
+
+互仍是独立关系观测空间，FlowEvent 只是其子类型。
+
+可包含：
+
+```text
+直接互
+复合互
+路径残差
+流止互
+转换互
+反馈互
+条件互
+时序互
 ```
-直接互:        A-B 直接关系
-复合互:        A-B-C 经由中介
-路径残差:      A-C直接 vs A-B-C复合 的差异
-流止互:        天↔地↔人拓扑 flow/stop/filter 事件
-转换互:        信息形态变化
-反馈互:        输出回流影响输入
-条件互:        特定条件下成立的关系
-时序互:        随时间变化的关系
-```
 
-互信息空间记录信息的动态关系, 可带时间戳与事件ID。
+关系视图不负责判断关系真假；证据状态与来源应保留给下游验证。
 
-### 与元信息空间的关系
-互信息空间和元信息空间完全独立编码、独立归一化。
-两者仅在跨空间一致性检查阶段通过 endpoint_refs 关联。
-互归一化不需要等待元归一化完成, 可以并行执行。
+## 3. 输入
 
-### 互 ≠ FlowEvent
-互是独立观测空间, FlowEvent只是互的一个子类型。
-互归一化处理全部关系类型, 不限于流止事件。
-
----
-
-## 2. 输入输出
-
-### 输入
 ```yaml
 input:
-  B_T:                    # 任务边界
-    required_spaces: [...] # 必须包含 hu
-    hu_axes: [...]        # 互信息轴选择
-    forbidden_loss: [...]  # 禁止损失的关系
-    epsilon_T: 0.05       # 误差预算
-  raw_relations:           # 原始关系材料
-    - source: "..."
-      target: "..."
-      relation_type: "..."
+  B_T:
+    task_id: ...
+    boundary_id: ...
+    hu_axes: [...]
+    attention_focus: {...}
+    preservation_requirements: [...]
+  raw_relations:
+    - relation_id: rel_001
+      source_ref: source_item_001
+      source: A
+      target: B
+      relation_type: direct
       conditions: [...]
-      strength: 0.8
-  meta_view:               # (可选)元信息视图, 用于跨空间引用
-    representation_id: "mt_..."
-    source_node_refs: [...]
 ```
 
-### 输出
+`B_T` 只控制本轮优先展开的关系轴，不授予删除权限。
+
+## 4. 输出
+
 ```yaml
 mutual_view:
-  representation_id: "ht_{timestamp}_{seq}"
-  boundary_id: "bt_..."
+  representation_id: ht_...
+  boundary_id: bt_...
   observation_system: hu
-  origin: "..."
-  axes:                    # 选择的轴
+  axes:
     - direct
     - composite
     - path_residual
-  route_code: "q_H"        # 离散路由码
-  continuous_signal: "s_H" # 连续信号分数
-  endpoint_refs:           # 关系端点引用
-    - "store_..."
-  relation_type: direct
-  direct_or_composite: direct
-  path_refs:               # 复合互的路径引用
-    - "store_..."
-  path_residual: null      # 路径残差
-  conditions: []           # 关系成立条件
-  strength: 0.8
-  preserved_features:      # 保留的关系特征
-    - "..."
-  omitted_features:        # 被压缩删除的关系特征
-    - "..."
-  recovery_refs:           # 恢复路径
-    - "..."
-  residual_features:       # 路径残差特征(特殊保护)
-    - "..."
-  loss:
-    structural: 0.02
-    functional: 0.01
+  route_code: q_H
+  continuous_signal: {...}
+  relation_refs:
+    - rel_001
+  aligned_relations:
+    - relation_ref: rel_001
+      endpoint_refs: [A, B]
+      relation_type: direct
+      conditions: [...]
+      source_ref: source_item_001
+  unresolved_relations:
+    - relation_ref: rel_019
+      source_ref: source_item_009
+      reason: unresolved_endpoint
+  path_residual_refs:
+    - pr_001
+  coverage:
+    relations_in: 27
+    relations_traceable_out: 27
   valid: true
 ```
 
----
+### 关键不变量
 
-## 3. 归一化流程
-
-### 步骤1: 轴加载
-读取 B_T.hu_axes, 确定使用哪些互信息轴。
-默认全加载: [direct, composite, path_residual]
-快速任务可以减少: 最少保留1轴(至少保留direct)。
-
-### 步骤2: 关系提取
-对原始关系材料, 按选定的轴提取关系:
-- 直接互轴: 提取 A-B 直接关系
-- 复合互轴: 提取 A-B-C 经由中介的关系
-- 路径残差轴: 计算 A-C直接 vs A-B-C复合 的差异
-- 流止互轴: 提取 flow/stop/filter 事件(如有天地人拓扑上下文)
-- 转换互轴: 提取信息形态变化
-- 反馈互轴: 提取输出回流关系
-
-提取结果编码为 MutualNode。
-
-### 步骤3: 任务条件路由
-对每个 MutualNode, 根据B_T判定:
-- required: 任务必需的关系, 不能删除
-- forbidden: 任务禁止的关系(如已知错误引用), 主动排除
-- indifferent: 任务无关的关系, 可删除
-
-判定依据: forbidden_loss 列表 + F_T 功能测试。
-
-### 步骤4: 路径残差保护
-路径残差是互信息空间的特殊特征:
-- 如果 A-C 既有直接互又有复合互, 两者的差异(路径残差)必须保留
-- 路径残差不能被当作 indifferent 删除
-- 即使快速任务也必须保留路径残差(如果存在)
-
-### 步骤5: 任务条件压缩
-对 indifferent 关系执行压缩:
-- 保留: required 关系 + path_residual + endpoint_refs + recovery_refs
-- 删除: indifferent 关系
-- 记录: 被删关系的 recovery_refs
-
-压缩约束: D_f(F_T(X), F_T(Z_T)) ≤ ε_T
-- 功能距离基于关系结构, 不是向量距离
-
-### 步骤6: 信号编码
-生成连续信号 s_H 和离散路由码 q_H:
-- s_H: 每个轴上的连续信号分数 [0, 1]
-  - 1 = 该轴关系丰富
-  - 0 = 该轴无关系
-- q_H: 轴信号二值化后的离散编码
-  - 仅用于路由寻址, 不用于质量判断
-
-### 步骤7: 功能检查
-验证压缩后的互信息是否满足 F_T:
-- 关系覆盖: required 关系是否全部保留
-- 路径残差: 路径残差是否被保护
-- 禁止损失: forbidden_loss 中的关系是否被删除
-- 功能测试: F_T.test_cases 是否通过
-
-通过 -> valid=true
-未通过 -> 恢复被删关系, 重新检查
-
----
-
-## 4. 独立性约束
-
-本子skill:
-- 不依赖元归一化(可以并行执行)
-- 不依赖conscious/unconscious/deep-conscious
-- 不依赖缓存波动力学
-- 可独立运行, 只要输入 B_T + raw_relations
-
-本子skill不:
-- 生成元信息(那是元归一化的工作)
-- 执行跨空间一致性检查(那是多重归一化调度器的工作)
-- 调用藏归调度器
-- 修改ρ/θ
-
----
-
-## 5. 与元归一化的并行执行
-
-元归一化和互归一化可以并行执行, 因为:
-```
-元归一化输入: B_T + raw_material (信息内容)
-互归一化输入: B_T + raw_relations (信息关系)
-```
-两者的输入不同, 输出不同, 互不依赖。
-
-跨空间一致性检查在两者都完成后执行:
-```
-比较:
-  路线A: 完整元信息 -> 压缩元信息(M_T) -> 从M_T提取互(H'_T)
-  路线B: 完整互信息 -> 压缩互信息(H_T)
-
-若 |H'_T - H_T| > ε_T:
-  说明元压缩删除了生成关系所需的对象特征
-  或互压缩删除了无法由元信息恢复的关系特征
-  -> 恢复被删特征
+```text
+set(raw_relation_refs) subset_of traceable_relation_refs(H_T)
 ```
 
----
+关系是否被“重点展开”与关系是否“仍然存在”必须分离。
 
-## 6. 兼容包要求
+## 5. 流程
 
-- 输出格式: YAML + JSON兼容
-- 可嵌入任何支持skill机制的环境
-- 不依赖本地绝对路径
-- 不依赖Hermes特定API
+### 步骤 1：加载 B_T 轴与 attention focus
+
+决定本轮优先展开哪些关系，但不改变 relation survival。
+
+### 步骤 2：关系提取与类型对齐
+
+统一 direct/composite/path_residual/flow/transform/feedback 等表示；每条关系保留 source_ref 与 endpoint_refs。
+
+### 步骤 3：条件与路径对齐
+
+复合路径、路径残差、成立条件和时间关系都保留可追溯引用。
+
+快速视图可以不展开完整正文，但必须保留 reference 和 unresolved 标记。
+
+### 步骤 4：未解析项保留
+
+无法解析的关系进入：
+
+```text
+unmapped_relations / unresolved_relations
+```
+
+而不是 omitted。
+
+### 步骤 5：路由信号编码
+
+`s_H` 与 `q_H` 只能用于查询/路由提示，不用于质量判断、真实性判断或过滤权限。
+
+### 步骤 6：保真检查
+
+至少验证：
+
+- raw relation refs 仍可追溯；
+- path residual refs 未静默消失；
+- preservation requirements 指定的关系仍可定位；
+- unresolved 项没有被吞掉；
+- 本模块没有写 FilterLease。
+
+## 6. 跨空间一致性
+
+元/互都改为无损对齐后，跨空间检查不再用于“决定该恢复哪些被删内容”。
+
+它只检查：
+
+```text
+M_T 中的对象引用是否能解释 H_T 端点
+H_T 中的关系引用是否都有来源与端点
+unresolved 是否需要下游 RAG/人工继续处理
+```
+
+如果发现不一致：
+
+```text
+mark unresolved / emit diagnostic
+```
+
+而不是自动删除另一侧信息。
+
+## 7. 与 Filter 的边界
+
+若存在 ACTIVE FilterLease：
+
+1. Filter 先对来源/关系引用执行 frozen spec；
+2. H_T 只对 PASS candidate view 做结构化展开；
+3. HOLD relations 仍存在于 source state 和 FilterReceipt；
+4. H_T 不得重新判断 HOLD/PASS，也不得扩大 spec。
+
+没有 ACTIVE FilterLease 时，所有关系引用都必须保持可追溯。
+
+## 8. 独立性约束
+
+本模块：
+
+- 不依赖元归一化；
+- 不依赖 ρ/θ；
+- 不依赖缓存波；
+- 不调用 RAG retriever/reranker/generator；
+- 不生成最终答案；
+- 不修改来源关系。
+
+默认输出用于 `RAGRequestFrame` 编译。
