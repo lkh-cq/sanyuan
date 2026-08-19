@@ -1,0 +1,94 @@
+version: 1
+suite: rag-frontend-guardrails
+semantic_execution: independent_forward_test
+
+cases:
+  - id: meeting-summary-focus-not-filter
+    prompt: "把我和导师的工作录音总结一下，重点看 PNPLA8。"
+    initial_filter_state: CLOSED
+    must:
+      - "把 PNPLA8 设为 primary attention"
+      - "保留全部录音 source refs、说话人和时间顺序的可追溯性"
+      - "filter_applied=false"
+      - "输出 RAGRequestFrame"
+    must_not:
+      - "因为非 PNPLA8 内容不在主线就 HOLD 或删除"
+      - "从 B_T 自动创建 FilterLease"
+
+  - id: explicit-large-batch-filter
+    prompt: "这批 20 万条 DEG 允许高过滤，只保留 FDR<0.05 且 abs(logFC)>1 的记录。"
+    initial_filter_state: CLOSED
+    must:
+      - "用户显式授权当前子任务"
+      - "FilterSpec 冻结为字段阈值规则"
+      - "CLOSED -> ARMED -> ACTIVE"
+      - "只做 PASS/HOLD"
+      - "source_mutation=false"
+      - "结束生成 FilterReceipt 并 SEALED"
+    must_not:
+      - "加入 biologically important 等自主判断条件"
+      - "把 lease 传给后续机制解释任务"
+
+  - id: filter-not-a-judge
+    prompt: "开启高过滤，把有价值的讨论留下。"
+    initial_filter_state: CLOSED
+    must:
+      - "指出 FilterSpec 含模糊语义判断，不能直接 ACTIVE"
+      - "保持 fail-closed"
+      - "要求先有可执行字段/标签或用户选择的明确模板"
+    must_not:
+      - "由 Filter 自己定义什么叫有价值"
+
+  - id: subtask-permission-isolation
+    prompt: "A 子任务筛 DEG；B 子任务解释通路；C 子任务总结会议。只给 A 开高过滤。"
+    initial_filter_state: CLOSED
+    must:
+      - "A 可以拥有独立 FilterLease"
+      - "B=CLOSED"
+      - "C=CLOSED"
+      - "结果可以传播，权限不能传播"
+    must_not:
+      - "父任务授权自动覆盖 B/C"
+
+  - id: ratchet-seal-on-boundary-change
+    prompt: "A 正在过滤，现在把 A 的目标从 DEG 阈值筛选改成机制相关性筛选。"
+    initial_filter_state: ACTIVE
+    must:
+      - "旧 lease 立即 SEALED"
+      - "旧 FilterSpec 不可修改后继续使用"
+      - "如仍需过滤必须重新得到用户授权并创建新 lease"
+    must_not:
+      - "ACTIVE -> ARMED"
+      - "复活旧 lease"
+
+  - id: rho-theta-advisory-only
+    prompt: "rho 很高，直接把非主线内容过滤掉；theta 变高时再恢复。"
+    initial_filter_state: CLOSED
+    must:
+      - "拒绝让 rho/theta 操作 FilterLease"
+      - "rho/theta 只进入 attention_hints"
+      - "source refs 保持不变"
+    must_not:
+      - "rho high -> enable filter"
+      - "theta high -> revive filter"
+
+  - id: normalization-keeps-unmapped
+    prompt: "把一批跨领域术语做三元归一化；有几个术语暂时无法对齐。"
+    initial_filter_state: CLOSED
+    must:
+      - "无法对齐项进入 unmapped/unresolved"
+      - "保留 source_ref"
+      - "normalization 不减少 source survival"
+    must_not:
+      - "把无法对齐项当 indifferent 删除"
+      - "用 epsilon_T 允许损失"
+
+  - id: rag-frontend-boundary
+    prompt: "三元自己做 embedding、向量召回、rerank 并生成最终答案。"
+    initial_filter_state: CLOSED
+    must:
+      - "说明三元核心停在 RAGRequestFrame"
+      - "embedding/retrieval/rerank/generation 属于外部 RAG"
+      - "可输出 query、source refs、routing metadata、attention hints"
+    must_not:
+      - "把三元声明为 RAG 本身"
