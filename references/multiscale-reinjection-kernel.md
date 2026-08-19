@@ -1,186 +1,155 @@
 ---
 name: multiscale-reinjection-kernel
 module_id: extension-multiscale-reinjection-kernel
-description: "把多时间尺度信号分层、循环语义再注入与 ρ/θ 拓扑门控组合成一个实验性最小运行核。"
-version: 0.1.0
-category: experimental-runtime
+description: "实验性 RAG 前端路由协议：用 SignalEnvelope 描述来源、时间尺度和传播提示，并把 rho/theta 仅作为 attention hints。不是 Transformer、RAG 或持久运行时。"
+version: 0.2.0
+category: experimental-frontend
 manifest_ref: references/project-manifest.yaml
 ---
 
-# 多时间尺度语义再注入核
+# 多时间尺度前端路由与语义再注入实验
 
-本模块是实验性组合层，不修改 `architecture.md` 的冻结本体。它把现有 `B_T`、元/互独立归一化、`ρ + θ = 1`、藏归、n 位聚焦、缓存波与 Endoscope 重新解释为一个事件驱动循环中的不同策略，而不是继续扩张新的平级“认知器官”。
+## 0. 定位纠正
 
-## 1. 最小目标
+本模块原先被描述为“最小运行核”，容易把三元误解成自带状态循环、RAG、Transformer 或 Agent runtime。V3.4 起改为：
 
-运行核只冻结两个动作：
+> **RAG 前端的实验性 routing metadata / request compilation 协议。**
 
-1. **语义再注入**：现实或工具产生新事件后，先按当前任务边界归一化，更新状态，再只把本轮需要的最小工作集编译为上下文。
-2. **ρ/θ 门控**：`ρ + θ = 1`。ρ 表示当前方向的收束分配，θ 表示当前方向之外的分配；二者不是正确率/错误率。θ 升高时允许重构边界或恢复被压低的路径。
+它不拥有 retrieval、rerank、generation、向量库、长期状态引擎或用户信息生存权。
 
-概念循环：
+## 1. 核心对象不是 token，而是 FrontendEvent
 
-```text
-observe -> normalize -> state delta -> compile/reinject
-       -> rho/theta gate -> act -> observe ...
-```
-
-Transformer、检索器、R/Java 计算核、外部模型或工具都只是该循环中的算子，不是世界状态本体。
-
-## 2. 为什么增加“信号头”，而不是只增加 embedding
-
-不同输入不仅模态不同，还可能具有不同的更新频率、传播范围、状态寿命、来源和证据边界。因此本模块把每个可路由输入拆成：
+前端只记录：
 
 ```text
-payload reference + routing header
+FrontendEvent = payload_ref + routing_metadata
 ```
 
-`payload_ref` 指向原始内容或现有 Store/Read/Mutual/FlowEvent；路由头只描述如何处理，不复制完整内容。正式字段见 `schema-signal-envelope.schema.json`。
+routing metadata 可以包含：
 
-最小路由头包括：
+- source.kind；
+- modality；
+- temporal.timescale；
+- temporal.persistence；
+- propagation.scope；
+- propagation.fanout；
+- provenance；
+- uncertainty；
+- task_boundary_ref。
 
-- `source.kind`：来源类别，允许领域适配器自定义；
-- `modality`：文本、图像、音频、表格、运行时事件等输入形态；
-- `temporal.timescale`：fast / intermediate / slow / static；
-- `temporal.persistence`：transient / session / persistent；
-- `propagation.scope`：local / regional / global；
-- `propagation.fanout`：dense / sparse / broadcast；
-- `provenance` 与 `uncertainty`：证据来源和不确定性；
-- `task_boundary_ref`：当前 `B_T` 引用。
+这些字段用于帮助下游 RAG 决定如何消费信息，不代表三元自己实现对应 attention。
 
-这些字段是路由元数据，不是新的本体实体，也不自动等价于生物学神经、免疫、代谢或内分泌机制。生物学可以提供结构启发，但不能未经证据直接写成 AI 机制事实。
+## 2. 稠密/稀疏/broadcast 是提示，不是权限
 
-## 3. 稠密/稀疏是传播权限，不是信号身份
+`dense / sparse / broadcast` 只能作为 routing hint：
 
-本模块不规定“神经=稠密、代谢=稀疏”。同一来源在不同任务里可以使用不同 fanout。默认只区分：
+- dense：建议下游在当前局部工作集中保留较高连通；
+- sparse：建议下游优先显式依赖/命中边；
+- broadcast：建议下游把该状态视为较广域上下文。
 
-- `dense`：当前局部工作集内允许较高连通；
-- `sparse`：只沿显式依赖、命中关系或恢复坐标传播；
-- `broadcast`：写入共享慢状态，但不代表每一轮都重新 token 化。
+它们不得：
 
-因此稀疏/稠密是**路由策略**，不是领域标签。
+- 删除 source refs；
+- 自动触发 FilterLease；
+- 变成“神经=稠密、代谢=稀疏”等固定生物学映射；
+- 被三元解释为 learned attention 权重。
 
-## 4. 快流与慢流
+## 3. fast/slow 只描述时间尺度
 
-运行状态分为两个时间尺度容器：
+`fast / intermediate / slow / static` 表示前端事件的更新时间尺度或持续性提示。
+
+三元不拥有持久 `S_fast/S_slow` 世界状态。若下游系统具有 memory/state store，可自行选择如何解释这些字段。
+
+因此：
 
 ```text
-S = S_fast + S_slow
+slow != persistent storage owned by Sanyuan
+fast != automatic high-priority retrieval
 ```
 
-`S_fast` 保存高频、短寿命、当前工作相关的变化；`S_slow` 保存低频、长寿命或跨轮次持续的状态。两者仍属于同一个状态空间。
+## 4. rho/theta 的角色
 
-关键约束：**慢状态不因每一轮推理而重复展开为完整 token。** 未变化的慢状态只保留引用；只有 `delta`、任务边界变化、跨尺度依赖命中或 θ 门控要求重构时，才进入新的再注入帧。
+`rho + theta = 1` 只作为主注意力辅助：
 
-参考状态演化：
+- rho：主方向收束提示；
+- theta：次级/边界外关注提示。
+
+允许写入 `RAGRequestFrame.attention_hints`。
+
+禁止：
 
 ```text
-S_fast(t+dt) = F(S_fast, delta_fast, refs(S_slow))
-S_slow(t+dT) = G(S_slow, aggregate(S_fast), delta_slow)
+rho/theta -> FilterLease
+rho/theta -> source survival
+rho/theta -> truth judgment
+rho/theta -> retrieval execution
 ```
 
-其中 `dt < dT` 只是时间尺度关系，不强制具体物理时长。
+## 5. Normalization 与 routing metadata
 
-## 5. 跨尺度耦合
-
-四类路由边：
-
-- fast -> fast：当前局部高频工作；
-- slow -> slow：长期状态之间的低频更新；
-- fast -> slow：高频事件积累后改变持久状态；
-- slow -> fast：持久状态改变当前工作集可走的路径。
-
-真正需要额外关注的是跨尺度边，但本模块不预设其权重。任何权重必须来自任务策略、运行观测或外部训练/校准，而不是从模块名称推导。
-
-如果下游使用 Transformer，可把路由头转译为 attention bias / mask：
+SignalEnvelope 可以携带对齐后的术语、单位、来源和时间尺度元数据，但 normalization 必须遵守 `rag-frontend-governance.md`：
 
 ```text
-logit(i,j) = q_i*k_j/sqrt(d)
-           + B_source + B_time + B_scope + B_state + M_route
+representation may change
+source survival may not change
 ```
 
-这里只定义编译接口，不宣称当前项目已经训练出这些 bias。
+无法对齐的内容标记 `unmapped/unresolved`，不进入默认 omitted。
 
-## 6. 与现有三元模块的组合
+## 6. ReinjectionFrame 的迁移含义
 
-| 现有模块 | 在最小核中的位置 |
-| --- | --- |
-| `B_T` | 每轮再注入前的任务边界 |
-| 元归一化 | 对对象自身属性做任务条件校准 |
-| 互归一化 | 对关系、流止、路径残差做任务条件校准 |
-| 藏 | 持久化具体内容和可恢复引用 |
-| 归 | 按新边界重新读取/重新编译旧状态 |
-| n 位聚焦 | `compile()` 的工作集预算策略 |
-| 缓存波 / condense | fast/slow 状态的驻留与压缩策略 |
-| Endoscope / NSL | θ 上升或新证据命中时的最小恢复策略 |
-| ρ | 当前方向的收束分配 |
-| θ | 边界外分配与重构门控 |
+现有 `schema-reinjection-frame.schema.json` 暂时保留兼容，但其语义降级为**前端请求编译中间帧**，不是运行时世界状态。
 
-因此这些模块不需要继续互相模拟。它们都应向同一个 `observe -> normalize -> state -> reinject -> gate` 循环提供策略。
-
-## 7. 与已有仓库的边界
-
-- **sanyuan**：本模块的语义与协议权威来源。
-- **visualR**：PAL/九宫/矩阵计算的 R 参考实现；不因本模块自动改写其数学语义。
-- **java-runtime**：现有 Topology Operator ABI 与执行编排层；只有在语义契约先被验证后，才应增加信号路由实现，继续遵守“Java 不自行重定义语义”。
-- **sanyuan-context-router**：薄客户端/适配器，不成为新内核；未来可只透传 SignalEnvelope 头部或调用通用 sidecar。
-- **mirror-bus**：保持冻结。它只可作为历史的外部观察信号源协议参考，不得因此重启 watcher 或自动注入运行时。
-
-## 8. Reinjection Frame
-
-每一轮上下文编译输出一个 `ReinjectionFrame`，而不是复制整个状态：
+允许字段：
 
 ```text
-frame = {
-  boundary_ref,
-  delta_refs,
-  persistent_refs,
-  revived_refs,
-  rho,
-  theta,
-  gate
-}
+boundary_ref
+new_event_refs
+persistent_context_refs
+attention_hints
+routing_metadata_refs
 ```
 
-正式合同见 `schema-reinjection-frame.schema.json`。`persistent_refs` 只是未变化慢状态的地址，不代表已把正文重新送入模型。
+其中 `persistent_context_refs` 只是外部/上游状态的引用，不代表三元自己维护长期 memory。
 
-## 9. 门控规则
+后续若 `RAGRequestFrame` 完全覆盖该需求，可将 ReinjectionFrame 标记 deprecated。
 
-本实验模块只冻结守恒关系和行为边界：
+## 7. 与 FilterLease 的关系
 
-```text
-rho in [0,1]
-theta = 1 - rho
-```
+无关系。
 
-- `CONVERGE`：当前边界继续有效，优先注入本轮 delta；
-- `REFRAME`：当前边界需要重新编译，可按 `recovery_ref`/跨尺度依赖最小恢复；
-- 不允许把 θ 解释为错误概率；
-- 不允许仅因为来源标签为“慢信号”就强行提升或压低 ρ/θ；
-- 不允许自动把实验性路由权重写回稳定策略。
+SignalEnvelope 的 source/timescale/fanout 不得自动转换为过滤条件。
 
-阈值属于 TaskProfile/运行策略，不属于冻结本体。
+只有 `filter-ratchet-permission.md` 定义的用户显式授权，才能建立 ACTIVE FilterLease。
 
-## 10. 参考实现边界
+## 8. 与已有仓库的边界
 
-`scripts/multiscale_reinjection.py` 只实现：
+- **sanyuan**：定义前端语义与协议；
+- **sanyuan-context-router**：薄客户端，可未来透传 RAGRequestFrame / SignalEnvelope；
+- **visualR**：保持 PAL/九宫/矩阵参考语义，本模块不改；
+- **java-runtime**：保持执行编排，不得因为本实验自动实现新的认知本体；
+- **mirror-bus**：继续冻结，不恢复 watcher 或自动注入。
 
-- SignalEnvelope 的不可变路由头；
-- fast/slow 状态容器；
-- delta 检测；
-- 未变化 slow state 只输出引用；
-- `rho + theta = 1` 门控；
-- ReinjectionFrame 生成。
+## 9. 参考实现边界
 
-它**不实现** embedding、学习型 attention、概率校准、领域因果推断，也不替代现有 LLM/Transformer。
+`scripts/multiscale_reinjection.py` 现阶段只能被视为协议实验夹具。
 
-## 11. 晋升条件
+V3.4 必须审查并删除/降级任何以下行为：
 
-本模块保持 experimental，至少完成以下证据后才可讨论进入冻结架构：
+- 自行维护长期世界状态；
+- 把 rho/theta 当 gate 权限；
+- 根据 fanout/timescale 删除来源；
+- 自行执行 RAG；
+- 自动恢复/压缩来源。
 
-1. 在文本、代码/运行时和至少一种非文本模态上验证同一 SignalEnvelope 合同；
-2. 比较“每轮重放全部慢状态”与“delta + persistent refs”的 token/延迟差异；
-3. 验证 sparse/dense/broadcast 路由不会静默丢失关键依赖；
-4. 验证 θ 触发最小恢复时的 Recovery Efficiency；
-5. 与 visualR/java-runtime 的现有 PAL/ABI 做兼容性测试，而不是重写其语义；
-6. 通过独立前向任务验证后，再决定是否修改 `architecture.md`。
+## 10. 晋升条件
+
+本模块保持 experimental，至少满足：
+
+1. RAGRequestFrame 前端合同稳定；
+2. SignalEnvelope 不改变 source survival；
+3. rho/theta 只作为 advisory hints；
+4. 无任何路径可由 routing metadata 自动创建 FilterLease；
+5. 与 context-router 透传测试通过；
+6. 事故回放证明会议/录音/原始数据不会因任务聚焦静默丢失；
+7. 再决定是否保留 ReinjectionFrame 或将其废弃。
