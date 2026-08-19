@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "title": "FilterLease",
+  "description": "Task-local, single-owner, one-shot permission for explicit large-batch high-filter preprocessing. This permission is advisory to the front-end filter only and never mutates the source.",
+  "type": "object",
+  "required": [
+    "lease_id",
+    "task_id",
+    "state",
+    "issued_by",
+    "batch_mode",
+    "filter_intensity",
+    "filter_spec",
+    "inheritable",
+    "refreshable",
+    "source_mutation_allowed",
+    "auto_close_on"
+  ],
+  "properties": {
+    "lease_id": {
+      "type": "string",
+      "pattern": "^fl_[A-Za-z0-9._:-]+$"
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "state": {
+      "type": "string",
+      "enum": ["CLOSED", "ARMED", "ACTIVE", "SEALED"]
+    },
+    "issued_by": {
+      "type": "string",
+      "enum": ["user_explicit"]
+    },
+    "authorization_event_ref": {
+      "type": ["string", "null"]
+    },
+    "batch_mode": {
+      "type": "string",
+      "enum": ["large_batch"]
+    },
+    "filter_intensity": {
+      "type": "string",
+      "enum": ["high"]
+    },
+    "filter_spec": {
+      "type": "object",
+      "required": ["source", "frozen", "predicates"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["user_explicit", "user_selected_template"]
+        },
+        "frozen": {
+          "const": true
+        },
+        "predicates": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["field", "operator", "value"],
+            "properties": {
+              "field": {"type": "string", "minLength": 1},
+              "operator": {
+                "type": "string",
+                "enum": ["eq", "neq", "lt", "lte", "gt", "gte", "in", "not_in", "contains"]
+              },
+              "value": {}
+            },
+            "additionalProperties": false
+          }
+        },
+        "spec_hash": {
+          "type": ["string", "null"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "inheritable": {
+      "const": false
+    },
+    "refreshable": {
+      "const": false
+    },
+    "source_mutation_allowed": {
+      "const": false
+    },
+    "auto_close_on": {
+      "type": "array",
+      "uniqueItems": true,
+      "allOf": [
+        {"contains": {"const": "task_complete"}},
+        {"contains": {"const": "task_abort"}},
+        {"contains": {"const": "task_timeout"}},
+        {"contains": {"const": "boundary_change"}},
+        {"contains": {"const": "spec_change"}}
+      ],
+      "items": {
+        "type": "string",
+        "enum": ["task_complete", "task_abort", "task_timeout", "boundary_change", "spec_change"]
+      }
+    },
+    "worker_scope": {
+      "type": "object",
+      "properties": {
+        "parallel_workers_allowed": {"type": "boolean"},
+        "sublease_allowed": {"const": false}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
