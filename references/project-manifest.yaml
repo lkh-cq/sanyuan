@@ -386,6 +386,7 @@ extensions:
 validation:
   output_contract: references/output-contract.md
   acceptance_cases: references/acceptance-tests.yaml
+  frontend_acceptance_cases: references/frontend-acceptance-tests.yaml
   framework_pitfalls:
     path: references/framework-pitfalls.md
     version: 0.1.0
