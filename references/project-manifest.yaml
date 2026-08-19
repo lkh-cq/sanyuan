@@ -1,7 +1,7 @@
 project:
   id: consciousness-bus
   name: 意识总线
-  version: 3.3.0
+  version: 3.4.0
 
 version_policy:
   project_version_source: references/project-manifest.yaml#project.version
@@ -36,6 +36,8 @@ module_lifecycle:
     - extension-modality-boundary
     - validation-framework-pitfalls
   experimental:
+    - governance-rag-frontend-boundary
+    - preprocessor-filter-ratchet
     - extension-yijing-coupling-matrix
     - extension-multi-norm-diagnosis
     - extension-frozen-definitions
@@ -51,26 +53,40 @@ module_lifecycle:
 entrypoints:
   root: SKILL.md
   research: references/research-recipe.yaml
-  fast_filter: references/fast-filter-recipe.yaml
+  fast_view: references/fast-view-recipe.yaml
+  batch_filter: references/fast-filter-recipe.yaml
 
 authority:
   architecture:
     path: references/architecture.md
     module_id: root-architecture
+  rag_frontend_guardrail:
+    path: references/rag-frontend-governance.md
+    module_id: governance-rag-frontend-boundary
+
+governance:
+  rag_frontend:
+    id: rag-frontend-governance
+    name: RAG 前端职责与权限规范
+    path: references/rag-frontend-governance.md
+    version: 0.1.0
+    module_id: governance-rag-frontend-boundary
+  update_plan:
+    path: references/update-plan-rag-frontend-v3.4.md
 
 core:
   conscious:
     id: conscious-rho
-    name: ρ收束
+    name: ρ主注意力辅助
     path: references/rho-convergence.md
-    version: 3.0.0
+    version: 3.1.0
     module_id: core-rho-convergence
 
   unconscious:
     id: unconscious-theta
-    name: θ切换
+    name: θ次级注意力辅助
     path: references/theta-switching.md
-    version: 1.4.0
+    version: 1.5.0
     module_id: core-theta-switching
     depends_on:
       - conscious-rho
@@ -105,14 +121,14 @@ preprocessors:
     id: task-boundary-compiler
     name: 任务边界编译
     path: references/task-boundary.md
-    version: 0.1.0
+    version: 0.2.0
     module_id: preprocessor-task-boundary
 
   meta_normalization:
     id: meta-normalization
     name: 元归一化
     path: references/meta-normalization.md
-    version: 0.1.0
+    version: 0.2.0
     module_id: preprocessor-meta-normalization
     depends_on:
       - task-boundary-compiler
@@ -121,8 +137,17 @@ preprocessors:
     id: hu-normalization
     name: 互归一化
     path: references/hu-normalization.md
-    version: 0.1.0
+    version: 0.2.0
     module_id: preprocessor-hu-normalization
+    depends_on:
+      - task-boundary-compiler
+
+  filter_ratchet:
+    id: filter-ratchet-permission
+    name: 单任务棘轮过滤权限
+    path: references/filter-ratchet-permission.md
+    version: 0.1.0
+    module_id: preprocessor-filter-ratchet
     depends_on:
       - task-boundary-compiler
 
@@ -204,7 +229,9 @@ branches:
 recipes:
   research:
     path: references/research-recipe.yaml
-  fast_filter:
+  fast_view:
+    path: references/fast-view-recipe.yaml
+  batch_filter:
     path: references/fast-filter-recipe.yaml
 
 storage:
@@ -228,6 +255,8 @@ schemas:
   task_boundary: references/schema-task-boundary.schema.yaml
   meta_normalization: references/schema-meta-normalization.schema.yaml
   hu_normalization: references/schema-hu-normalization.schema.yaml
+  filter_lease: references/schema-filter-lease.schema.json
+  rag_request_frame: references/schema-rag-request-frame.schema.json
   endoscope_shadow: references/schema-endoscope-shadow.schema.json
   endoscope_event: references/schema-endoscope-event.schema.json
   endoscope_gate: references/schema-endoscope-gate.schema.json
@@ -317,9 +346,9 @@ extensions:
       - archive-ingestion
   multiscale_reinjection_kernel:
     id: multiscale-reinjection-kernel
-    name: 多时间尺度语义再注入核
+    name: 多时间尺度前端路由实验
     path: references/multiscale-reinjection-kernel.md
-    version: 0.1.0
+    version: 0.2.0
     module_id: extension-multiscale-reinjection-kernel
     depends_on:
       - conscious-rho
@@ -364,6 +393,7 @@ validation:
   bundle_validator: scripts/validate_bundle.py
   endoscope_validator: scripts/validate_endoscope.py
   multiscale_validator: scripts/validate_multiscale_reinjection.py
+  frontend_guardrail_validator: scripts/validate_frontend_guardrails.py
   ci_workflow: .github/workflows/validate.yml
 
 canvas:
