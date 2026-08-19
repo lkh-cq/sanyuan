@@ -178,7 +178,7 @@ Phase 0  文档硬约束 + 默认 CLOSED
 
 ## 8. 版本与发布策略
 
-- 项目版本：目标 `3.4.0`；
+- 项目版本：只从 `project-manifest.yaml#project.version` 读取；
 - `rag-frontend-governance`：0.1.0，迁移期硬约束；
 - `filter-ratchet-permission`：0.1.0，实验性权限模块；
 - `task-boundary`、`meta-normalization`、`hu-normalization`：迁移至 0.2.0；
