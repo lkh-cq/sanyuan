@@ -1,33 +1,39 @@
 # Task Boundary Schema
-# 任务边界 B_T
+# 任务边界 B_T — RAG 前端任务视图，不授予过滤权限
 
 $schema: "https://json-schema.org/draft-07/schema#"
 title: TaskBoundary
-description: "任务边界: 在过滤/归一化之前编译的任务条件对象"
+description: "任务边界: 定义当前子任务目标、观测轴、注意力重点和前端输出目标。不得创建或激活 FilterLease。"
 
 type: object
 required:
   - boundary_id
+  - task_id
   - task_goal
   - F_T
-  - forbidden_loss
-  - epsilon_T
+  - preservation_requirements
   - required_spaces
   - optional_spaces
+  - output_target
 
 properties:
   boundary_id:
     type: string
-    description: "边界ID, 格式 bt_{timestamp}_{seq}"
+    description: "边界ID, 格式 bt_YYYYMMDD_seq"
     pattern: "^bt_\\d{8}_\\d{3}$"
+
+  task_id:
+    type: string
+    minLength: 1
 
   task_goal:
     type: string
-    description: "任务目标, 一句话主谓宾结构"
+    minLength: 1
+    description: "当前子任务目标；重点不等于删除非重点来源"
 
   F_T:
     type: object
-    description: "任务功能, 可验证的功能测试"
+    description: "前端功能测试，不得以压缩率作为成功指标"
     required:
       - description
       - test_cases
@@ -38,62 +44,76 @@ properties:
         type: array
         items:
           type: object
+          required: [input, expected]
           properties:
             input:
               type: string
             expected:
               type: string
 
-  forbidden_loss:
+  preservation_requirements:
     type: array
-    description: "禁止损失: 不能被压缩删除的特征/关系/路径"
+    description: "额外强调的保真/可追溯要求；未列出的来源也仍默认保留"
     items:
       type: string
-
-  epsilon_T:
-    type: number
-    description: "误差预算, 允许的最大功能损失"
-    exclusiveMinimum: 0
-    maximum: 1
 
   required_spaces:
     type: array
     description: "必需观测空间"
+    minItems: 2
+    uniqueItems: true
     items:
       type: string
       enum: [meta, hu, time, evidence, source, uncertainty, risk, execution, history]
-    contains:
-      enum: [meta]
+    allOf:
+      - contains:
+          const: meta
+      - contains:
+          const: hu
 
   optional_spaces:
     type: array
-    description: "可选观测空间"
+    description: "可选补充空间；未展开不等于来源可删除"
+    uniqueItems: true
     items:
       type: string
       enum: [time, evidence, source, uncertainty, risk, execution, history]
 
   meta_axes:
     type: array
-    description: "元信息空间内部选择轴"
+    description: "元信息对齐轴"
     items:
       type: string
       enum: [tiancai, dicai, rencai]
 
   hu_axes:
     type: array
-    description: "互信息空间内部选择轴"
+    description: "互信息对齐轴"
     items:
       type: string
       enum: [direct, composite, path_residual, flow, stop, filter, transform, buffer, feedback]
 
+  attention_focus:
+    type: object
+    description: "只用于主/次注意力提示，不授予过滤权限"
+    properties:
+      primary_axes:
+        type: array
+        items:
+          type: string
+      secondary_axes:
+        type: array
+        items:
+          type: string
+    additionalProperties: false
+
+  output_target:
+    type: string
+    enum: [rag_request_frame]
+
   recipe_route:
     type: string
-    enum: [research, fast_filter]
-    description: "配方路由: 由路由门自动判定"
+    enum: [direct, fast_view, research_frontend]
+    description: "仅选择无损前端路径；batch_filter 由独立 FilterLease 路由"
 
-allOf:
-  - description: "hu 始终在 required_spaces 中"
-    properties:
-      required_spaces:
-        contains:
-          enum: [hu]
+additionalProperties: false
