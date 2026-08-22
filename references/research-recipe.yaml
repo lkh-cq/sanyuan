@@ -1,9 +1,9 @@
-# 科研深度分析配方
-# 项目版本读取 project-manifest.yaml；本配方保持任务边界优先、元互独立归一化与内外输出分层。
+# 科研深度前端配方
+# 项目版本读取 project-manifest.yaml；默认无损；三元停在 RAGRequestFrame，不替代下游 RAG。
 
-recipe_id: research-deep
-name: 科研深度分析
-description: "复杂科研任务的完整认知预处理流程。任务边界编译->元互双空间独立归一化->跨空间一致性->藏归->核心->读者端自然语言交付。"
+recipe_id: research-frontend
+name: 科研深度前端编译
+description: "复杂科研任务的 RAG 前端流程。任务边界 -> 子任务隔离 -> 元/互保真归一化 -> 一致性诊断 -> 藏归引用组织 -> 注意力辅助 -> RAGRequestFrame。"
 
 modules:
   - think-before-responding
@@ -15,124 +15,99 @@ modules:
   - deep-conscious
   - conscious-rho
   - unconscious-theta
-  - reader-facing-analysis
-  - cache-wave
 
 sequence:
   - step: 1
     module: think-before-responding
-    action: "三思而后行: 提取主题词, 独立研判"
+    action: "提取主题词与任务线索；不得据此删除来源"
 
   - step: 2
     module: task-boundary-compiler
-    action: "任务边界编译: 生成B_T(目标F_T, 禁止损失, ε_T, 必需空间, 轴选择)"
+    action: "生成 B_T：目标、保真要求、观测轴、attention focus；FilterLease 默认 CLOSED"
     output: B_T
 
   - step: 3
     module: task-decomposition
-    action: "子任务拆分: 复杂任务拆为子任务, 各生成B_T"
+    action: "复杂任务拆为子任务；每个子任务独立 B_T，且 FilterLease 重新初始化为 CLOSED"
     condition: "if task_complexity > threshold"
 
   - step: 4
     module: meta-normalization
-    action: "元信息空间独立归一化: 三才轴提取, 任务条件压缩, 生成M_T"
+    action: "元信息保真对齐；不得产生默认 omitted/delete"
     input: B_T + raw_material
     output: M_T
     parallel_with: step_5
 
   - step: 5
     module: hu-normalization
-    action: "互信息空间独立归一化: 关系提取, 路径残差保护, 生成H_T"
+    action: "互信息保真对齐；不得产生默认 omitted/delete"
     input: B_T + raw_relations
     output: H_T
     parallel_with: step_4
 
   - step: 6
-    action: "跨空间一致性检查"
+    action: "跨空间一致性诊断"
     description: |
-      比较两条路线:
-        路线A: 完整元信息 -> 压缩元信息(M_T) -> 从M_T提取互(H'_T)
-        路线B: 完整互信息 -> 压缩互信息(H_T)
-      若 |H'_T - H_T| > ε_T:
-        说明元压缩删除了生成关系所需的对象特征
-        或互压缩删除了无法由元信息恢复的关系特征
-        -> 恢复被删特征
+      检查 M_T 的对象引用与 H_T 的关系端点、来源和条件是否可互相定位。
+      不一致时标记 unresolved/diagnostic，不自动删除另一侧信息，也不通过 recovery_ref 掩盖默认损失。
     input: M_T + H_T
     output: consistency_report
 
   - step: 7
     module: zang-gui-orchestrator
-    action: "三才藏: 按M_T的source_node_refs写入StoreNode"
+    action: "按需组织来源、StoreNode/MutualNode/ReadNode 引用；不得把摘要替代原始来源"
 
   - step: 8
-    module: zang-gui-orchestrator
-    action: "三题归: 按H_T的endpoint_refs提取ReadNode"
+    module: deep-conscious
+    action: "n 位聚焦只控制当前前端展开预算；未展开来源仍保持 source_ref"
 
   - step: 9
-    action: "耦合态登记: 引用StoreNode、MutualNode与可选ReadNode形成可检索事务"
-    output: coupling_state
-    description: |
-      保持内容节点、关系节点和读取节点分离。
-      保存来源、成立条件、证据边界与observed/hypothesized/disputed/incomplete状态。
+    module: conscious-rho
+    action: "rho 生成主注意力辅助提示；advisory only"
 
   - step: 10
-    module: deep-conscious
-    action: "n位聚焦: O(1)查表, 聚焦当前任务n位"
+    module: unconscious-theta
+    action: "theta 生成次级注意力/扩宽提示；advisory only"
 
   - step: 11
-    module: conscious-rho
-    action: "ρ收束: 注意力收束到任务方向"
-
-  - step: 12
-    module: unconscious-theta
-    action: "θ边界检查: 场景边界稳定性"
-
-  - step: 13
-    action: "功能贞验: 验证任务功能F_T是否满足"
+    action: "前端保真验收"
     description: |
       检查项:
-        - 特征覆盖(M_T)
-        - 关系覆盖(H_T)
-        - 路径完整性(H_T path_residual)
-        - 跨空间一致性
-        - F_T.test_cases通过
+        - source refs 全量可追溯
+        - relation refs 全量可追溯
+        - unmapped/unresolved 未静默消失
+        - 子任务 FilterLease 默认 CLOSED
+        - rho/theta 未改变权限
+        - normalization 未执行未授权 HOLD
 
-  - step: 14
-    action: "内部结果合成: 生成Z_T任务特定表示"
-    output: Z_T
+  - step: 12
+    action: "编译 RAGRequestFrame"
+    output: RAGRequestFrame
     description: |
-      Z_T是内部工作表示, 不直接作为读者端交付。
-      内部必含:
-        - M_T元信息视图
-        - H_T互信息视图
-      内部选含:
-        - 补充空间视图(时间/证据/来源)
-        - loss_vector
-
-  - step: 15
-    module: reader-facing-analysis
-    action: "读者端转译: 将Z_T编译为简明、连贯、可独立阅读的自然语言结果"
-    input: Z_T + B_T.output_contract
-    output: reader_deliverable
-    description: |
-      默认交付:
-        - 隐藏内部节点、边、关系代码和M_T/H_T/Z_T字段
-        - 用完整句子展开内容顺序、逻辑作用和证据边界
-        - 文献分析以2—4句论述单元为主
-        - 图表仅作有完整名称、关系说明、来源和图例的补充
-      仅当用户明确要求审计时:
-        - 在主要结果之后追加独立audit_appendix
-
-  - step: 16
-    module: cache-wave
-    action: "缓存波更新: 更新Ω/∇E/dθ'/dt"
+      默认包含:
+        - task_id / boundary_ref
+        - primary_query / secondary_axes
+        - source_refs
+        - normalization_refs
+        - attention_hints(rho/theta, advisory only)
+        - optional routing_metadata_refs
+        - filter.filter_applied=false
+      本配方到此结束。embedding、retrieval、rerank、generation 由外部 RAG 负责。
 
 branch_conditions:
   - condition: "B_T.required_spaces contains time"
-    action: "加载时间补充空间"
+    action: "加载时间补充空间；不改变 source survival"
   - condition: "B_T.required_spaces contains evidence"
-    action: "加载证据补充空间"
-  - condition: "子任务B_T不同"
-    action: "各子任务独立执行步骤4-6, 合成时取并集"
-  - condition: "用户明确要求查看框架、机器表示或审计过程"
-    action: "在reader_deliverable之后附独立审计块; 不得用审计块替代自然语言结果"
+    action: "加载证据补充空间；不改变 source survival"
+  - condition: "子任务 B_T 不同"
+    action: "各子任务独立执行前端编译；权限不继承"
+  - condition: "用户显式授权大批次高过滤"
+    action: "转入 batch-filter 配方；必须验证 ACTIVE FilterLease，不得在本配方内自动过滤"
+
+constraints:
+  - "本配方是 RAG 前端，不是 RAG"
+  - "默认 FilterLease=CLOSED"
+  - "Focus is priority, not filter"
+  - "Normalization is lossless alignment"
+  - "rho/theta are advisory attention hints only"
+  - "不得内建 retrieval/rerank/generation"

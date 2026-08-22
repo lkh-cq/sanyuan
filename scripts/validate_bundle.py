@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Validate deterministic structure for the installable consciousness-bus bundle.
 
-This script deliberately does not claim semantic understanding. Frozen meanings and
-reader-facing behavior require review plus independent forward tests.
+This script deliberately does not claim semantic understanding. Frozen meanings,
+front-end behavior, and downstream RAG quality require review plus independent
+forward tests.
 """
 
 from __future__ import annotations
@@ -20,6 +21,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "SKILL.md"
 MANIFEST = ROOT / "references" / "project-manifest.yaml"
 ACCEPTANCE = ROOT / "references" / "acceptance-tests.yaml"
+FRONTEND_ACCEPTANCE = ROOT / "references" / "frontend-acceptance-tests.yaml"
 SEMVER = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 REPO_PATH_PREFIXES = ("references/", "assets/", "scripts/", ".github/")
 
@@ -102,26 +104,35 @@ def check_recipe(failures: list[str]) -> None:
         numbers = [item["step"] for item in sequence]
         if numbers != sorted(numbers) or len(numbers) != len(set(numbers)):
             fail("research recipe steps must be unique and ascending", failures)
+
         steps = {item.get("module"): item["step"] for item in sequence if "module" in item}
         boundary = steps["task-boundary-compiler"]
         if not boundary < steps["meta-normalization"]:
             fail("task boundary must precede meta normalization", failures)
         if not boundary < steps["hu-normalization"]:
             fail("task boundary must precede hu normalization", failures)
-        synthesis = next(
+
+        frame_steps = [
             item["step"]
             for item in sequence
-            if item.get("action", "").startswith("内部结果合成")
-        )
-        if not synthesis < steps["reader-facing-analysis"] < steps["cache-wave"]:
-            fail("reader-facing analysis must follow synthesis and precede cache update", failures)
+            if "RAGRequestFrame" in str(item.get("action", ""))
+            or "RAGRequestFrame" in str(item.get("output", ""))
+        ]
+        if not frame_steps:
+            fail("research recipe must terminate in RAGRequestFrame compilation", failures)
+        elif max(numbers) != max(frame_steps):
+            fail("RAGRequestFrame compilation must be the final research front-end step", failures)
+
+        modules = set(recipe.get("modules", []))
+        if "reader-facing-analysis" in modules:
+            fail("reader-facing-analysis must not be in the front-end core recipe", failures)
     except Exception as exc:
         fail(f"research recipe: {exc}", failures)
 
 
-def check_acceptance(failures: list[str]) -> None:
+def _check_case_file(path: Path, required_keys: tuple[str, ...], failures: list[str]) -> None:
     try:
-        acceptance = yaml.safe_load(ACCEPTANCE.read_text(encoding="utf-8"))
+        acceptance = yaml.safe_load(path.read_text(encoding="utf-8"))
         cases = acceptance.get("cases")
         if not isinstance(cases, list) or not cases:
             raise ValueError("cases must be a non-empty list")
@@ -129,7 +140,7 @@ def check_acceptance(failures: list[str]) -> None:
         for index, case in enumerate(cases):
             if not isinstance(case, dict):
                 raise ValueError(f"case {index} must be a mapping")
-            for key in ("id", "prompt", "expected_mode", "must", "must_not"):
+            for key in required_keys:
                 if key not in case:
                     raise ValueError(f"case {index} missing {key}")
             if not isinstance(case["id"], str) or not case["id"]:
@@ -138,9 +149,22 @@ def check_acceptance(failures: list[str]) -> None:
                 raise ValueError(f"case {case['id']} must use list assertions")
             ids.append(case["id"])
         if len(ids) != len(set(ids)):
-            fail("acceptance case IDs must be unique", failures)
+            fail(f"{path.name} case IDs must be unique", failures)
     except Exception as exc:
-        fail(f"acceptance tests: {exc}", failures)
+        fail(f"{path.name}: {exc}", failures)
+
+
+def check_acceptance(failures: list[str]) -> None:
+    _check_case_file(
+        ACCEPTANCE,
+        ("id", "prompt", "expected_mode", "must", "must_not"),
+        failures,
+    )
+    _check_case_file(
+        FRONTEND_ACCEPTANCE,
+        ("id", "prompt", "initial_filter_state", "must", "must_not"),
+        failures,
+    )
 
 
 def main() -> int:

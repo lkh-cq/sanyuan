@@ -1,9 +1,9 @@
 ---
 name: meta-normalization
 module_id: preprocessor-meta-normalization
-description: "元信息空间独立归一化子skill。对信息的固有属性(三才层编码)进行任务条件化归一化。不依赖互归一化或任何核心skill, 可独立运行。输出M_T元信息任务视图。"
+description: "元信息空间独立归一化。只负责保真对齐与标注，不拥有过滤、压缩或删除权限。输出可追溯的 M_T 元信息视图。"
 category: preprocessor
-version: 0.1.0
+version: 0.2.0
 canvas_refs:
   - assets/canvas/意识总线_总架构.canvas
 manifest_ref: references/project-manifest.yaml
@@ -11,183 +11,179 @@ manifest_ref: references/project-manifest.yaml
 
 # 元信息空间归一化
 
-> 独立子skill。只处理元信息空间, 不处理互信息空间。
-> 输入: B_T(任务边界) + 原始信息材料
-> 输出: M_T(元信息任务视图)
+> 输入：`B_T + raw_material`
+>
+> 输出：`M_T` 元信息对齐视图。
+>
+> **Normalization changes representation, not information survival.**
 
----
+## 1. 权限边界
 
-## 1. 冻结定义
+元归一化只允许：
 
-### 元信息空间
-对应信息的固有属性编码。映射三才层:
+- 实体/术语/别名对齐；
+- 单位、编码、来源、时间尺度等表示对齐；
+- 三才轴上的属性提取与标注；
+- 无法对齐时标记 `unmapped` / `unresolved`；
+- 为下游 RAG 请求生成可追溯引用。
+
+元归一化禁止：
+
+- 根据任务相关性删除特征；
+- 把 `indifferent` 解释为“可删除”；
+- 用 `epsilon_T`、ρ/θ、SVD、n 位聚焦或 Endoscope 自动压缩来源；
+- 只留下 `recovery_ref` 而让原特征从正常视图不可见；
+- 创建或激活 FilterLease。
+
+若需要高过滤，必须走独立 `filter-ratchet-permission.md` 路径。
+
+## 2. 元信息空间
+
+三才仍作为默认元信息编码轴：
+
+```text
+天才 = 规律
+地才 = 环境
+人才 = 实践
 ```
-天才 = 规律 (周期/阈值/稳定模式/变化规律/约束)
-地才 = 环境 (载体/空间/材料/制度/边界/保存条件)
-人才 = 实践 (生产/行动/使用/实验/观察/记录)
-```
 
-元信息空间记录信息的静态属性, 无时间维度依赖。
+元信息空间可以包含来源、置信度、模态、时间尺度等补充属性，但本模块不据此判断信息“重要/不重要”。
 
-### 三才是元信息的主编码器
-三才藏提供元信息的主要存储坐标, 但不等于全部元信息理论。
-元信息空间可以包含三才之外的属性轴(如来源标识、置信度), 但三才是默认轴。
+## 3. 输入
 
-### 与元信息空间的关系
-元信息空间和互信息空间完全独立编码、独立归一化。
-两者仅在跨空间一致性检查阶段通过 endpoint_refs 关联。
-元归一化不知道互信息空间的存在, 也不需要知道。
-元归一化和互归一化可以并行执行, 互不依赖。
-
----
-
-## 2. 输入输出
-
-### 输入
 ```yaml
 input:
-  B_T:                    # 任务边界(来自任务边界编译器)
-    required_spaces: [...] # 必须包含 meta
-    meta_axes: [...]      # 元信息轴选择
-    forbidden_loss: [...]  # 禁止损失的元特征
-    epsilon_T: 0.05       # 误差预算
-  raw_material:            # 原始信息材料
-    - id: "..."
-      content: "..."
-      store_node_refs: [...]  # 三才藏节点引用(可选)
+  B_T:
+    task_id: ...
+    boundary_id: ...
+    meta_axes: [...]
+    attention_focus: {...}
+    preservation_requirements: [...]
+  raw_material:
+    - id: source_item_001
+      content_ref: ...
+      source_node_refs: [...]
 ```
 
-### 输出
+`B_T` 只决定本轮优先展开哪些轴，不授予删除权限。
+
+## 4. 输出
+
 ```yaml
 meta_view:
-  representation_id: "mt_{timestamp}_{seq}"
-  boundary_id: "bt_..."       # 关联的任务边界ID
-  observation_system: meta    # 固定为 meta
-  origin: "..."               # 元空间原点描述
-  axes:                       # 选择的轴
+  representation_id: mt_...
+  boundary_id: bt_...
+  observation_system: meta
+  axes:
     - tiancai
     - dicai
     - rencai
-  route_code: "q_M"           # 离散路由码(元卦)
-  continuous_signal: "s_M"    # 连续信号分数
-  source_node_refs:           # 三才藏节点引用
-    - "store_tian_..."
-    - "store_di_..."
-    - "store_ren_..."
-  preserved_features:         # 保留的元特征
-    - "..."
-  omitted_features:           # 被压缩删除的元特征
-    - "..."
-  recovery_refs:              # 恢复路径(被删特征的原始位置)
-    - "..."
-  loss:                       # 元信息损失向量
-    structural: 0.02          # 结构损失
-    functional: 0.01          # 功能损失
-  valid: true                 # 是否通过功能检查
+  route_code: "101"
+  continuous_signal:
+    tiancai: 0.8
+    dicai: 0.4
+    rencai: 0.9
+  source_item_refs:
+    - source_item_001
+  source_node_refs:
+    - store_...
+  aligned_features:
+    - feature_ref: f_001
+      source_ref: source_item_001
+      normalized_label: ...
+  unmapped_features:
+    - feature_ref: f_019
+      source_ref: source_item_001
+      reason: unresolved_alias
+  coverage:
+    source_items_in: 12
+    source_items_traceable_out: 12
+  valid: true
 ```
 
----
+### 关键不变量
 
-## 3. 归一化流程
-
-### 步骤1: 轴加载
-读取 B_T.meta_axes, 确定使用哪些三才轴。
-默认全加载: [tiancai, dicai, rencai]
-快速任务可以减少: 最少保留1轴。
-
-### 步骤2: 元特征提取
-对每个原始信息材料, 按选定的三才轴提取元特征:
-- 天才轴: 提取规律、周期、阈值、约束
-- 地才轴: 提取环境、载体、边界、保存条件
-- 人才轴: 提取实践、实验、观察、记录方式
-
-提取结果编码为 StoreNode 引用。
-
-### 步骤3: 任务条件路由
-对每个元特征, 根据B_T判定:
-- required: 任务必需, 不能删除
-- forbidden: 任务禁止(如错误信息源), 主动排除
-- indifferent: 任务无关, 可删除
-
-判定依据: forbidden_loss 列表 + F_T 功能测试。
-
-### 步骤4: 任务条件压缩
-对 indifferent 特征执行压缩:
-- 保留: required 特征 + source_node_refs + recovery_refs
-- 删除: indifferent 特征
-- 记录: 被删特征的 recovery_refs(原始位置指针)
-
-压缩约束: D_f(F_T(X), F_T(Z_T)) ≤ ε_T
-- X: 压缩前信息
-- Z_T: 压缩后信息
-- D_f: 功能距离(不是向量距离, 不是方差距离)
-- ε_T: 任务误差预算
-
-如果压缩后功能损失超过ε_T, 恢复被删特征直到满足约束。
-
-### 步骤5: 信号编码
-生成连续信号 s_M 和离散路由码 q_M:
-- s_M: 每个轴上的连续信号分数 [0, 1]
-  - 1 = 信号强(该轴特征丰富)
-  - 0 = 信号弱(该轴无特征)
-- q_M: 三才信号组合的离散编码
-  - 基于 s_M 的二值化(>threshold=1, <=threshold=0)
-  - 三轴二值化 = 3位二进制 = 8种组合
-  - 仅用于一级路由寻址, 不用于质量判断
-
-### 步骤6: 功能检查
-验证压缩后的元信息是否满足 F_T:
-- 特征覆盖: required 特征是否全部保留
-- 禁止损失: forbidden_loss 中的特征是否被删除
-- 功能测试: F_T.test_cases 是否通过
-
-通过 -> valid=true
-未通过 -> 恢复被删特征, 重新检查, 直到通过或达到最大恢复次数
-
----
-
-## 4. 秩自适应(修复原SVD缺陷)
-
-原SVD归一化的缺陷:
-- rank=2时 σ₃=0 导致 κ=σ₁/σ₃ 除零
-- 无任务条件, 用全局方差代替任务功能
-- 不区分元信息和互信息
-
-本模块的修复:
-- 不使用SVD作为过滤依据
-- 不使用rank/κ/σ积作为阈值
-- 使用任务条件化压缩(D_f ≤ ε_T)
-- 元信息空间独立编码, 不与互信息混合
-
-如果需要诊断元信息矩阵的结构(非门控), 可调用SVD作为诊断工具:
+```text
+set(source_items_in) subset_of traceable_source_refs(M_T)
 ```
-rank=2: κ₂ = σ₁ / max(σ₂, ε), V₂ = σ₁·σ₂
-rank≥3: κ₃ = σ₁ / max(σ₃, ε), V₃ = σ₁·σ₂·σ₃
-ε = 1e-8 (配置项)
+
+不能因为某一轴没有展开，就让对应来源项失去可追溯性。
+
+## 5. 流程
+
+### 步骤 1：加载 B_T 轴与 attention focus
+
+只决定本轮**优先对齐/展开**的属性，不决定来源 survival。
+
+### 步骤 2：元特征提取
+
+按需要提取：
+
+- 天才：规律、周期、阈值、约束；
+- 地才：环境、载体、边界、保存条件；
+- 人才：实践、实验、观察、记录方式。
+
+每个特征必须保留 `source_ref`。
+
+### 步骤 3：表示对齐
+
+允许：
+
+- 别名统一；
+- 单位换算后的统一表示；
+- 编码标准化；
+- 来源字段补齐；
+- 同义实体归并时保留原始别名列表。
+
+不得把“与当前 task_goal 低相关”作为删除条件。
+
+### 步骤 4：未解析项保留
+
+无法对齐的特征进入：
+
+```text
+unmapped_features / unresolved_features
 ```
-但SVD诊断结果不作为过滤门控, 仅作为结构参考。
 
----
+而不是 omitted。
 
-## 5. 独立性约束
+### 步骤 5：路由信号编码
 
-本子skill:
-- 不依赖互归一化
-- 不依赖conscious/unconscious/deep-conscious
-- 不依赖缓存波动力学
-- 可独立运行, 只要输入 B_T + raw_material
+`s_M` 与 `q_M` 只能用于前端路由/查询提示，不用于质量、真实性或过滤判断。
 
-本子skill不:
-- 生成互信息(那是互归一化的工作)
-- 执行跨空间一致性检查(那是多重归一化调度器的工作)
-- 调用藏归调度器(那是配方的工作)
-- 修改ρ/θ(那是核心层的工作)
+### 步骤 6：保真检查
 
----
+至少验证：
 
-## 6. 兼容包要求
+- 每个 source item 仍有可追溯引用；
+- preservation requirements 均可定位；
+- unmapped 项没有静默消失；
+- 本模块没有写 FilterLease。
 
-- 输出格式: YAML + JSON兼容
-- 可嵌入任何支持skill机制的环境
-- 不依赖本地绝对路径
-- 不依赖Hermes特定API
+## 6. 与 Filter 的边界
+
+若当前任务存在 ACTIVE FilterLease：
+
+1. Filter 先对**来源引用集合**执行已冻结 PASS/HOLD 规则；
+2. 元归一化只处理 Filter 传入的 candidate view；
+3. HOLD 项仍保留在 source state 和 FilterReceipt 中；
+4. 元归一化不得扩大或缩小 FilterSpec。
+
+如果 FilterLease 不是 ACTIVE，则所有来源引用进入对齐视图。
+
+## 7. SVD
+
+SVD 仅可作为结构诊断工具，不作为过滤、压缩或来源生存门控。
+
+## 8. 独立性约束
+
+本模块：
+
+- 不依赖互归一化；
+- 不依赖 ρ/θ；
+- 不依赖缓存波；
+- 不调用 RAG retriever/reranker/generator；
+- 不生成最终答案；
+- 不修改原始来源。
+
+默认输出用于 `RAGRequestFrame` 编译。

@@ -4,9 +4,9 @@
 
 - 项目：意识总线 / 三元三才
 - 运行基线：读取 `project-manifest.yaml#project.version`
-- 日期：2026-07-27
+- 日期：2026-08-19
 - Skill 封装日期：2026-07-30
-- 激活原则：任务边界优先；元信息空间与互信息空间独立编码、独立归一化；跨空间一致性后再进入藏归与 ρ/θ 总线。
+- 当前激活原则：三元是 RAG 前端；来源保真优先；B_T 只管任务/视图；元/互归一化只做无损对齐；rho/theta 只做注意力提示；FilterLease 默认 CLOSED 且只能由用户针对单子任务手动开启。
 
 ## 输入包指纹
 
@@ -96,16 +96,36 @@
 
 ## 2026-08-16 V3.3.0 多时间尺度再注入实验组合
 
-本次把近期关于“ρ/θ 极小控制核、循环语义再注入、来源可区分的稠密/稀疏混合注意力、快/慢状态流”的讨论登记为**实验性组合层**，暂不修改 `references/architecture.md` 的冻结本体。
+本次把近期关于“ρ/θ 极小控制核、循环语义再注入、来源可区分的稠密/稀疏混合注意力、快/慢状态流”的讨论登记为实验性组合层，暂不修改 `references/architecture.md` 的冻结本体。
 
 1. 新增 `multiscale-reinjection-kernel`，把现有 `B_T → 元/互归一化 → 藏归 → n-focus/cache/condense → ρ/θ → Endoscope` 重新映射为同一个事件驱动循环中的策略，而非继续增加平级总线器官。
-2. 新增 `SignalEnvelope`：`payload_ref + routing header`，显式区分来源、模态、时间尺度、持久性、传播范围、fanout、证据来源、不确定性与任务边界；不把这些字段全部压成 embedding。
-3. 新增 fast/slow 状态容器；未变化的 persistent slow state 只保留引用，不在每一轮重复展开为完整 token。只有 delta、边界变化、跨尺度依赖命中或显式 revival 才进入 ReinjectionFrame。
-4. 稠密/稀疏/broadcast 被定义为传播权限，而不是“神经/免疫/代谢”等来源的固定身份；生物学只作为结构启发，不能未经证据直接升级为 AI 机制事实。
-5. 新增 ReinjectionFrame 合同，继续冻结 `ρ + θ = 1` 且禁止把 θ 当错误概率；ρ 由外部任务策略或观测过程提供，参考实现不通过模型自报估计正确性。
-6. `visualR` 保持 PAL/九宫/矩阵参考实现；`java-runtime` 继续执行“Java 不自行重定义语义”；`sanyuan-context-router` 继续作为薄客户端；已冻结 `mirror-bus` 不因本实验重启。
-7. 新增纯标准库 Python 参考实现和确定性 validator；它们只证明路由合同与 delta/persistent 行为自洽，不证明 learned attention 或领域因果有效。
-8. 晋升前必须完成跨模态前向测试、token/延迟基准、关键依赖漏失测试、θ 最小恢复效率测试，以及与 visualR/java-runtime 现有 ABI 的兼容验证。
+2. 新增 `SignalEnvelope`：`payload_ref + routing header`，显式区分来源、模态、时间尺度、持久性、传播范围、fanout、证据来源、不确定性与任务边界。
+3. 新增 fast/slow 状态容器；未变化的 persistent slow state 只保留引用，不在每一轮重复展开为完整 token。
+4. 稠密/稀疏/broadcast 被定义为传播权限，而不是“神经/免疫/代谢”等来源的固定身份；生物学只作为结构启发。
+5. 新增 ReinjectionFrame 合同，继续冻结 `ρ + θ = 1` 且禁止把 θ 当错误概率。
+6. `visualR`、`java-runtime`、`sanyuan-context-router` 与冻结 `mirror-bus` 保持既有边界。
+7. 新增纯标准库 Python 参考实现和确定性 validator。
+8. 晋升前要求跨模态、token/延迟、关键依赖漏失、恢复效率与 ABI 兼容验证。
+
+## 2026-08-19 V3.4.0 RAG 前端职责与过滤权限收束
+
+本次修订由真实录音总结事故触发：三元在用户未授权过滤时，任务聚焦与任务条件归一化把导师讨论中与提示词主线低相关的细节静默压出 active view，暴露了“任务焦点被误当成信息删减许可”的架构缺陷。
+
+本次是权限与职责边界修订；三才、三题、互等冻结本体暂不直接改写，`architecture.md` 的正式迁移留到验收完成后处理。
+
+1. **项目重新定位为 RAG front-end preprocessor。** 三元只负责任务/来源解析、元互对齐、attention hints、可选批量机械过滤与 RAGRequestFrame 编译；embedding、retrieval、rerank、generation 均留给外部 RAG。
+2. **新增 `rag-frontend-governance`。** 明确 `B_T` 只定义任务/视图，`Normalization` 只改变表示，`Filter` 是独立权限域，`rho/theta` 只做主/次注意力辅助。
+3. **新增 FilterLease 棘轮权限。** 默认 CLOSED；只有用户对当前子任务显式授权，且满足 large-batch + high-filter + frozen spec 才可 ACTIVE。权限 task-local、single-owner、one-shot、non-inheritable、non-refreshable；任务完成/终止/超时/B_T变化/spec变化后进入 SEALED，不能恢复。
+4. **Filter 不判断。** FilterSpec 只能是已冻结的字段/标签/阈值规则，Filter 只做 PASS/HOLD；“重要/相关/有价值”等语义判断必须由独立标注/判断阶段完成，Filter 本身不能生成条件。
+5. **元/互归一化升级至 0.2.0。** 删除默认 `indifferent -> 可删除`、任务条件压缩与 `epsilon_T` 有损许可；无法对齐的信息进入 unmapped/unresolved，并保留 source/relation refs。
+6. **B_T 升级至 0.2.0。** 移除 epsilon_T 的权限语义，新增 preservation requirements、attention focus 与 `output_target=rag_request_frame`；B_T 不能创建 FilterLease。
+7. **rho/theta 降级为 advisory attention hints。** rho 模块升级至 3.1.0，theta 模块升级至 1.5.0；二者不能改变 FilterLease、source survival、retrieval 或 truth decision。
+8. **快速路径拆分。** 新增无损 `fast-view-recipe.yaml`；旧 fast-filter 改造成只有 ACTIVE FilterLease 才可进入的 `batch-filter` 配方。
+9. **深度配方停止在 RAGRequestFrame。** `research-recipe.yaml` 不再默认执行 reader-facing generation；读者端分析退为可选展示 adapter。
+10. **多时间尺度模块降级为前端路由实验。** SignalEnvelope/fast-slow/dense-sparse-broadcast 仅是 routing metadata；三元不拥有 Transformer 或长期世界状态。
+11. **新增 machine contracts。** `schema-filter-lease.schema.json` 与 `schema-rag-request-frame.schema.json` 明确权限和前端输出边界。
+12. **新增 CI guardrail。** `validate_frontend_guardrails.py` 检查 B_T 无 epsilon_T 权限字段、normalization schema 无默认 omitted/loss、FilterLease 仅 user_explicit、不可继承/刷新/修改来源，以及研究主链终止于 RAGRequestFrame。
+13. **禁止静默降级。** ACTIVE 过滤必须产生 FilterReceipt；无过滤时前端明确 `filter_applied=false`。
 
 ## 2026-08-17 V3.3.1 README 宣传与契约修正
 
@@ -129,8 +149,8 @@ V3.3.3 的 `claude-code.png` 取自 Anthropic 组织头像数值路径 `avatars.
 
 ## 对验证材料的解释边界
 
-多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
+多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious 旧版本的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
 
-Endoscope 的 Bloodtesting 夹具同样只是协议校准起点，不是通用 coding benchmark。工程自测通过只证明合同与参考实现自洽；真实 Agent 上的误报、漏报、首次出血、错误传播、恢复效率和 output 节省必须由前向运行数据支持。
+Endoscope 的 Bloodtesting 夹具只是协议校准起点，不是通用 coding benchmark。V3.4 起，旧 NSL/omitted 行为还必须接受前端权限审计：默认 normalization 不得以“可恢复”为理由先行删减来源。
 
-多时间尺度再注入参考实现同样只验证协议守恒、delta 检测与持久引用行为；任何稀疏/稠密路由权重、跨尺度 attention bias、真实多模态收益都必须由独立运行数据支持。
+多时间尺度参考实现同样只验证协议结构；任何真实 attention 收益、跨尺度权重或 RAG 质量改进都必须由外部前向测试支持。

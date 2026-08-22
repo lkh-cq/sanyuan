@@ -1,9 +1,9 @@
 ---
 name: task-boundary-compiler
 module_id: preprocessor-task-boundary
-description: "任务边界编译器: 在任何过滤/归一化之前执行。定义任务目标F_T、禁止损失、误差预算ε_T、必需观测空间、可选空间。不负责文档筛选, 不负责藏归写入。"
+description: "任务边界编译器：定义当前子任务目标、功能、观测轴与注意力重点。B_T 不拥有过滤、压缩或删除权限；每个子任务的 FilterLease 默认 CLOSED。"
 category: preprocessor
-version: 0.1.0
+version: 0.2.0
 canvas_refs:
   - assets/canvas/意识总线_总架构.canvas
 manifest_ref: references/project-manifest.yaml
@@ -11,98 +11,157 @@ manifest_ref: references/project-manifest.yaml
 
 # 任务边界编译器
 
-> 在任何过滤、归一化、藏归操作之前执行。
-> 唯一职责: 把模糊的任务意图编译为可校验的边界条件。
+> 唯一职责：把模糊的任务意图编译为可校验的**当前子任务视图**。
+>
+> `B_T` 只决定“现在在做什么、应该重点看什么”，不决定“什么信息可以消失”。
 
----
+## 1. 冻结候选约束
 
-## 1. 冻结定义
-
-任务边界 B_T 是一个结构化对象, 包含:
-
+```text
+B_T -> task/view/attention scope
+B_T -/-> FilterLease
+B_T -/-> source deletion
+B_T -/-> lossy compression
 ```
+
+任何旧实现若从 `B_T` 自动推导删除、HOLD、omitted 或压缩许可，属于 V3.4 迁移期禁止行为。
+
+## 2. 结构
+
+```text
 B_T = {
-  task_goal:        任务目标(自然语言)
-  F_T:              任务功能(可验证的功能测试)
-  forbidden_loss:   禁止损失(哪些特征/关系/路径不能被删除)
-  epsilon_T:        误差预算(允许的最大功能损失)
-  required_spaces:  必需观测空间(至少包含 meta + hu)
-  optional_spaces:  可选观测空间(time/evidence/source/...)
-  meta_axes:        元信息空间内部选择轴
-  hu_axes:          互信息空间内部选择轴
+  task_goal:              当前子任务目标
+  F_T:                    可验证的前端功能
+  preservation_requirements:
+                          需特别强调保持可追溯的来源/关系/条件
+  required_spaces:        必需观测空间
+  optional_spaces:        可选补充空间
+  meta_axes:              元信息对齐轴
+  hu_axes:                关系对齐轴
+  attention_focus:        主注意力与次级注意力提示
+  output_target:          默认 RAGRequestFrame
 }
 ```
 
-约束:
-- required_spaces 至少包含 meta 和 hu
-- 禁止把 hu 从 required_spaces 中移除, 即使是快速任务
-- epsilon_T > 0 (零误差预算意味着不压缩, 等于不做归一化)
-- F_T 必须是可验证的, 不能是"质量好"这种不可测试语句
+### 不再属于 B_T 的字段
 
----
+- `epsilon_T`：不得再作为默认有损压缩预算；
+- `filter_permission`：过滤权限只能来自独立 FilterLease；
+- `omitted/indifferent deletion policy`：不属于任务边界。
 
-## 2. 编译流程
+旧输入若仍携带 `epsilon_T`，前端必须忽略其“授权删除”含义，并记录兼容警告。
 
-### 步骤1: 任务目标提取
-输入: 用户的自然语言任务描述
-输出: task_goal (一句话, 主谓宾结构)
+## 3. 编译流程
 
-### 步骤2: 任务功能定义
-输入: task_goal
-输出: F_T (功能测试函数描述)
-规则: F_T 必须能回答"输入X, 任务应该输出什么"和"输入Z, 任务应该输出什么"
+### 步骤 1：识别当前子任务
 
-### 步骤3: 禁止损失识别
-输入: task_goal + F_T
-输出: forbidden_loss 列表
-规则: 列出完成任务功能所必需、不能被压缩删除的特征/关系/路径
+每个子任务都有独立 `task_id` 与 `boundary_id`。
 
-### 步骤4: 误差预算设定
-输入: task_goal
-输出: epsilon_T (浮点数, 范围 (0, 1])
-默认值: 科研任务 0.05, 快速任务 0.2
-规则: epsilon_T 越小, 压缩越保守
+复杂任务拆分后：
 
-### 步骤5: 观测空间选择
-输入: task_goal + F_T
-输出: required_spaces + optional_spaces
-规则:
-- meta 和 hu 始终在 required_spaces 中
-- 时间维度: 历史分析/时序比较任务 -> required; 其他 -> optional
-- 证据维度: 文献综述/事实核查 -> required; 其他 -> optional
-- 来源维度: 引用追溯 -> required; 其他 -> optional
-- 不确定性维度: 风险评估 -> required; 其他 -> optional
+```text
+Task
+|- subtask_A -> B_T(A), FilterLease=CLOSED
+|- subtask_B -> B_T(B), FilterLease=CLOSED
+|- subtask_C -> B_T(C), FilterLease=CLOSED
+```
 
-### 步骤6: 轴选择
-输入: required_spaces + optional_spaces
-输出: meta_axes + hu_axes
-规则:
-- 元信息轴默认: 天才(规律), 地才(环境), 人才(实践)
-- 互信息轴默认: 直接互, 复合互, 路径残差
-- 快速任务可以减少轴数, 但不能减到零
+过滤权限不得继承。
 
----
+### 步骤 2：定义 task_goal
 
-## 3. 输出格式
+一句话描述当前子任务目标，不把“重点”翻译成“删除其它内容”。
+
+例如：
+
+```text
+用户：总结导师录音里与 PNPLA8 实验有关的重点
+```
+
+合法编译：
+
+```text
+task_goal = 优先组织 PNPLA8 实验相关讨论
+attention_focus.primary = PNPLA8 实验
+```
+
+禁止编译：
+
+```text
+remove_non_PNPLA8_discussion = true
+```
+
+除非用户另外显式开启该子任务的 FilterLease。
+
+### 步骤 3：定义 F_T
+
+F_T 只验证前端是否正确构造任务视图与下游请求，例如：
+
+- primary query 是否反映用户目标；
+- source refs 是否保持可追溯；
+- required spaces 是否完成；
+- ρ/θ 是否只作为 advisory hints；
+- 无 FilterLease 时是否未发生 HOLD。
+
+F_T 不把“压缩率高”当作成功指标。
+
+### 步骤 4：preservation_requirements
+
+默认原则是**全部 source refs 保持可追溯**。
+
+该字段用于额外强调高风险信息，例如：
+
+- 发言者；
+- 时间顺序；
+- 实验条件；
+- 数值；
+- 反对意见；
+- 未解决问题；
+- 证据来源。
+
+它不是“只有列表中的内容才保留”。
+
+### 步骤 5：观测空间选择
+
+`meta` 和 `hu` 仍是默认必需空间；补充空间按任务选择。
+
+选择观测轴只改变**前端展开与标注方式**，不允许因此丢失来源引用。
+
+### 步骤 6：attention_focus
+
+attention_focus 可包含：
+
+```yaml
+attention_focus:
+  primary_axes: [...]
+  secondary_axes: [...]
+```
+
+ρ/θ 可以据此给下游生成 attention hints，但不能操作 FilterLease。
+
+## 4. 输出示例
 
 ```yaml
 task_boundary:
-  boundary_id: bt_{timestamp}_{seq}
-  task_goal: "..."
+  boundary_id: bt_20260819_001
+  task_id: summarize_meeting_01
+  task_goal: "优先组织导师讨论中与 PNPLA8 实验设计有关的内容"
   F_T:
-    description: "..."
+    description: "生成保留来源可追溯性的 RAG 前端请求"
     test_cases:
-      - input: "..."
-        expected: "..."
-  forbidden_loss:
-    - "..."
-  epsilon_T: 0.05
+      - input: "原始录音包含 PNPLA8 与其它实验讨论"
+        expected: "全部来源片段仍可追溯；PNPLA8 进入 primary attention"
+  preservation_requirements:
+    - speaker_identity
+    - temporal_order
+    - experimental_conditions
+    - disagreements
   required_spaces:
     - meta
     - hu
   optional_spaces:
     - time
-    - evidence
+    - source
   meta_axes:
     - tiancai
     - dicai
@@ -111,46 +170,46 @@ task_boundary:
     - direct
     - composite
     - path_residual
+  attention_focus:
+    primary_axes:
+      - PNPLA8
+      - experiment_design
+    secondary_axes:
+      - unresolved_questions
+  output_target: rag_request_frame
 ```
 
----
+## 5. 路由
 
-## 4. 路由门: 任务复杂度判定
+B_T 只可选择无损前端路径：
 
-在编译完成后, 根据B_T的复杂度决定走哪条配方:
+- `direct`：单一简单请求；
+- `fast_view`：低成本、保真前端视图；
+- `research_frontend`：多材料、多关系、深度前端编译。
 
-```
-if required_spaces == [meta, hu] and optional_spaces == [] and epsilon_T >= 0.2:
-    -> 快速信息筛选配方
-else:
-    -> 科研深度分析配方
-```
+大批次高过滤**不是 B_T 自动路由结果**。
 
-快速配方的约束:
-- 可以降低轴数量(最低: meta 1轴, hu 1轴)
-- 可以降低关系展开深度(只保留直接互)
-- 可以降低补充空间数量(全部optional)
-- 可以使用粗粒度卦码
-- 不能把互信息降为零
-- 不能关闭元信息提取
+若用户显式授权 FilterLease，调用器可以额外进入 `batch_filter` 路径；该路径的权限检查由 `filter-ratchet-permission.md` 负责。
 
----
+## 6. 禁止行为
 
-## 5. 禁止行为
+- 不得从 B_T 自动开启过滤；
+- 不得从 task_goal 推导“非重点内容可删除”；
+- 不得用 `epsilon_T` 赋予信息损失权限；
+- 不得把快速任务等同于高过滤；
+- 不得把 optional space 未展开解释为来源项可删除；
+- 不得修改 ρ/θ；
+- 不负责 embedding、retrieval、rerank 或 generation；
+- 不生成最终 RAG 答案，默认输出前端请求合同。
 
-- 不负责文档筛选(那是归一化器的工作)
-- 不负责藏归写入(那是藏归调度器的工作)
-- 不负责ρ/θ控制(那是核心层的工作)
-- 不生成任务结果(只生成边界条件)
-- 不跳过元或互空间(即使任务看起来很简单)
+## 7. 依赖与消费者
 
----
+B_T 被以下模块消费：
 
-## 6. 依赖
+- 元归一化；
+- 互归一化；
+- fast-view / research-front-end 配方；
+- ρ/θ attention hint 编译器；
+- RAGRequestFrame 编译器。
 
-- 无核心层依赖(在ρ/θ之前运行)
-- 输出 B_T 被以下模块消费:
-  - 元归一化 (references/meta-normalization.md)
-  - 互归一化 (references/hu-normalization.md)
-  - 科研深度分析配方 (references/research-recipe.yaml)
-  - 快速信息筛选配方 (references/fast-filter-recipe.yaml)
+FilterLease 只引用 `task_id` / `boundary_id` 检查所有权，不由 B_T 创建。

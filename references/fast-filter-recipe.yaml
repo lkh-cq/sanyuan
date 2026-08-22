@@ -1,74 +1,82 @@
-# 快速信息筛选配方
-# 项目版本读取 project-manifest.yaml；快速通道不省略元互双空间，只降低精度。
+# 大批次高过滤配方
+# 仅用于用户显式授权的单子任务；默认不自动路由到本配方。
 
-recipe_id: fast-filter
-name: 快速信息筛选
-description: "简单任务的快速通道。降低轴数和精度, 但不关闭元或互。"
+recipe_id: batch-filter
+name: 大批次高过滤
+description: "用户针对当前子任务显式授权后，对大批次数据按 frozen FilterSpec 做机械 PASS/HOLD。Filter 不判断意义，不修改来源。"
 
 modules:
   - task-boundary-compiler
+  - filter-ratchet-permission
   - meta-normalization
   - hu-normalization
   - conscious-rho
   - unconscious-theta
-  - cache-wave
+
+entry_gate:
+  require_all:
+    - user_explicit_authorization: true
+    - filter_lease_state: ACTIVE
+    - owner_task_matches_current_subtask: true
+    - batch_mode: large_batch
+    - filter_intensity: high
+    - filter_spec_frozen: true
 
 sequence:
   - step: 1
     module: task-boundary-compiler
-    action: "简化任务边界: 生成B_T(路由门判定为快速通道)"
+    action: "读取当前子任务 B_T；B_T 不创建 FilterLease"
     output: B_T
-    constraints:
-      epsilon_T: 0.2
-      meta_axes_min: 1
-      hu_axes_min: 1
 
   - step: 2
-    module: meta-normalization
-    action: "最小元信息提取: 单轴提取, 粗粒度压缩"
-    input: B_T + raw_material
-    output: M_T
-    constraints:
-      axes_max: 1
-      use_coarse_route_code: true
+    module: filter-ratchet-permission
+    action: "验证 task-local FilterLease；任一条件不满足则 fail closed"
+    output: verified_FilterLease
 
   - step: 3
-    module: hu-normalization
-    action: "最小互信息提取: 仅直接互, 不展开复合互"
-    input: B_T + raw_relations
-    output: H_T
+    action: "按 frozen FilterSpec 对 source refs 做机械 PASS/HOLD"
     constraints:
-      axes_max: 1
-      relation_type: direct
-      skip_composite: true
-      skip_path_residual: false
+      source_mutation: false
+      semantic_judgment_inside_filter: false
+      spec_mutation: false
+    output:
+      - pass_refs
+      - hold_refs
 
   - step: 4
-    action: "快速任务掩码匹配: 用q_M和q_H做一级路由"
-    description: |
-      卦码仅用于候选粗筛和状态变化检测。
-      不用于质量判断、真实性判断、深度判断。
+    module: meta-normalization
+    action: "仅对 pass_refs 做元信息对齐；hold_refs 仍保留在 source state 与 receipt"
+    output: M_T
 
   - step: 5
-    module: conscious-rho
-    action: "ρ收束"
+    module: hu-normalization
+    action: "仅对 pass relation refs 做关系对齐；不得重新判断 PASS/HOLD"
+    output: H_T
 
   - step: 6
-    module: unconscious-theta
-    action: "θ边界检查"
+    module: conscious-rho
+    action: "生成 rho 主注意力辅助提示；不得改变 FilterSpec/Lease"
 
   - step: 7
-    action: "低成本功能检查: 仅验证required特征覆盖"
+    module: unconscious-theta
+    action: "生成 theta 次级注意力辅助提示；不得改变 FilterSpec/Lease"
 
   - step: 8
-    module: cache-wave
-    action: "缓存波更新"
+    action: "编译 RAGRequestFrame + FilterReceipt"
+    output:
+      - RAGRequestFrame
+      - FilterReceipt
+
+  - step: 9
+    module: filter-ratchet-permission
+    action: "子任务结束、终止、超时、B_T变化或spec变化后立即 SEALED"
 
 constraints:
-  - "不得把互信息降为零(即使快速任务)"
-  - "不得关闭元信息提取(即使快速任务)"
-  - "只能降低轴数量(最低各1轴)"
-  - "只能降低关系展开深度(只保留直接互)"
-  - "只能降低补充空间数量(全部optional)"
-  - "只能使用粗粒度卦码"
-  - "路径残差如果存在则必须保留"
+  - "FilterLease 默认 CLOSED；本配方不能自动开启"
+  - "FilterSpec 只能来自 user_explicit 或 user_selected_template"
+  - "Filter 只执行字段/标签/阈值规则，不生成重要性判断"
+  - "并行 worker 可消费同一 lease，但不得创建 sublease"
+  - "权限不可继承；结果可以传递"
+  - "HOLD 不等于删除；source mutation=false"
+  - "rho/theta 与 FilterLease 完全隔离"
+  - "SEALED lease 不可恢复，重新过滤必须新建 lease"

@@ -23,6 +23,7 @@ jobs:
       - run: python scripts/validate_endoscope.py
       - run: python scripts/endoscope.py selftest
       - run: python scripts/validate_multiscale_reinjection.py
+      - run: python scripts/validate_frontend_guardrails.py
 
   endoscope-r:
     runs-on: ubuntu-latest
