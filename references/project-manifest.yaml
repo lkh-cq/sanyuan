@@ -1,7 +1,6 @@
 project:
   id: consciousness-bus
   name: 意识总线
-  version: 3.4.0
 
 version_policy:
   project_version_source: references/project-manifest.yaml#project.version

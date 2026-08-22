@@ -127,6 +127,26 @@
 12. **新增 CI guardrail。** `validate_frontend_guardrails.py` 检查 B_T 无 epsilon_T 权限字段、normalization schema 无默认 omitted/loss、FilterLease 仅 user_explicit、不可继承/刷新/修改来源，以及研究主链终止于 RAGRequestFrame。
 13. **禁止静默降级。** ACTIVE 过滤必须产生 FilterReceipt；无过滤时前端明确 `filter_applied=false`。
 
+## 2026-08-17 V3.3.1 README 宣传与契约修正
+
+本次为 v3.3.0 之后的加固/宣传批次，不修改冻结本体。
+
+1. README 新增"支持 Agent"标识：Hermes / Claude Code / Codex·GPT / DeepSeek dsh（本批先以徽章/头像样式迭代，定稿见 V3.3.2）。
+2. README 新增"版本更新"入口，指向本文件（遵守"版本号不漂移到 manifest/provenance 之外"规则）。
+3. Endoscope 协议文档维持 0.2.0（履约全链路版本），修正一度误推的 0.1.1。
+
+## 2026-08-17 V3.3.2 支持 Agent 标识定稿
+
+README"支持 Agent"标识定为：**官方组织头像 + 加粗名称内联**，接于各 Agent 名称后方；去除独立"标识"列与徽章样式。头像走 `avatars.githubusercontent.com` 直链（GitHub README camo 代理对 `github.com/…png` 的 302 会拦成黑块，此方式已实测 200 可渲染）。
+
+## 2026-08-17 V3.3.3 标识资源落盘为仓库内相对路径
+
+V3.3.2 的 `avatars.githubusercontent.com/{org名}` 经实测对 Anthropic/OpenAI 返回灰色默认头像且受 camo 影响。本期改为：**官方仓库资源落盘到本仓库 `assets/agent-icons/`，README 用相对路径引用**，彻底脱离外部代理/头像别名。来源与采集锚点记录于 `assets/agent-icons/SOURCES.md`（Hermes=NousResearch 官方 PNG，Claude Code=Anthropic 官方组织头像，Codex=openai/codex 官方 PNG，dsh=deepseek-ai 官方 favicon）。吉祥物由 `mascot-abigail.webp` 无损转存为 `mascot-abigail.png`（README 改引 PNG 以兼容 GitHub 图片渲染），原 WebP 保留作源文件。
+
+## 2026-08-17 V3.3.4 Claude Code 图标换源
+
+V3.3.3 的 `claude-code.png` 取自 Anthropic 组织头像数值路径 `avatars.../u/76263028`，实测返回 GitHub 灰色/黑色默认占位（非品牌 logo）。本期改以 **simple-icons 的 `anthropic` A 字形**（填 Anthropic 官方橙 `#D97757`）落盘为 `claude-code.svg` 并替换引用；README 现全部图标均为本仓库相对路径资源。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious 旧版本的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
