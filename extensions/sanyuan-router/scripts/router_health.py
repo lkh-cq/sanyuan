@@ -90,17 +90,28 @@ def main() -> int:
             else:
                 add(name + "/注册", False, "config 无此桥注册段")
 
-    # L4: sidecar
-    try:
-        with urllib.request.urlopen("http://127.0.0.1:8765/health", timeout=5) as r:
-            h = json.loads(r.read())
+    # L4: sidecar (两次尝试, 防瞬时抖动)
+    h = None
+    last_err = None
+    for attempt in range(2):
+        try:
+            with urllib.request.urlopen("http://127.0.0.1:8765/health", timeout=5) as r:
+                h = json.loads(r.read())
+            break
+        except Exception as e:  # noqa: BLE001
+            last_err = e
+            if attempt == 0:
+                import time
+                time.sleep(1.5)
+    if h is not None:
         add("L4 sidecar/health", h.get("status") == "ok",
             f"status={h.get('status')}")
         rl, rd = h.get("routing_loaded"), h.get("routing_degradation")
         add("L4 sidecar/routing", bool(rl),
             f"loaded={rl} degradation={rd}" + ("" if rl else " → R3"))
-    except Exception as e:  # noqa: BLE001
-        add("L4 sidecar/health", False, f"8765 不通 ({e}) → 修复: bash {SIDECAR_START}")
+    else:
+        add("L4 sidecar/health", False,
+            f"8765 不通 ({last_err}) → 修复: bash {SIDECAR_START}")
 
     # 路由派生文件新鲜度
     if BRIDGE_TABLE.exists() and ROUTES.exists():
