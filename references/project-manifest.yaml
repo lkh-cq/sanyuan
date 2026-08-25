@@ -1,7 +1,7 @@
 project:
   id: consciousness-bus
   name: 意识总线
-  version: 3.3.4
+  version: 3.3.5
 
 version_policy:
   project_version_source: references/project-manifest.yaml#project.version
@@ -44,6 +44,7 @@ module_lifecycle:
     - extension-endoscopic-code-actuation
     - extension-index-naming-norm
     - extension-multiscale-reinjection-kernel
+    - extension-sanyuan-router
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -313,6 +314,14 @@ extensions:
     path: extensions/index-naming/SKILL.md
     version: 0.1.0
     module_id: extension-index-naming-norm
+    depends_on:
+      - archive-ingestion
+  sanyuan_router:
+    id: sanyuan-router
+    name: 三元router运行时链路总控
+    path: extensions/sanyuan-router/SKILL.md
+    version: 0.1.0
+    module_id: extension-sanyuan-router
     depends_on:
       - archive-ingestion
   multiscale_reinjection_kernel:
