@@ -45,21 +45,43 @@ def stdio_tools(script: Path) -> tuple[int | None, str]:
         '{"jsonrpc":"2.0","method":"notifications/initialized"}\n'
         '{"jsonrpc":"2.0","id":2,"method":"tools/list"}\n'
     )
+    # Popen 保活 stdin: run(input=) 会立刻 EOF, 服务器可能在响应前关停 (竞态, 08-25 实测)
     try:
-        proc = subprocess.run(
+        proc = subprocess.Popen(
             [str(VENV_PY), str(script)],
-            input=payload, capture_output=True, text=True, timeout=20,
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, text=True,
         )
-    except subprocess.TimeoutExpired:
-        return None, "握手超时 (>20s)"
-    for line in proc.stdout.splitlines():
-        try:
-            d = json.loads(line)
-        except json.JSONDecodeError:
-            continue
-        if d.get("id") == 2:
-            return len(d["result"]["tools"]), ""
-    return None, f"无 tools/list 响应 (stderr: {proc.stderr.strip()[:80]})"
+    except OSError as e:
+        return None, f"启动失败: {e}"
+    try:
+        proc.stdin.write(payload)
+        proc.stdin.flush()
+        import time
+        deadline = time.time() + 20
+        answer = ""
+        while time.time() < deadline:
+            line = proc.stdout.readline()
+            if not line:
+                time.sleep(0.05)
+                continue
+            answer += line
+            if '"id":2' in line.replace(" ", ""):
+                break
+        if '"id":2' not in answer.replace(" ", ""):
+            proc.kill()
+            return None, f"20s 内无 tools/list 响应 (stderr: {proc.stderr.read()[:80] if proc.poll() is not None else ''})"
+        for line in answer.splitlines():
+            try:
+                d = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if d.get("id") == 2:
+                return len(d["result"]["tools"]), ""
+        return None, "tools/list 响应解析失败"
+    finally:
+        if proc.poll() is None:
+            proc.kill()
 
 
 def main() -> int:
