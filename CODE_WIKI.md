@@ -85,10 +85,11 @@
 ├── .github/workflows/validate.yml   # CI：4 个校验 job + 自动版本标签 + 清理 agent 分支
 ├── agents/openai.yaml               # GPT/Codex 界面元数据（display_name、default_prompt）
 ├── assets/                          # 吉祥物阿比盖尔、Agent 图标、5 张 Canvas
-├── extensions/                      # 可选子模块（3 个，各含 SKILL.md + scripts/）
+├── extensions/                      # 可选子模块（4 个，各含 SKILL.md + scripts/）
 │   ├── process-transparency/        #   过程透明：决策日志四字段 + archive_wsl.sh
 │   ├── index-naming/                #   index 命名规范 v2.0 + validate_index_naming.py
-│   └── sanyuan-router/              #   运行时链路总控 + router_health.py
+│   ├── sanyuan-router/              #   运行时链路总控 + router_health.py
+│   └── systematic-retrieval/        #   系统化检索分支 + validate_retrieval_spec.py
 ├── integrations/obsidian/           # Obsidian 插件(main.js) + Python sidecar 元数据/env
 ├── references/                      # 只读规范层：本体/协议/配方/来源/扩展/Schema（80+ 文件）
 ├── scripts/                         # Python/R 参考实现与确定性校验
@@ -160,6 +161,7 @@
 | extension-process-transparency | 0.1.0 | 决策日志四字段（conclusion/evidence/assumption/verification）+ 翻转三级预警 |
 | extension-index-naming-norm | 0.1.0 | 知识库 index 命名 v2.0（层级=上游文件夹数、三段式） |
 | extension-sanyuan-router | 0.1.0 | Hermes/Obsidian 运行时链路总控（L1-L9 拓扑、事故 runbook） |
+| extension-systematic-retrieval | 0.1.0 | 系统化检索分支：三阶段检索（全量拓展→审核→收束）+ 6 步循环 + 7 类盲点 + 4 类来源指南 + RetrievalPlan schema |
 | extension-archive-ingestion | 0.1.0 | 归档方案迁移协议（stable 生命周期） |
 
 ---
@@ -233,6 +235,7 @@
 | `extensions/index-naming/scripts/validate_index_naming.py` | index 命名 v2.0 只读校验；`--dry` 输出建议新名；永不写入；退出码 0/1/2 |
 | `extensions/sanyuan-router/scripts/router_health.py` | L1-L9 全链路健康检查：三桥 stdio 握手（initialize→tools/list）、8765 sidecar、路由派生新鲜度、DB/插件存在性 |
 | `extensions/process-transparency/scripts/archive_wsl.sh` | 两阶段归档：WSL 侧先 tar 原地压缩 → 再 mv 到 D 盘；`now` / `status` 子命令 |
+| `extensions/systematic-retrieval/scripts/validate_retrieval_spec.py` | 检索协议结构校验（3 阶段/6 步循环/7 盲点/4 来源）；`--plan FILE` 校验运行时 RetrievalPlan；只读；退出码 0/1/2 |
 
 ### 4.6 Obsidian 集成（`integrations/obsidian/`）
 
@@ -327,6 +330,10 @@ python3 extensions/index-naming/scripts/validate_index_naming.py --dry <知识�
 
 # sanyuan-router 链路巡检（退出码 0=全绿 / 1=有 FAIL）
 python3 extensions/sanyuan-router/scripts/router_health.py
+
+# systematic-retrieval 检索协议/计划校验（退出码 0/1/2）
+python3 extensions/systematic-retrieval/scripts/validate_retrieval_spec.py
+python3 extensions/systematic-retrieval/scripts/validate_retrieval_spec.py --plan <plan.yaml>
 
 # 过程透明归档（WSL→压缩→D盘）
 bash extensions/process-transparency/scripts/archive_wsl.sh now|status

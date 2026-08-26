@@ -1,0 +1,172 @@
+# 系统化检索分支协议 (systematic-retrieval)
+#
+# 定位: B_T (任务边界) 编译之后、三才藏之前的"取"分支。
+#       检索分支只负责"把外部信息取进来, 并审计取得是否充分";
+#       取回材料的语义处理仍归藏归层与归一化层。
+# 本体约束: 检索事件复用 FlowEvent 既有类型 (flow/filter/merge/conflict/loss/restore),
+#           不新增第四本体实体, 不修改冻结本体。
+# 鲁棒性基线: "未检索到"与"检索通道故障"必须显式区分, 缺失不得静默当作不存在。
+
+meta:
+  module_id: extension-systematic-retrieval
+  version: 0.1.0
+  lifecycle: experimental
+  position: after_task_boundary_before_sancai_store
+  inputs: [B_T, retrieval_budget]
+  outputs: [candidate_store_nodes, retrieval_rounds, retrieval_followups]
+
+phases:
+  expansion:
+    name: 全量拓展检索
+    goal: 最大化召回, 宁多勿漏
+    strategy: 敏感式检索 (宽检索式)
+    actions:
+      - 按 B_T 的 meta_axes 与 hu_axes 分解检索轴
+      - 受控词表扩展 (约定性: MeSH/主题词表) 与同义词网络扩展 (设计性) 并行
+      - 多来源并行, 计划内来源逐一生成检索记录
+    acceptance: 计划来源全部有检索记录 (含 zero_hit 与 channel_failed 两种显式状态)
+  audit:
+    name: 审核检索
+    goal: 审计"取到的"与"没取到的", 而非只审材料本身
+    strategy: 覆盖审计 + 关键词合理性复审
+    actions:
+      - 按七类盲点清单逐项核查
+      - 去重与来源分级
+      - 跨来源冲突登记为 FlowEvent conflict
+      - 关键词合理性复审: 检索词是否命中受控词表更优词条
+    acceptance: 盲点清单每项有结论 (存在 / 不存在 / 无法判定并给出原因)
+  convergence:
+    name: 收束目标检索
+    goal: 对显式缺口做精确补检
+    strategy: 特异式检索 (窄检索式)
+    actions:
+      - 由 expected_but_absent 与盲点结论生成定向检索式
+      - 只补决策关键缺口, 不再做全量扫描
+      - 受 ρ 收束信号约束: 新增命中不再改变任务功能即停
+    acceptance: 显式缺口全部补检或显式放弃 (含放弃理由)
+
+loop:
+  name: 检索-获取-审核-变更关键词循环
+  steps: [formulate, execute, ingest, audit, revise_keywords, decide]
+  max_rounds_default: 3
+  max_rounds_hard: 5
+  stop_conditions:
+    - rho_converged: 新增命中不再改变任务功能 (与 output-contract 停止条件同构)
+    - theta_scene_shift: θ 达场景重识别阈值, 需换轴而非换词 (移交 θ切换协议)
+    - budget_exhausted: 轮次或时间预算耗尽, 显式登记未补缺口
+    - marginal_gain_below_epsilon: 边际新增命中低于 epsilon_T 对应阈值
+    - blindspots_all_resolved: 七类盲点全部有结论
+
+keyword_revision_actions:
+  broaden: 换上位词 / 放宽限定 / 去掉 AND 条件
+  narrow: 换下位词 / 加限定 / 改用特异式检索
+  swap_axis: 更换检索轴 (meta_axes 与 hu_axes 互换)
+  swap_vocabulary: 受控词表与自由词互查
+  swap_language: 切换检索语言 (如英文与中文互查)
+  swap_source_class: 更换来源类别 (文献 / 社区 / 实践 / SOP)
+  rule: 每次变更必须在 RetrievalRound 登记 change_reason; 同轴同词表连续两轮无新增即换轴
+
+blindspots:
+  source_blindspot:
+    description: 计划内来源未检索, 或通道故障被静默吞掉
+    detection: 来源覆盖矩阵存在空格; 通道状态非 ok 且未登记
+    response: 补检, 或显式放弃并在交付中声明
+  lexical_blindspot:
+    description: 检索词未覆盖同义词 / 受控词条 / 领域新术语
+    detection: 关键词合理性复审发现更优词条; 某来源零命中但同义词在其他来源有命中
+    response: swap_vocabulary 或 broaden
+  modality_blindspot:
+    description: 检索模态受限, 把"文本拓扑"误当"证据拓扑"
+    detection: 继承 modality-boundary 的 available/partial/missing 清单
+    response: 显式声明缺失模态, 结论降级为"正文阅读拓扑"
+  structural_blindspot:
+    description: 阅读拓扑中应出现而未出现的证据节点
+    detection: reading-topology 的 expected_but_absent 与 topology_gap
+    response: 生成 RetrievalFollowup 定向补检
+  temporal_blindspot:
+    description: 时间窗外的关键进展缺席 (新发表 / 新版本 / 撤稿与更正)
+    detection: 检索时间窗与最新命中时间差; 撤稿与更正记录未查
+    response: 收窄到最新时间窗补检; 查更正与撤稿记录
+  language_blindspot:
+    description: 非当前检索语言的文献缺席
+    detection: 领域主要语言清单与实际检索语言对比
+    response: swap_language 至少执行一轮
+  stance_blindspot:
+    description: 只检到支持性证据, 反方或利益归属方证据缺席
+    detection: 命中来源利益归属分布同质; 未检索反对证据 / 阴性结果 / 资助声明
+    response: 定向检索反方证据; 引用前严格区分利益归属, 有利益归属者的结论标注选择性偏倚风险并重点检查其文献主线忽略的旁通路
+
+sources:
+  literature:
+    name: 文献层
+    examples: [PubMed, Embase, Scopus, Web of Science, Google Scholar, arXiv, bioRxiv]
+    conventions: [PICOS, MeSH 受控词表, Boolean 检索式, search hedges, Cochrane 手册]
+    evidence_grade: 高 (同行评审)
+    notes: 预印本与正式发表分级不同; 撤稿记录必须查
+  community:
+    name: 社区落地层
+    examples: [GitHub issues 与 discussions, StackOverflow, bioconductor forum, Hacker News, Reddit, 知乎]
+    conventions: [issue 与 PR 检索, 复现报告, 版本迁移讨论]
+    evidence_grade: "中 (真实落地信号: 活跃度 / 复现 / 踩坑)"
+    notes: 落地证据优先于官方宣称; 注意幸存者偏差
+  practice:
+    name: 实践经验层
+    examples: [protocols.io, 官方文档, 工程博客, 会议报告, 访谈]
+    conventions: [协议步骤复现, 配置示例, 踩坑记录]
+    evidence_grade: 中低 (操作性高, 证据强度低)
+    notes: 每条来源必须给出可追溯链接与访问日期
+  sop:
+    name: 可参照 SOP 层
+    examples: [ISO 与 GB 与 NIST 标准, 行业手册, vendor whitepaper, 权威操作规范]
+    conventions: [标准编号引用, 版本号锁定]
+    evidence_grade: 高 (操作规范权威性)
+    notes: 注意标准版本时效; vendor 白皮书有利益归属
+  grading_note: 证据分级按用途反转——找"如何落地"时 community 与 sop 优先于 literature; 分级只用于排序与披露, 不冒充真值
+
+query_design:
+  convention:
+    description: 约定性检索, 使用社区冻结的检索约定
+    tools: [受控词表, PICOS 与 PRISMA 框架, search hedges]
+    pros: 可复现, 社区可比, 跨库一致
+    cons: 领域新词滞后, 跨域迁移需验证
+  designed:
+    description: 设计性检索, 任务特定检索式构造
+    tools: [B_T 轴分解, 同义词网络, 敏感式与特异式双检索式]
+    pros: 覆盖任务特异缺口, 新领域可用
+    cons: 复现性依赖完整记录, 检索式必须登记
+  pairing_rule: 约定性给骨架, 设计性补缺口; 每轮关键词复审先查受控词表是否已有更优词条
+
+robustness:
+  channel_failure:
+    rule: 严格区分 negative_result (检索成功但无命中) 与 channel_failed (通道故障)
+    retry: 同通道连续三次故障则冻结该通道, 显式登记, 不静默重试
+  dedup:
+    rule: 来源指纹 (标题 + 年份 + 来源域) 生成稳定 ID; 重复命中合并登记
+  source_grading:
+    rule: 每条命中登记来源类别与证据分级; 分级只用于排序与披露, 不冒充真值
+  degradation:
+    rule: 受限来源不可用时降级到替代来源, 并按 modality-boundary 显式声明缺失, 不得静默当作不存在
+  traceability:
+    rule: 每条来源必须可追溯 (URL 或 DOI 或标准编号, 加访问日期); 严禁虚构检索结果或把未检索写成已检索
+
+artifacts:
+  plan:
+    name: RetrievalPlan
+    path_pattern: reference/retrieval/{plan_id}.yaml
+    required_fields: [task_boundary_ref, phases, sources, queries, budget, stop_conditions]
+    schema: references/schema-retrieval-plan.schema.yaml
+  round:
+    name: RetrievalRound
+    path_pattern: reference/retrieval/{plan_id}/round_{n}.yaml
+    required_fields: [round, queries, source_status, hits, blindspot_review, keyword_revision]
+  followup:
+    name: RetrievalFollowup
+    path_pattern: reference/retrieval/{plan_id}/followup_{n}.yaml
+    required_fields: [blindspot_type, gap_description, next_query, status]
+
+frozen_constraints:
+  - 检索事件复用 FlowEvent 既有类型, 不新增本体实体
+  - 不把检索分支画成第四节点; 检索管"取", 藏归管"存"与"读"
+  - 不修改冻结本体与本协议依赖模块的定义
+  - '"检索到"不等于"验证过"; 语义处理仍归藏归层'
+  - 缺失模态与未检索来源必须显式声明, 不得静默省略

@@ -1,0 +1,113 @@
+# Retrieval Plan Schema
+# 检索计划: 检索分支执行前登记的机器可读计划
+
+$schema: "https://json-schema.org/draft-07/schema#"
+title: RetrievalPlan
+description: "系统化检索分支的检索计划: 三阶段配置、来源清单、检索式、预算与停止条件"
+
+type: object
+required:
+  - plan_id
+  - task_boundary_ref
+  - phases
+  - sources
+  - queries
+  - budget
+  - stop_conditions
+
+properties:
+  plan_id:
+    type: string
+    description: "检索计划稳定 ID"
+
+  task_boundary_ref:
+    type: string
+    description: "关联的 B_T 引用"
+
+  phases:
+    type: array
+    items:
+      type: string
+      enum: [expansion, audit, convergence]
+    description: "启用的检索阶段, 按执行顺序登记"
+
+  sources:
+    type: object
+    description: "来源覆盖矩阵: 每个计划来源的类别与状态"
+    properties:
+      literature:
+        type: array
+        items: {type: string}
+      community:
+        type: array
+        items: {type: string}
+      practice:
+        type: array
+        items: {type: string}
+      sop:
+        type: array
+        items: {type: string}
+
+  queries:
+    type: array
+    items:
+      type: object
+      required: [query_id, text, phase, source_class, style]
+      properties:
+        query_id:
+          type: string
+        text:
+          type: string
+          description: "检索式原文, 必须登记以保证可复现"
+        phase:
+          type: string
+          enum: [expansion, audit, convergence]
+        source_class:
+          type: string
+          enum: [literature, community, practice, sop]
+        style:
+          type: string
+          enum: [sensitive, specific]
+          description: "sensitive=敏感式(宽), specific=特异式(窄)"
+
+  budget:
+    type: object
+    required: [max_rounds, time_limit]
+    properties:
+      max_rounds:
+        type: integer
+        maximum: 5
+        description: "循环轮次上限, 硬上限 5"
+      time_limit:
+        type: string
+        description: "时间预算描述"
+
+  stop_conditions:
+    type: array
+    items:
+      type: string
+      enum:
+        - rho_converged
+        - theta_scene_shift
+        - budget_exhausted
+        - marginal_gain_below_epsilon
+        - blindspots_all_resolved
+    description: "登记采用的停止条件"
+
+  blindspot_checklist:
+    type: array
+    items:
+      type: string
+      enum:
+        - source_blindspot
+        - lexical_blindspot
+        - modality_blindspot
+        - structural_blindspot
+        - temporal_blindspot
+        - language_blindspot
+        - stance_blindspot
+    description: "本计划需要逐项核查的盲点类型"
+
+  created_at:
+    type: string
+    description: "计划创建时间"

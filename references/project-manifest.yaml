@@ -45,6 +45,7 @@ module_lifecycle:
     - extension-index-naming-norm
     - extension-multiscale-reinjection-kernel
     - extension-sanyuan-router
+    - extension-systematic-retrieval
   source:
     - source-original-anchors
     - source-sanyuan-daobian
@@ -215,6 +216,7 @@ storage:
   read: reference/read/
   flow: reference/flow/
   routing: reference/routing/
+  retrieval: reference/retrieval/
 
 schemas:
   state_protocol: references/state-protocol.schema.yaml
@@ -362,6 +364,24 @@ extensions:
       path: scripts/endoscope.py
     r_adapter:
       path: scripts/endoscope_r.R
+  systematic_retrieval:
+    id: systematic-retrieval
+    name: 系统化检索分支
+    path: references/systematic-retrieval.md
+    version: 0.1.0
+    module_id: extension-systematic-retrieval
+    depends_on:
+      - task-boundary-compiler
+      - conscious-rho
+      - unconscious-theta
+      - reading-topology
+      - modality-boundary
+    protocol:
+      path: references/retrieval-protocol.yaml
+    schema:
+      path: references/schema-retrieval-plan.schema.yaml
+    skill:
+      path: extensions/systematic-retrieval/SKILL.md
 
 validation:
   output_contract: references/output-contract.md
@@ -373,6 +393,7 @@ validation:
   bundle_validator: scripts/validate_bundle.py
   endoscope_validator: scripts/validate_endoscope.py
   multiscale_validator: scripts/validate_multiscale_reinjection.py
+  retrieval_validator: extensions/systematic-retrieval/scripts/validate_retrieval_spec.py
   ci_workflow: .github/workflows/validate.yml
 
 canvas:
