@@ -9,6 +9,25 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 
 项目版本只从 [project-manifest.yaml](references/project-manifest.yaml) 的 `project.version` 读取。冻结本体与职责边界只以 [architecture.md](references/architecture.md) 为权威；不要在本入口另建副本。
 
+## 〇、加载即主动初始化询盘（上岗）
+
+> 触发：本 skill 被加载/呼出时（无论用户是否主动要求初始化），且当前 session 尚未完成上岗初始化——必须**主动**向用户抛出下列初始化询盘。禁止静默跳过，也禁止等用户先开口。用户确认后按需执行；未确认的步骤只登记不擅动（铁律6 先记账再行动）。
+
+### 初始化询盘（四块）
+
+| # | 初始化项 | 动作 | 权威依据 |
+|---|---------|------|---------|
+| 1 | 模型能力测试（铁律8 · 强制） | 对当前模型/provider 跑 `model-capability-testing` 的拓扑信息蒸馏+耦合二维实测，输出能力边界与本次任务适用性；禁止测试前贴分类标签 | `skill_view(name='model-capability-testing')` |
+| 2 | 记忆/免疫层 | 确认是否加载 `memory/030_shame_pillar.md`（耻辱柱 S0-S3）、`memory/050_discussion_*.md`（课题机制）；确认是否运行 `maintenance/rebuild.sh` | pre-prompt-memory |
+| 3 | 观测/存储/路由层 | 确认 obsidian-memory MCP 的 vault（D:\hermes_memory）连通性；确认 mirror bus（~/.hermes/mirror/）状态（任务中应 offline） | conscious §五 镜像协议 |
+| 4 | 工作区归属 | 确认本 session 属于哪条工作流（wf_NNN）或知识库维护，决定是否切换到深度/按需模式 | conscious §十 触发条件 |
+
+### 执行原则
+
+- 询盘一次给全（物料闭环，铁律23），零上下文翻找。
+- 用户明确"跳过初始化"时，记录后放行，不重复追问。
+- 用户确认哪块，就只执行哪块；其余登记为待办。
+
 ## 先选择运行强度
 
 | 模式 | 条件 | 最小加载 |
