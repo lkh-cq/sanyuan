@@ -28,8 +28,8 @@
 
 | 依赖方 | 被依赖方 | 契约要求 | 当前状态 |
 | --- | --- | --- | --- |
-| sanyuan-context-router | sidecar（integration/obsidian） | 必须固定 tag/commit，不得依赖可变分支 | 断裂：README 指向可变分支 |
-| extension-sanyuan-router 健康检查 | sanyuan-context-router 客户端 | 按契约版本判断功能（如 browse-sanyuan-nodes） | 断裂：0.1.1 客户端无此命令 |
+| sanyuan-context-router | sidecar（integration/obsidian） | 必须固定 tag/commit，不得依赖可变分支 | 已固定 commit `b930c8dd`（sanyuan-obsidian 0.1.0）；独立 tag 发布待办 |
+| extension-sanyuan-router 健康检查 | sanyuan-context-router 客户端 | 按契约版本判断功能（如 browse-sanyuan-nodes） | 已按契约版本判定；0.1.1 无此命令，需该命令须从固定 commit 构建 |
 | information-router | 学术检索 Schema / eval | 必须执行 JSON Schema、真实检索、来源验证 | 断裂：CI 仅做格式校验 |
 | fullstack-academic | 正式远端 | 未分配 remote 前不发布 | 断裂：本地 0.4.0a2 无 remote |
 
