@@ -376,6 +376,7 @@ validation:
   bundle_validator: scripts/validate_bundle.py
   endoscope_validator: scripts/validate_endoscope.py
   multiscale_validator: scripts/validate_multiscale_reinjection.py
+  release_gate: scripts/release_gate.py
   ci_workflow: .github/workflows/validate.yml
 
 canvas:

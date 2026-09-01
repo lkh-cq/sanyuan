@@ -124,14 +124,25 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 
 > 注：mirror 总线（跨窗口观察）是**独立功能**，协议与脚本已移出本仓库，见独立仓库 [lkh-cq/mirror-bus](https://github.com/lkh-cq/mirror-bus)（含 mirror-bus-spec、soul-echo-spec 与运行时脚本）。
 
-## 同族仓库（Sibling Repositories）
+## 项目地图（Project Map）
 
-产品拓扑见 [`references/product-topology.md`](references/product-topology.md)。以下仓库与本仓库同族但独立发布，代码不互相混入：
+本仓库不吸收所有项目代码；以下项目按责任边界独立发布或独立演进。权威登记见 [`references/product-topology.md`](references/product-topology.md)。
+
+| 项目 | 责任 |
+| --- | --- |
+| `sanyuan`（本仓） | 三元注意力基础、拓扑编译、上下文注入（核心 Skill） |
+| `sanyuan-router` | 主仓运行态 Router 扩展（`extensions/sanyuan-router/`，experimental） |
+| `sanyuan-context-router` | Obsidian 薄客户端（独立仓库，已发布 0.1.0/0.1.1） |
+| `integration/obsidian` | 实验性 sidecar，不属于稳定核心（源码在 `integration/obsidian` 分支，未合入 main） |
+| `information-router` | 独立通用信息检索 Skill（独立仓库，含学术协议） |
+| Fullstack | 实验性运行时与学术预设，不等于主仓发布版（尚未分配正式远端） |
+
+同族仓库（Sibling Repositories）与本仓库同族但独立发布，代码不互相混入：
 
 | 仓库 | 责任 | 状态 |
 | --- | --- | --- |
-| [lkh-cq/sanyuan-context-router](https://github.com/lkh-cq/sanyuan-context-router) | Obsidian 桌面客户端（thin client），依赖独立 sidecar | 已发布 0.1.0/0.1.1；sidecar 依赖链待固定版本 |
-| [lkh-cq/information-router](https://github.com/lkh-cq/information-router) | 独立学术检索路由（来源通道/矛盾检索/证据归一/偏差账本） | scaffold 0.1.0；学术预设待迁入 |
+| [lkh-cq/sanyuan-context-router](https://github.com/lkh-cq/sanyuan-context-router) | Obsidian 桌面客户端（thin client），依赖独立 sidecar | 已发布 0.1.0/0.1.1；sidecar 已固定不可变 commit |
+| [lkh-cq/information-router](https://github.com/lkh-cq/information-router) | 独立学术检索路由（来源通道/矛盾检索/证据归一/偏差账本/学术协议） | scaffold 0.1.0；学术协议已入 CI |
 | [lkh-cq/mirror-bus](https://github.com/lkh-cq/mirror-bus) | 跨窗口镜像总线（独立功能） | 独立发布 |
 
 > 说明：fullstack-academic（学术检索全链路 0.4.0a2）尚未分配正式远端，在获得远端前不计入已发布总包。

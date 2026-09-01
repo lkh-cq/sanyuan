@@ -138,6 +138,14 @@ V3.3.3 的 `claude-code.png` 取自 Anthropic 组织头像数值路径 `avatars.
 5. **Fullstack 状态**：`0.4.0a2` 建议归属仓库 `lkh-cq/fullstack-academic`（创建待授权重试）；在分配正式仓库并完成校验前，不计入已发布总包。
 6. **同族仓库**：`information-router` 与 `sanyuan-context-router` 保持独立仓库，本仓只登记为 sibling repository，不混入代码。
 
+## 2026-09-02 复核闭合（V3.3.7 内补充）
+
+复核确认审计结论不变，并补充以下可验证机制，不修改 `references/architecture.md` 的冻结本体。
+
+1. **README 项目地图**：新增「项目地图（Project Map）」表，明确 `sanyuan` / `sanyuan-router` / `sanyuan-context-router` / `integration/obsidian` / `information-router` / Fullstack 六项的责任边界；`integration/obsidian` 明确标注 experimental（不属于稳定核心）。
+2. **发布门（release gate）**：新增 `scripts/release_gate.py`，实现 `Git tag → 构建包 → 安装后版本读取 → 比对` 的版本闭环：`build` 产出 `release-manifest.json`（版本、文件数、契约文件哈希、校验结果），`verify` 断言 `v<version>` tag 指向 HEAD，`compare` 把已安装 Skill 与发布清单逐项比对（版本、文件数、SKILL.md/manifest/README 哈希）。已登记到 manifest 并加入 CI。
+3. **安装端版本漂移**：在获得正式远端前，GitHub main 的能力不得视为用户实际加载的能力；升级必须走发布门比对通过后的正式流程。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
