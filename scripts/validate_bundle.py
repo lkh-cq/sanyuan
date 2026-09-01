@@ -22,6 +22,7 @@ MANIFEST = ROOT / "references" / "project-manifest.yaml"
 ACCEPTANCE = ROOT / "references" / "acceptance-tests.yaml"
 SEMVER = re.compile(r"^[0-9]+\.[0-9]+\.[0-9]+$")
 REPO_PATH_PREFIXES = ("references/", "assets/", "scripts/", ".github/")
+NESTED_SKILL_DIRS = ("extensions", "integrations")
 
 
 def fail(message: str, failures: list[str]) -> None:
@@ -58,6 +59,15 @@ def manifest_paths(manifest: dict) -> set[str]:
     return paths
 
 
+def nested_skill_files() -> list[Path]:
+    files: list[Path] = []
+    for directory in NESTED_SKILL_DIRS:
+        base = ROOT / directory
+        if base.exists():
+            files.extend(sorted(base.rglob("SKILL.md")))
+    return files
+
+
 def registered_modules(manifest: dict) -> dict[str, dict]:
     modules: dict[str, dict] = {}
     for value in walk(manifest):
@@ -75,6 +85,7 @@ def registered_modules(manifest: dict) -> dict[str, dict]:
 def check_markdown_links(failures: list[str]) -> None:
     markdown_files = [SKILL, ROOT / "README.md", ROOT / "CONTRIBUTING.md"]
     markdown_files.extend(sorted((ROOT / "references").glob("*.md")))
+    markdown_files.extend(nested_skill_files())
     for path in markdown_files:
         if not path.exists():
             continue
@@ -91,6 +102,39 @@ def check_markdown_links(failures: list[str]) -> None:
                 continue
             if not target.exists():
                 fail(f"broken link: {path.relative_to(ROOT)} -> {link}", failures)
+
+
+def check_nested_skills(failures: list[str]) -> None:
+    for path in nested_skill_files():
+        try:
+            metadata = frontmatter(path.read_text(encoding="utf-8"))
+            if set(metadata) != {"name", "description"}:
+                fail(
+                    f"{path.relative_to(ROOT)} frontmatter must contain only name and description",
+                    failures,
+                )
+            if not isinstance(metadata.get("name"), str) or not metadata.get("name"):
+                fail(f"{path.relative_to(ROOT)} has invalid name", failures)
+        except Exception as exc:
+            fail(f"{path.relative_to(ROOT)}: {exc}", failures)
+
+
+def check_no_build_artifacts(failures: list[str]) -> None:
+    for path in ROOT.rglob("*"):
+        if ".git" in path.parts:
+            continue
+        if path.is_dir() and path.name.endswith(".egg-info"):
+            fail(f"forbidden build artifact directory: {path.relative_to(ROOT)}", failures)
+        elif path.is_file() and path.name == "sidecar.env":
+            fail(f"forbidden environment artifact: {path.relative_to(ROOT)}", failures)
+        elif path.is_file() and path.name == "main.js" and "integrations" in path.parts:
+            source_markers = [
+                path.parent / "src",
+                path.parent / "package.json",
+                path.parent / "tsconfig.json",
+            ]
+            if not any(marker.exists() for marker in source_markers):
+                fail(f"unsourced compiled artifact: {path.relative_to(ROOT)}", failures)
 
 
 def check_recipe(failures: list[str]) -> None:
@@ -231,6 +275,8 @@ def main() -> int:
         fail(f"project manifest: {exc}", failures)
 
     check_markdown_links(failures)
+    check_nested_skills(failures)
+    check_no_build_artifacts(failures)
     check_recipe(failures)
     check_acceptance(failures)
 
