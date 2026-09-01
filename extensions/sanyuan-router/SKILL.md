@@ -1,14 +1,13 @@
 ---
 name: sanyuan-router
 description: "Use when 调用/修复/巡检 sanyuan 意识总线运行时链路 (MCP桥/8765 sidecar/路由表/Obsidian插件). 三元router总控: 一条命令健康检查, 全链路拓扑图, 事故runbook."
-version: 0.1.0
-category: devops
 ---
 
 # Sanyuan Router — 意识总线运行时链路总控
 
 > 模块: extension-sanyuan-router
 > 版本: 0.1.0 (experimental)
+> 分类: devops
 > 来源: 2026-08-25 obsidian-memory 全链路修复战役 (mcp 2.0 升级断桥事故 + sidecar 路由接入 + 插件 0.2.0)
 > 定位: consciousness-bus 管"认知流程", 本模块管"运行时链路"——认知总线的物理血管。归一化端口(sanyuan-normalization-port)是数据平面, 本模块是控制平面。
 
