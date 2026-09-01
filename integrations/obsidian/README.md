@@ -1,6 +1,6 @@
 # Obsidian 集成（integration/obsidian）
 
-> 状态：本目录在 main 上**不携带可复现源码**。完整实现（Python sidecar、TypeScript 插件源码、测试、检索、rerank 与写回能力）位于 `integration/obsidian` 分支，尚未合并进 main。
+> 状态：**experimental**。本目录在 main 上**不携带可复现源码**。完整实现（Python sidecar、TypeScript 插件源码、测试、检索、rerank 与写回能力）位于 `integration/obsidian` 分支，尚未合并进 main，不属于稳定核心。
 
 ## 源码位置
 
