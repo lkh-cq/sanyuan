@@ -5,9 +5,9 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 
 # 三元三才·意识总线
 
-把本 Skill 作为复杂任务的认知预处理层、临时知识图谱协议和上下文编译器。保留用户原始材料与约束，先限定任务功能边界，再组织信息及其关系；不要把该框架冒充现实机制、证明系统或通用 Agent。
+把本 Skill 作为复杂任务的认知预处理层、临时知识图谱协议和上下文编译器。保留用户原始材料与约束，先限定任务边界，再组织信息及其关系；不要把该框架冒充现实机制、证明系统或通用 Agent。
 
-项目版本只从 [project-manifest.yaml](references/project-manifest.yaml) 的 `project.version` 读取。冻结本体与职责边界只以 [architecture.md](references/architecture.md) 为权威；不要在本入口另建副本。
+项目版本只从 [project-manifest.yaml](references/project-manifest.yaml) 的 `project.version` 读取。冻结本体与职责边界只以 [architecture.md](references/architecture.md) 为权威；产品拓扑（1 主 Skill + 4 Router 的名称/责任/仓库/版本）以 [product-topology.md](references/product-topology.md) 为权威。不要在本入口另建副本。
 
 ## 〇、加载即主动初始化询盘（上岗）
 
@@ -85,6 +85,7 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 ### 来源与边界
 
 - 冻结架构：[architecture.md](references/architecture.md)
+- 产品拓扑：[product-topology.md](references/product-topology.md)
 - 原始用户锚点：[original-anchors.md](references/original-anchors.md)
 - 三元道辩浓缩来源：[sanyuan-daobian-framework.md](references/sanyuan-daobian-framework.md)
 - 版本与迁移：[version-provenance.md](references/version-provenance.md)、[archive-ingestion.md](references/archive-ingestion.md)
@@ -97,6 +98,13 @@ description: "将复杂科研、写作、知识整理、项目规划或长上下
 - 关系与流止：[hu-observation-space.md](references/hu-observation-space.md)、[flow-topology.md](references/flow-topology.md)、[zang-gui-cycle.md](references/zang-gui-cycle.md)
 - 实验性矩阵：[yijing-coupling-matrix.md](references/yijing-coupling-matrix.md)
 - 实验性多时间尺度再注入：[multiscale-reinjection-kernel.md](references/multiscale-reinjection-kernel.md)
+
+### 扩展与同族 Router
+
+- 运行时链路总控（MCP 桥 / 8765 sidecar / 路由表 / Obsidian 插件巡检）：[`extensions/sanyuan-router/SKILL.md`](extensions/sanyuan-router/SKILL.md)
+- 知识库索引命名规范：[`extensions/index-naming/SKILL.md`](extensions/index-naming/SKILL.md)
+- 过程透明与决策防污染：[`extensions/process-transparency/SKILL.md`](extensions/process-transparency/SKILL.md)
+- 同族仓库与 Router 边界：见 [product-topology.md](references/product-topology.md)
 
 ### Endoscope / Bloodtesting
 
