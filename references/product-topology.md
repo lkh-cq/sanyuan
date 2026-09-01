@@ -61,6 +61,6 @@
 1. **创建 `lkh-cq/fullstack-academic` 仓库**：GitHub 集成授权已通过，需在新会话重试
    `create_repository`；创建后把 `0.4.0a2` 源码推入并打 tag，再更新本文件状态。
 2. **安装端升级**：等主仓校验与发布 tag 通过后，走正式升级流程同步安装包；
-   禁止直接用 GitHub main 的 `v3.3.6` 覆盖当前已加载版本。
+   禁止直接用 GitHub main 的最新版本号覆盖当前已加载版本。
 3. **main 分支保护**：为 `lkh-cq/sanyuan` 的 main 开启分支保护与必需状态检查
    （`validate`、`endoscope-r` 为必需 check），需要仓库管理员权限。
