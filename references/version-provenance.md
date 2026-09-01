@@ -127,6 +127,17 @@ V3.3.2 的 `avatars.githubusercontent.com/{org名}` 经实测对 Anthropic/OpenA
 
 V3.3.3 的 `claude-code.png` 取自 Anthropic 组织头像数值路径 `avatars.../u/76263028`，实测返回 GitHub 灰色/黑色默认占位（非品牌 logo）。本期改以 **simple-icons 的 `anthropic` A 字形**（填 Anthropic 官方橙 `#D97757`）落盘为 `claude-code.svg` 并替换引用；README 现全部图标均为本仓库相对路径资源。
 
+## 2026-09-01 V3.3.7 审计 P0 断点关闭与发布链闭合
+
+本次为审计结论（发布链与产品拓扑未闭合）的修复批次，不修改 `references/architecture.md` 的冻结本体。V3.3.5 / V3.3.6 的变更未在本文档登记（已知溯源缺口，本次一并说明）。
+
+1. **产品拓扑冻结**：新增 `references/product-topology.md`，登记 1 主 Skill + 4 Router（consciousness-bus / sanyuan-router / information-router / sanyuan-context-router）的名称、责任、仓库与版本；在 `project-manifest.yaml` 登记为权威来源。
+2. **README/SKILL 发现入口**：根 README 与根 SKILL 加入 product-topology 引用、`extensions/sanyuan-router` 扩展入口与同族仓库（sibling repositories）表。
+3. **扩大主仓校验**：`scripts/validate_bundle.py` 递归扫描 `extensions/` 与 `integrations/` 的嵌套 `SKILL.md`（frontmatter 只允许 name+description），并禁止 `.egg-info`、env 文件与无来源编译产物；修复 `extensions/sanyuan-router/SKILL.md` 非法顶层键与 `process-transparency` 缺失 frontmatter。
+4. **Obsidian 依赖链契约**：sidecar 固定不可变 commit，客户端固定兼容版本，健康检查按契约版本判断功能，不假设 `browse-sanyuan-nodes` 在每一版都存在。
+5. **Fullstack 状态**：`0.4.0a2` 建议归属仓库 `lkh-cq/fullstack-academic`（创建待授权重试）；在分配正式仓库并完成校验前，不计入已发布总包。
+6. **同族仓库**：`information-router` 与 `sanyuan-context-router` 保持独立仓库，本仓只登记为 sibling repository，不混入代码。
+
 ## 对验证材料的解释边界
 
 多版本对比包是固定随机种子下的模拟测试，可用于比较 deep-conscious v2.1 与 v3.0 的工程表达、覆盖度和稳定性；它不是对意识理论、认知机制或外部任务有效性的实证证明。
