@@ -1,14 +1,13 @@
 ---
 name: sanyuan-router
 description: "Use when 调用/修复/巡检 sanyuan 意识总线运行时链路 (MCP桥/8765 sidecar/路由表/Obsidian插件). 三元router总控: 一条命令健康检查, 全链路拓扑图, 事故runbook."
-version: 0.1.0
-category: devops
 ---
 
 # Sanyuan Router — 意识总线运行时链路总控
 
 > 模块: extension-sanyuan-router
 > 版本: 0.1.0 (experimental)
+> 分类: devops
 > 来源: 2026-08-25 obsidian-memory 全链路修复战役 (mcp 2.0 升级断桥事故 + sidecar 路由接入 + 插件 0.2.0)
 > 定位: consciousness-bus 管"认知流程", 本模块管"运行时链路"——认知总线的物理血管。归一化端口(sanyuan-normalization-port)是数据平面, 本模块是控制平面。
 
@@ -40,7 +39,8 @@ category: devops
 │ 源: sanyuan仓 integration/obsidian 分支                │
 │   → integrations/obsidian/python (stdlib-only)         │
 │ 启动: bash ~/.hermes/mcp_servers/start_sanyuan_sidecar.sh│
-│ 端点: GET /health | POST /v1/retrieve-and-inject       │
+│ 端点: GET /health | POST /v1/should-retrieve |          │
+│       POST /v1/retrieve-and-inject                     │
 │ 路由: SANYUAN_ROUTING_TABLE → bridge/sidecar_routes.yaml│
 │   (由 maintenance/gen_sidecar_routes.py 从冻结 bridge  │
 │    表派生; bridge 表更新后必须重跑生成器)               │
@@ -63,6 +63,11 @@ python3 ~/.hermes/skills/devops/sanyuan-router/scripts/router_health.py
 
 输出: 每条线路 PASS/FAIL + 修复提示。检查点: 三桥 stdio 握手、8765 health、
 routing_loaded、路由派生文件新鲜度 (mtime vs bridge 表)、插件版本、DB 存在性。
+
+**契约版本判定**: 插件功能按契约版本判断, 不假设命令存在。公开 0.1.1 客户端
+没有 `browse-sanyuan-nodes`; 该命令只在 integration/obsidian 分支 (固定 commit
+`b930c8dd039fb56369ca14ed0221def927d16ed5`)。健康检查必须核对客户端版本/commit,
+再判定功能, 不能把"命令缺失"一律当作插件损坏。
 
 ## 四、关键机制 (防再踩)
 
@@ -105,7 +110,9 @@ routing_loaded、路由派生文件新鲜度 (mtime vs bridge 表)、插件版�
 
 ### R4 | 插件旧/破图
 症状: 插件功能缺失 (无 browse-sanyuan-nodes 等)。
-修复: 按 §四.5 从 integration/obsidian 分支重建。
+判定: 先按契约版本核对——公开 0.1.1 客户端本身就没有 browse-sanyuan-nodes;
+      该命令只在 integration/obsidian 分支 (固定 commit b930c8dd)。
+修复: 需要该命令时, 按 §四.5 从固定 commit 重建, 不要假设 0.1.1 具备该功能。
 
 ### R5 | L5 context.json 死链 (已知未修)
 症状: context=null, updatedAt 停在旧日期 (08-03)。
@@ -126,5 +133,6 @@ routing_loaded、路由派生文件新鲜度 (mtime vs bridge 表)、插件版�
 - [ ] health: status=ok 且 routing_loaded=True
 - [ ] POST /v1/retrieve-and-inject 带 query_axes 能返回 routing 字段
 - [ ] hermes 本体 venv 升级后重跑 router_health.py 能立刻暴露断桥
+- [ ] 插件功能判定按契约版本 (0.1.1 无 browse-sanyuan-nodes, 不误报损坏)
 
 > 版本: 0.1.0 | 2026-08-25 | 来源: 2026-08-25 全链路修复战役 (见 source/)

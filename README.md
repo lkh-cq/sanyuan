@@ -11,7 +11,7 @@
 
 意识总线是面向复杂科研、知识整理、项目规划与长上下文任务的认知预处理协议。它先限定任务边界，再分离内容与关系，最后把内部结构转译为读者可以直接理解的结果。它不是现实机制、证明系统或通用 Agent。
 
-当前项目版本以 [`references/project-manifest.yaml`](references/project-manifest.yaml) 的 `project.version` 为唯一来源；正式版本由通过校验的 `v<version>` Git tag 标记。
+当前项目版本以 [`references/project-manifest.yaml`](references/project-manifest.yaml) 的 `project.version` 为唯一来源；正式版本由通过校验的 `v<version>` Git tag 标记。产品拓扑（1 主 Skill + 4 Router 的名称/责任/仓库/版本）以 [`references/product-topology.md`](references/product-topology.md) 为权威。
 
 ## 支持 Agent
 
@@ -27,6 +27,7 @@
 | 你要做什么 | 读取入口 |
 | --- | --- |
 | 理解项目本体与职责边界 | [`references/architecture.md`](references/architecture.md) |
+| 理解产品拓扑与 Router 边界 | [`references/product-topology.md`](references/product-topology.md) |
 | 快速筛选、比较或压缩信息 | [`references/fast-filter-recipe.yaml`](references/fast-filter-recipe.yaml) |
 | 科研深度分析与多材料整合 | [`references/research-recipe.yaml`](references/research-recipe.yaml) |
 | 分析论文写作逻辑与证据缺口 | [`references/reading-topology.md`](references/reading-topology.md) |
@@ -77,8 +78,8 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 ├── .github/workflows/       # 自动校验与版本标签
 ├── agents/                  # GPT/Codex 界面元数据
 ├── assets/                  # 图标、吉祥物与 5 张 Canvas
-├── extensions/              # 可选子模块（process-transparency、index-naming-norm）
-├── references/              # 本体、协议、配方、来源、扩展与 Schema
+├── extensions/              # 可选子模块（process-transparency、index-naming-norm、sanyuan-router）
+├── references/              # 本体、协议、配方、来源、扩展、Schema 与产品拓扑
 ├── scripts/                 # 确定性校验、Endoscope 控制器与 R 适配器
 ├── CONTRIBUTING.md          # 提交、评审与发布规范
 ├── LICENSE                  # 权利声明
@@ -88,7 +89,7 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 
 `references/` 按功能分为：
 
-- 权威与来源：架构、版本来源、用户原话、三元道辩浓缩、反例免疫；
+- 权威与来源：架构、产品拓扑、版本来源、用户原话、三元道辩浓缩、反例免疫；
 - 任务与控制：任务边界、拆分、ρ/θ、n 位聚焦、缓存波；
 - 藏归与关系：三才、三题、互、流止、耦合态、写入与读取；
 - 分析与交付：阅读拓扑、读者端分析、多模态边界、输出契约；
@@ -99,7 +100,7 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 
 ## 扩展（extensions/ 与协议文档）
 
-2026-08-12 新增两个扩展（已合并进 main，均通过独立并行门控测试）：
+2026-08-12 起新增多个扩展（均已合并进 main，通过独立并行门控测试）：
 
 ### index-naming-norm（extensions/index-naming/）
 
@@ -112,7 +113,28 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 - **校验**：`python3 extensions/index-naming/scripts/validate_index_naming.py --dry <目录>`（只读预览不合规清单）。
 - **约束**：只治理 Markdown 目录索引；node_modules/.git/dist 等程序索引不进入知识图谱。来源：hermes_memory 全盘索引拓扑审计（2026-08-12，367 个 index 路径）。
 
+### sanyuan-router（extensions/sanyuan-router/）
+
+三元 router 运行时链路总控（v0.1.0，experimental，2026-08-25）：
+
+- **定位**：consciousness-bus 管认知流程，本扩展管运行时链路——MCP 桥、8765 sidecar、路由表派生、Obsidian 插件巡检与事故 runbook。
+- **入口**：`extensions/sanyuan-router/SKILL.md`（触发词：`sanyuan router` / `链路检查` / `sidecar` / `插件更新`）。
+- **健康检查**：`python3 extensions/sanyuan-router/scripts/router_health.py`，输出每条线路 PASS/FAIL 与修复提示。
+- **边界**：不管认知流程（归 consciousness-bus）与归一化数据面（归 sanyuan-normalization-port）。
+
 > 注：mirror 总线（跨窗口观察）是**独立功能**，协议与脚本已移出本仓库，见独立仓库 [lkh-cq/mirror-bus](https://github.com/lkh-cq/mirror-bus)（含 mirror-bus-spec、soul-echo-spec 与运行时脚本）。
+
+## 同族仓库（Sibling Repositories）
+
+产品拓扑见 [`references/product-topology.md`](references/product-topology.md)。以下仓库与本仓库同族但独立发布，代码不互相混入：
+
+| 仓库 | 责任 | 状态 |
+| --- | --- | --- |
+| [lkh-cq/sanyuan-context-router](https://github.com/lkh-cq/sanyuan-context-router) | Obsidian 桌面客户端（thin client），依赖独立 sidecar | 已发布 0.1.0/0.1.1；sidecar 依赖链待固定版本 |
+| [lkh-cq/information-router](https://github.com/lkh-cq/information-router) | 独立学术检索路由（来源通道/矛盾检索/证据归一/偏差账本） | scaffold 0.1.0；学术预设待迁入 |
+| [lkh-cq/mirror-bus](https://github.com/lkh-cq/mirror-bus) | 跨窗口镜像总线（独立功能） | 独立发布 |
+
+> 说明：fullstack-academic（学术检索全链路 0.4.0a2）尚未分配正式远端，在获得远端前不计入已发布总包。
 
 ## 版本与成熟度
 
@@ -124,7 +146,7 @@ Bloodtesting 提供 12 个初始对照夹具，包括 PDE 截断污染与 Lasso 
 
 ### 版本更新
 
-版本与变更历史以 [`references/version-provenance.md`](references/version-provenance.md) 为唯一记录（process-transparency 扩展 → Endoscope 全链路实验实现 → 多时间尺度再注入实验组合，版本演进见该文件）。仓库规则禁止版本号漂移到 manifest/provenance 之外，README 不重复登记。
+版本与变更历史以 [`references/version-provenance.md`](references/version-provenance.md) 为唯一记录（process-transparency 扩展 → Endoscope 全链路实验实现 → 多时间尺度再注入实验组合 → sanyuan-router 扩展，版本演进见该文件）。仓库规则禁止版本号漂移到 manifest/provenance 之外，README 不重复登记。
 
 ## 资产与授权
 

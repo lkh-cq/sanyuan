@@ -1,10 +1,15 @@
 # Python
 __pycache__/
 *.py[cod]
+*.egg-info/
 
 # Node (obsidian plugin)
 integrations/obsidian/plugin/node_modules/
 integrations/obsidian/plugin/dist/
+integrations/obsidian/plugin/main.js
+
+# Environment / runtime
+integrations/obsidian/python/sidecar.env
 
 # Tooling temp
 .claude-materials/

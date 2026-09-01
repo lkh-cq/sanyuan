@@ -59,6 +59,9 @@ authority:
     path: references/architecture.md
     module_id: root-architecture
 
+product_topology:
+  authority: references/product-topology.md
+
 core:
   conscious:
     id: conscious-rho

@@ -1,3 +1,8 @@
+---
+name: process-transparency
+description: "Use when 探索性/逆向/反编译任务需要决策防污染、翻转预警或两阶段归档。过程透明与决策防污染扩展：决策日志四字段、翻转预警、归档前决策留痕。作为 consciousness-bus 的扩展子模块加载。"
+---
+
 # 过程透明与决策防污染扩展
 
 > 模块: extension-process-transparency
