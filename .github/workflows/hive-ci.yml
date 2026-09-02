@@ -30,8 +30,8 @@ jobs:
         run: mypy src/
       - name: security (bandit)
         run: bandit -q -r src/
-      - name: dependency audit (pip-audit)
-        run: pip-audit
+      - name: dependency audit (pip-audit, 仅项目声明依赖)
+        run: pip-audit --path .
       - name: markdown link check
         run: python3 scripts/check_md_links.py
       - name: release state gate
