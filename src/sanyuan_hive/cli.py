@@ -4,7 +4,9 @@ import argparse
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(prog="hive", description="sanyuan-hive CLI (M1 skeleton)")
+    parser = argparse.ArgumentParser(
+        prog="hive", description="sanyuan-hive CLI (M1 skeleton)"
+    )
     parser.add_argument("--version", action="store_true")
     args = parser.parse_args()
     if args.version:

@@ -22,6 +22,13 @@
 
 core_bundle: 完整、只读、带来源指纹的版本包导入; runtime_state_shared 恒为 false。
 
+## 发布责任分离 (ADR 0003)
+
+- hive-main 与 Fullstack 是不同发布单元, 禁止共用 remote / tag 前缀 / 分支保护。
+- hive-main 版本标签固定 `hive-v*`; 发布前必须通过 `scripts/release_check.py`
+  (版本源一致 + 工作区干净 + commit/tag 闭环)。
+- 未绑定真实证据 (宿主身份/receipt/执行产物) 的状态不得晋升为可信稳定。
+
 ## 迁出条款
 
 hive-main 成熟到需独立 issue/release 治理时可无损迁出为单独仓库; 迁出前不得反向耦合 main。

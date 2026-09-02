@@ -14,9 +14,25 @@ jobs:
         with:
           python-version: "3.11"
       - name: install
-        run: pip install -e .
+        run: |
+          pip install -e .
+          pip install ruff mypy bandit pip-audit
       - name: schema validation (P0)
         run: |
           python3 -c "import json; [json.load(open(f)) for f in ['src/sanyuan_hive/schemas/boundary-task.schema.json','src/sanyuan_hive/schemas/worker-result.schema.json']]"
       - name: unit tests (isolation)
         run: python3 -m pytest tests/ -q
+      - name: lint (ruff)
+        run: ruff check src/ tests/ scripts/
+      - name: format (ruff)
+        run: ruff format --check src/ tests/ scripts/
+      - name: typecheck (mypy)
+        run: mypy src/
+      - name: security (bandit)
+        run: bandit -q -r src/
+      - name: dependency audit (pip-audit)
+        run: pip-audit
+      - name: markdown link check
+        run: python3 scripts/check_md_links.py
+      - name: release state gate
+        run: python3 scripts/release_check.py
