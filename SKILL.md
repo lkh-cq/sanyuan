@@ -35,8 +35,10 @@ B_parallel = 1 - (T_split + max(T_i) + T_merge) / T_serial
 1. 跨任务零默认耦合: 不同任务同域 = 上下文污染; 共享只经 import bridge (Owner 授权)。
 2. 任一 worker 同一时刻只附着一个 hive; 一个 hive 只允许一个活动 B_T 代际。
 3. hive_id / boundary_hash 不匹配 → fail-closed, 禁退化全局检索。
-4. 外部副作用 (消息/推送/删除/不可逆动作) 必须过单独授权门, worker 永不直接执行。
-5. 非多窗口记忆层、非 Obsidian/编辑器插件、非 K8s/Spark/MPI 替代品。
+4. source_scope 必须经 `validate_source_scope` fail-closed 校验: 禁裸通配/根级通配/`..` 穿越/编码穿越 (ADR 0003)。
+5. 外部副作用 (消息/推送/删除/不可逆动作) 必须过单独授权门, worker 永不直接执行。
+6. 非多窗口记忆层、非 Obsidian/编辑器插件、非 K8s/Spark/MPI 替代品。
+7. 未绑定真实证据 (宿主身份/receipt/执行产物) 的状态不得晋升为可信稳定 (ADR 0003)。
 
 ## 四、总线联系 (frozen core)
 
@@ -53,7 +55,9 @@ immutable: true, runtime_state_shared: false
 pip install -e .        # 可安装空运行时
 hive --version          # → 0.1.0a1
 schemas/                # boundary-task / worker-result (JSON Schema 2020-12)
-tests/                  # P0 合同测试 (fail-closed)
+tests/                  # P0 合同测试 (fail-closed) + source_scope 否定测试
+scripts/release_check.py   # 发布门: 版本源一致 + 工作区干净 + commit/tag 闭环
+scripts/check_md_links.py  # Markdown 内部链接检查
 ```
 
 ## 六、里程碑
