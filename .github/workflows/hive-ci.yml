@@ -16,7 +16,7 @@ jobs:
       - name: install
         run: |
           pip install -e .
-          pip install ruff mypy bandit pip-audit
+          pip install pytest ruff mypy bandit pip-audit
       - name: schema validation (P0)
         run: |
           python3 -c "import json; [json.load(open(f)) for f in ['src/sanyuan_hive/schemas/boundary-task.schema.json','src/sanyuan_hive/schemas/worker-result.schema.json']]"
