@@ -14,6 +14,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from ecr_plan import plan  # noqa: E402
+from ecr_o8 import o8_baseline  # noqa: E402
 
 
 def ev(eid, projs, **kw):
@@ -98,6 +99,94 @@ def t3_gates_power():
     assert p["coverage"]["c"]["x3"] == 0, "降级后不得计入覆盖度"
     assert "x3" in p["gaps"], "降级即缺口，必须外显"
     return f"blocked={sorted(blocked)}, power_downgraded={sorted(pw)}, x3 降级后进 gaps"
+
+
+@case
+def t4_baseline_o8():
+    # (a) 稀疏矩阵: 3 证据各覆盖 1 个子问题 → N=3, minE=1/3 → 逐格不可报
+    sparse = doc(["s1", "s2", "s3"],
+                 [ev("d1", [("s1", "support", 10)]),
+                  ev("d2", [("s2", "support", 10)]),
+                  ev("d3", [("s3", "support", 10)])])
+    a = o8_baseline(sparse, {"d1", "d2", "d3"})
+    assert a["matrix"]["N"] == 3, a["matrix"]
+    assert a["cell_level"]["status"] == "not_applicable_binary", a["cell_level"]
+    assert abs(a["cell_level"]["min_expected"] - 0.333333) < 1e-6, a["cell_level"]
+    # 每个列对共享 0 行 → C-score = 1.0；行/列度数全为 1 时交换无法改变矩阵 → 零模型恒定
+    assert abs(a["null_model"]["observed"] - 1.0) < 1e-9, a["null_model"]
+    assert a["null_model"]["p_low"] == 1.0 and a["null_model"]["p_high"] == 1.0, a["null_model"]
+    assert a["null_model"]["null_sd"] == 0.0, "退化零分布必须给出 sd=0，而不是假装有方差"
+
+    # (b) 同输入两次调用必须逐字段一致（固定 seed 的可复现性）
+    b = o8_baseline(sparse, {"d1", "d2", "d3"})
+    assert json.dumps(a, sort_keys=True) == json.dumps(b, sort_keys=True), "O8 非确定性"
+
+    # (c) hub 结构: e00 覆盖全部 10 列, 且 s0 被全部 10 行覆盖 → 单格 maxE=10*10/19≈5.26
+    #     用来证明: 即使单格 E 冲到 5 以上, 只要存在小格, 0/1 尺度的逐格推断仍无定义
+    ten = [f"s{i}" for i in range(10)]
+    hub_ev = [ev("e00", [(s, "support", 10) for s in ten])]
+    hub_ev += [ev(f"e{i:02d}", [("s0", "support", 10)]) for i in range(1, 10)]
+    dh = doc(ten, hub_ev)
+    h = o8_baseline(dh, {e["id"] for e in hub_ev})
+    assert h["matrix"]["N"] == 19, h["matrix"]
+    assert h["cell_level"]["max_expected"] > 5.0, h["cell_level"]
+    assert h["cell_level"]["status"] == "not_applicable_binary", h["cell_level"]
+
+    # (d) counts 尺度下同一矩阵应判 forbidden（说明状态由尺度决定，不是写死的字符串）
+    dh2 = dict(dh)
+    dh2["matrix_scale"] = "counts"
+    h2 = o8_baseline(dh2, {e["id"] for e in hub_ev})
+    assert h2["cell_level"]["status"] == "forbidden", h2["cell_level"]
+
+    # (e) 缺口不是"未完成"，但门位孤证是：verdict 必须自报完整度
+    p_deg = plan(dh)
+    assert p_deg["verdict"]["gate_balance"] == "insufficient", p_deg["verdict"]
+    assert p_deg["verdict"]["overall"] == "degraded", p_deg["verdict"]
+
+    dh3 = json.loads(json.dumps(dh))
+    for e in dh3["evidence"]:                # 全部改到方法门 → 门位均衡应恢复
+        e["gate"] = 2
+    p = plan(dh3)
+    assert p["verdict"]["cell_level_stats"] == "not_applicable_binary", p["verdict"]
+    assert p["verdict"]["gate_balance"] == "ok", p["verdict"]
+    assert p["verdict"]["coverage_gaps"] == 0, p["verdict"]
+    assert p["verdict"]["overall"] == "complete", p["verdict"]
+    return (f"minE={a['cell_level']['min_expected']}(binary 无定义) / hub maxE="
+            f"{h['cell_level']['max_expected']} 仍无定义；counts 尺度={h2['cell_level']['status']}；"
+            f"零模型 sd={a['null_model']['null_sd']}；两次调用一致")
+
+
+@case
+def t5_convergence_o9():
+    from ecr_o9 import score as o9
+
+    poor_doc = doc(["x1", "x2"], [ev("p1", [("x1", "support", 10)], gate=3)])
+    poor = plan(poor_doc)
+
+    better_doc = doc(["x1", "x2"], [
+        ev("p1", [("x1", "support", 10)], gate=2),
+        ev("p2", [("x1", "support", 10)], gate=2),
+        ev("p3", [("x2", "support", 10)], gate=2),
+        ev("p4", [("x2", "support", 10)], gate=3),
+    ])
+    better = plan(better_doc, None, 200, poor)
+
+    c = better["convergence"]
+    assert c["verdict"] == "improved", c
+    assert c["monotone"] is True, c
+    assert c["delta"]["D_abs"] < 0, c["delta"]
+    assert poor["convergence"]["error_vector"]["gap"] == 1, poor["convergence"]
+    assert c["error_vector"]["gap"] == 0, c["error_vector"]
+
+    back = o9(poor, better)
+    assert back["verdict"] == "regressed", back
+    assert "gap" in back["regressed_by"], back
+
+    flat = o9(better, better)
+    assert flat["verdict"] == "flat" and flat["delta"]["D_abs"] == 0, flat
+
+    return (f"D {poor['convergence']['D_abs']} → {c['D_abs']} (Δ{c['delta']['D_abs']})；"
+            f"反向={back['verdict']}(上升 {back['regressed_by']})；自比={flat['verdict']}")
 
 
 def main():

@@ -1,5 +1,56 @@
 # CHANGELOG · ECR
 
+## v1.2 — 2026-11-12（O9 收敛度：把"每轮更进一步"变成单调函数）
+
+**性质**：加一层**跨轮判据**。v1.1 解决了"单轮内能算的都算完"，v1.2 解决"两轮之间凭什么说更近了"。
+
+### 出发点
+磨合期不要求一次命中。要求的是：**每掷一次都必须离错误目标更远，或者至少不更近**；反过来看（离错误越远越好）才是可被机器语言计算的单调函数。
+
+### 新增 `scripts/ecr_o9.py`
+- `D = Σ w_i·e_i`，8 个错误分量全部回指 plan 字段（缺口 3.0 / 单源 2.0 / 拒载 1.5 / 未核 1.0 / 门位缺 1.0 / 无佐证 0.5 / 尺度不可判 0.5 / 预算低效 0.5）；
+- `D_rel = D / D_max(k)`，仅同 `k` 内可比；
+- `--prev-plan` 触发跨轮对比：`delta` / `components_delta` / `monotone` / `verdict ∈ {improved, flat, regressed}`，退步必须点名 `regressed_by`；
+- 权重是**声明**不是拟合；`D` 的下降可归因到具体分量，因此是阳性依赖的判据。
+
+### 验收
+- `selftest` **4/4 → 5/5**（新增 `t5_convergence_o9`：improved / regressed / flat 三态 + 自比必须 flat）；
+- 实例首轮：`D=11.5`、`D_max=39.5`、`D_rel=0.291139`，分量 `{gap:1, single_source:2, gate_missing:1, no_corroboration:5, scale_mismatch:1, budget_underuse:1}`；
+- 同输入二次运行（以首轮为 `prev`）：`ΔD=0.0`、`verdict=flat`、`monotone=True` —— 无变化不会被记成进步。
+
+### 该版本的主张边界
+`D` 是**错误侧距离**，不是正确率。它不能证明结论为真，只能证明"这一轮比上一轮少了几类可枚举的错"。把它当评分跨命题比较，违反红线 19。
+
+## v1.1 — 2026-11-12（O8 从"人判"改为算子）
+
+**性质**：修 v1.0 的一处结构性错误——把机器能算的量标成了"人工复核"，等于交付一个未完成的状态机。
+
+### 问题
+v1.0 的 O8 只写了三条纪律（扣度数边际、配置模型、E<5 禁报），校验栏写"人工复核"。但这三条**全部可机械执行**：边际、期望、调整残差、保度零模型都在给定矩阵后唯一确定。留成待办，是把判断成本转嫁给操作者。
+
+### 新增
+1. **`scripts/ecr_o8.py`**（独立模块，每次 `plan()` 必跑）
+   - `margins`：行边际 `n_i`、列边际 `n_j`、`N`；
+   - `cells[]`：`E_ij = n_i·n_j/N`、调整残差 `z_ij`；
+   - `cell_level`：三态判定 `allowed / forbidden / not_applicable_binary`；
+   - `null_model`：C-score（Stone & Roberts 1990）+ 棋盘格交换保双边边际零模型（Gotelli 2000），`seed=20261112`、`--null-reps` 可调；
+   - `readout[]`：平铺数值现象，不含判断词。
+2. **`matrix_scale`**：默认 `binary`；`counts` 时走 Cochran 阈值。
+3. **新输出四项**：`baseline_stats` / `power` / `verdict` / `coding`，均进 schema `required`。
+4. **`verdict`**：`budget_feasible`、`gate_balance(ok|insufficient)`、`cell_level_stats`、`overall(complete|degraded)` —— 计划必须自报完整度。
+
+### 修正（被 t4 逼出来的）
+- **0/1 关联矩阵的逐格推断在 binary 尺度上无定义**：期望格受边际约束，平衡结构下 `E ≡ 1`，永远达不到 5（本实例 `maxE=1.090909`）。把它标成 `forbidden` 会误导成"再补几篇文献就能算"，故单列 `not_applicable_binary`。
+- **O6 门位从告警升级为判定**：`gate_balance=insufficient` → `overall=degraded`（`t4 (e)` 断言了 degraded→complete 的翻转）。
+
+### 验收
+- `selftest` **3/3 → 4/4**（新增 `t4_baseline_o8`：稀疏 / 确定性 / hub 结构 / counts 尺度 / verdict 翻转）；
+- 实例数字：`minE=0.045455`、`maxE=1.090909`、C-score `9.8` vs 零分布 `8.9906±0.55034`、`p_low=0.9321`、`p_high=0.1299`；
+- 同路径重跑 stdout 与 JSON 均字节一致（该版 `plan.json` md5 已随后续版本变化，v1.2 终值见 §验收）。
+
+### 该版本否掉的旧说法
+"x1 有 12 条证据 → 强共识"：在 binary 尺度上逐格不可说；C-score 与保边际随机无差别（`p_low=0.93`），语料并未额外聚集。只能报 `c=12` 这个计数。
+
 ## v1.0 — 2026-11-12（落盘版）
 
 **性质**：v0.1 设计的完成态 + 本会话（2026-11-11）全部提炼产物的并入。首个可执行版本。

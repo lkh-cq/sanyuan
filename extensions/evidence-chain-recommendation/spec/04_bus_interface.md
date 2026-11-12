@@ -65,8 +65,9 @@ python3 scripts/ecr_selftest.py
 | 交付前 | 用 `dropped[].reason` 回查被舍弃的证据是否误舍 |
 | 归档前 | `provenance` 全量 sha256 作为复现断言（S1-40：补录先溯源） |
 
-## 4.5 已知接口缺口（v1.1 计划）
+## 4.5 已知接口缺口（v1.2 计划）
 
 1. 无 schema 校验器（`jsonschema` 未引入，保持零依赖）→ 计划用 `--strict` 手写最小校验。
-2. `expected_min_cell` 需人工填，尚无估计器。
+2. ~~`expected_min_cell` 需人工填~~ → **已由 O8 从边际推导**（`ecr_o8.py`）；`matrix_scale=counts` 时才走 Cochran 阈值，`binary` 尺度判 `not_applicable_binary`。
 3. 与 `conscious` 的 ρ 字段只是单向输出，尚未形成闭环。
+4. `coding.kappa` 目前恒为 `null`（单编码者）：要填它必须真的跑第二编码者，本制度不代填。

@@ -253,6 +253,293 @@
  ],
  "dropped": [],
  "blocked": [],
+ "baseline_stats": {
+  "operator": "O8",
+  "sources": [
+   "Bishop/Fienberg/Holland 1975 (准独立调整残差)",
+   "Stone & Roberts 1990 (C-score)",
+   "Gotelli 2000 (保度零模型)",
+   "Cochran 1954 (逐格 E<5 不可报)"
+  ],
+  "matrix": {
+   "rows": 17,
+   "cols": 6,
+   "N": 22
+  },
+  "margins": {
+   "row": {
+    "a01": 2,
+    "a02": 1,
+    "a03": 1,
+    "a04": 2,
+    "a05": 2,
+    "a06": 1,
+    "a07": 1,
+    "a08": 2,
+    "a09": 2,
+    "a10": 1,
+    "a11": 1,
+    "a12": 1,
+    "a13": 1,
+    "a14": 1,
+    "a15": 1,
+    "a16": 1,
+    "a17": 1
+   },
+   "col": {
+    "x1": 12,
+    "x2": 3,
+    "x3": 5,
+    "x4": 1,
+    "x5": 1,
+    "x6": 0
+   }
+  },
+  "cells": [
+   {
+    "evidence": "a01",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 1.090909,
+    "adj_residual": -0.135
+   },
+   {
+    "evidence": "a01",
+    "subquestion": "x5",
+    "observed": 1,
+    "expected": 0.090909,
+    "adj_residual": 3.237
+   },
+   {
+    "evidence": "a02",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a03",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a04",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 1.090909,
+    "adj_residual": -0.135
+   },
+   {
+    "evidence": "a04",
+    "subquestion": "x3",
+    "observed": 1,
+    "expected": 0.454545,
+    "adj_residual": 0.965
+   },
+   {
+    "evidence": "a05",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 1.090909,
+    "adj_residual": -0.135
+   },
+   {
+    "evidence": "a05",
+    "subquestion": "x3",
+    "observed": 1,
+    "expected": 0.454545,
+    "adj_residual": 0.965
+   },
+   {
+    "evidence": "a06",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a07",
+    "subquestion": "x4",
+    "observed": 1,
+    "expected": 0.045455,
+    "adj_residual": 4.69
+   },
+   {
+    "evidence": "a08",
+    "subquestion": "x2",
+    "observed": 1,
+    "expected": 0.272727,
+    "adj_residual": 1.572
+   },
+   {
+    "evidence": "a08",
+    "subquestion": "x3",
+    "observed": 1,
+    "expected": 0.454545,
+    "adj_residual": 0.965
+   },
+   {
+    "evidence": "a09",
+    "subquestion": "x2",
+    "observed": 1,
+    "expected": 0.272727,
+    "adj_residual": 1.572
+   },
+   {
+    "evidence": "a09",
+    "subquestion": "x3",
+    "observed": 1,
+    "expected": 0.454545,
+    "adj_residual": 0.965
+   },
+   {
+    "evidence": "a10",
+    "subquestion": "x2",
+    "observed": 1,
+    "expected": 0.136364,
+    "adj_residual": 2.576
+   },
+   {
+    "evidence": "a11",
+    "subquestion": "x3",
+    "observed": 1,
+    "expected": 0.227273,
+    "adj_residual": 1.887
+   },
+   {
+    "evidence": "a12",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a13",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a14",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a15",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a16",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   },
+   {
+    "evidence": "a17",
+    "subquestion": "x1",
+    "observed": 1,
+    "expected": 0.545455,
+    "adj_residual": 0.934
+   }
+  ],
+  "cell_level": {
+   "scale": "binary",
+   "min_expected": 0.045455,
+   "max_expected": 1.090909,
+   "threshold": 5.0,
+   "status": "not_applicable_binary",
+   "basis": "0/1 关联矩阵的期望格受边际约束：平衡结构下 E≡1，永远达不到 5 → 逐格推断在 binary 尺度上无定义，只能报整体零模型"
+  },
+  "per_subquestion_min_expected": {
+   "x1": 0.545455,
+   "x2": 0.136364,
+   "x3": 0.227273,
+   "x4": 0.045455,
+   "x5": 0.090909,
+   "x6": null
+  },
+  "null_model": {
+   "statistic": "C-score (列对共现；棋盘格交换保双边边际)",
+   "observed": 9.8,
+   "reps": 1000,
+   "seed": 20261112,
+   "swap_attempts_per_rep": 2040,
+   "null_mean": 8.9906,
+   "null_sd": 0.55034,
+   "p_low": 0.9321,
+   "p_high": 0.1299
+  },
+  "readout": [
+   "矩阵 17×6，N=22",
+   "列边际 c: x1=12, x2=3, x3=5, x4=1, x5=1, x6=0",
+   "行边际 n_i: a01=2, a02=1, a03=1, a04=2, a05=2, a06=1, a07=1, a08=2, a09=2, a10=1, a11=1, a12=1, a13=1, a14=1, a15=1, a16=1, a17=1",
+   "期望格 minE=0.045455 maxE=1.090909（阈值 5）→ 尺度=binary，逐格推断=not_applicable_binary",
+   "C-score obs=9.8；零分布 n=1000 seed=20261112 mean=8.9906 sd=0.55034 p_low=0.9321 p_high=0.1299"
+  ]
+ },
+ "power": {
+  "basis": "incidence_margins",
+  "scale": "binary",
+  "cell_level_status": "not_applicable_binary",
+  "min_expected_cell": 0.045455,
+  "max_expected_cell": 1.090909,
+  "stat_rule": "0/1 矩阵：逐格推断在 binary 尺度无定义（E 上限受边际约束），只报整体零模型",
+  "per_subquestion": {
+   "x1": {
+    "c": 12,
+    "min_expected_cell": 0.545455,
+    "cell_level_p": "not_applicable_binary"
+   },
+   "x2": {
+    "c": 3,
+    "min_expected_cell": 0.136364,
+    "cell_level_p": "not_applicable_binary"
+   },
+   "x3": {
+    "c": 5,
+    "min_expected_cell": 0.227273,
+    "cell_level_p": "not_applicable_binary"
+   },
+   "x4": {
+    "c": 1,
+    "min_expected_cell": 0.045455,
+    "cell_level_p": "not_applicable_binary"
+   },
+   "x5": {
+    "c": 1,
+    "min_expected_cell": 0.090909,
+    "cell_level_p": "not_applicable_binary"
+   },
+   "x6": {
+    "c": 0,
+    "min_expected_cell": null,
+    "cell_level_p": "not_applicable_binary"
+   }
+  }
+ },
+ "verdict": {
+  "budget_feasible": true,
+  "gate_balance": "ok",
+  "cell_level_stats": "not_applicable_binary",
+  "coverage_gaps": 1,
+  "gaps_are_output": true,
+  "overall": "complete"
+ },
+ "coding": {
+  "coders": 1,
+  "kappa": null,
+  "status": "single_coder",
+  "impact": "O1 分层依赖单源 stance 标注；无 κ 即无随机一致性证据，独占层不可升级为共识"
+ },
  "gates_checked": [
   "A",
   "B",
@@ -411,5 +698,38 @@
   "T4": "写结论/主因/权重前: H(降维?) + A + E(门槛接到检验? 基线去了?)",
   "T5": "写归档/交付/补录前: B(零出处不落笔) + F(授权面) + J(闸门在落笔处?)"
  },
- "stop_reason": "O4 停机: 无候选能新增覆盖或提供佐证(边际价值=0)"
+ "stop_reason": "O4 停机: 无候选能新增覆盖或提供佐证(边际价值=0)",
+ "convergence": {
+  "operator": "O9",
+  "objective": "D = Σ w_i·e_i，离错误目标的总距离（越小越好，必须单调不升）",
+  "weights": {
+   "gap": 3.0,
+   "single_source": 2.0,
+   "blocked": 1.5,
+   "unverified": 1.0,
+   "gate_missing": 1.0,
+   "no_corroboration": 0.5,
+   "scale_mismatch": 0.5,
+   "budget_underuse": 0.5
+  },
+  "error_vector": {
+   "gap": 1,
+   "single_source": 2,
+   "blocked": 0,
+   "unverified": 0,
+   "gate_missing": 1,
+   "no_corroboration": 5,
+   "scale_mismatch": 1,
+   "budget_underuse": 1
+  },
+  "D_abs": 11.5,
+  "D_max": 39.5,
+  "D_rel": 0.291139,
+  "prev": null,
+  "delta": null,
+  "components_delta": null,
+  "monotone": null,
+  "verdict": "first_run",
+  "regressed_by": []
+ }
 }

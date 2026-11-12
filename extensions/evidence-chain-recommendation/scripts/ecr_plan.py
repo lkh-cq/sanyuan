@@ -18,6 +18,9 @@ import hashlib
 import json
 import os
 
+from ecr_o8 import o8_baseline
+from ecr_o9 import score as o9_score
+
 DECIDABLE = ("support", "refute", "partial")
 WEIGHT_CRITICAL = 2.0
 MODE_ORDER = {"L0": 0, "L1": 1, "L2": 2}
@@ -277,7 +280,7 @@ def build_chain(doc, usable, coverage_state, critical, locked, pool):
 
 
 
-def plan(doc, root=None):
+def plan(doc, root=None, null_reps=1000, prev=None):
     usable, blocked, failed, downgraded, provenance = check_gates(doc, root)
     c, consensus, exclusive, gap, critical, locked = coverage(doc, usable)
     pool = pools(doc)
@@ -292,6 +295,27 @@ def plan(doc, root=None):
 
     used = {k: pool[k] - remaining[k] for k in ("B_C", "B_U", "B_L")}
 
+    # O8 基线统计：由算子算出，不留给操作者
+    base = o8_baseline(doc, usable, null_reps)
+    col_margins = base["margins"]["col"]
+    permE = base["per_subquestion_min_expected"]
+    power = {
+        "basis": "incidence_margins",
+        "scale": base["cell_level"]["scale"],
+        "cell_level_status": base["cell_level"]["status"],
+        "min_expected_cell": base["cell_level"]["min_expected"],
+        "max_expected_cell": base["cell_level"]["max_expected"],
+        "stat_rule": ("0/1 矩阵：逐格推断在 binary 尺度无定义（E 上限受边际约束），只报整体零模型"
+                      if base["cell_level"]["status"] == "not_applicable_binary"
+                      else "逐格 E<5 时禁报逐格 p/z，只报聚合量与零模型"),
+        "per_subquestion": {
+            s: {"c": col_margins.get(s, 0),
+                "min_expected_cell": permE.get(s),
+                "cell_level_p": base["cell_level"]["status"]}
+            for s in col_margins
+        },
+    }
+
     # O6 门位均衡统计（只告警，不阻断）
     gate_of = {ev["id"]: ev.get("gate") for ev in doc["evidence"]}
     by_gate, warnings = {}, []
@@ -303,7 +327,24 @@ def plan(doc, root=None):
         warnings.append("O6 现象孤证: 链内含 gate=3 证据但无 gate=0/2 支撑面, "
                         "现象对≠整条链对")
 
-    return {
+    gate_status = "insufficient" if (
+        by_gate.get("3", 0) > 0 and (by_gate.get("0", 0) + by_gate.get("2", 0)) == 0
+    ) else "ok"
+    verdict = {
+        "budget_feasible": not pool["infeasible"],
+        "gate_balance": gate_status,
+        "cell_level_stats": base["cell_level"]["status"],
+        "coverage_gaps": len(gap),
+        "gaps_are_output": True,
+        "overall": "complete" if (not pool["infeasible"] and gate_status == "ok") else "degraded",
+    }
+
+    coding = doc.get("coding") or {
+        "coders": 1, "kappa": None, "status": "single_coder",
+        "impact": "O1 分层依赖单源 stance 标注；无 κ 即无随机一致性证据，独占层不可升级为共识",
+    }
+
+    out = {
         "schema": "ecr.injection_plan/v1",
         "instance_id": doc.get("instance_id"),
         "x_id": doc["task"]["x_id"],
@@ -322,6 +363,10 @@ def plan(doc, root=None):
         "gaps": gap,
         "dropped": dropped,
         "blocked": blocked,
+        "baseline_stats": base,
+        "power": power,
+        "verdict": verdict,
+        "coding": coding,
         "gates_checked": ["A", "B", "C", "E", "F", "G", "H", "I", "J"],
         "invariants_failed": failed,
         "power_downgraded": downgraded,
@@ -330,16 +375,27 @@ def plan(doc, root=None):
         "stop_reason": stop_reason,
     }
 
+    out["convergence"] = o9_score(out, prev)
+    return out
+
 
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--input", required=True)
     ap.add_argument("--root", default=None)
     ap.add_argument("--out", default=None)
+    ap.add_argument("--null-reps", type=int, default=1000,
+                    help="O8 保度零模型重复次数（固定 seed，重复即可字节一致）")
+    ap.add_argument("--prev-plan", default=None,
+                    help="上一轮 plan.json 路径；给出则计算 O9 收敛度 ΔD 与单调性")
     a = ap.parse_args()
     with open(a.input, encoding="utf-8") as fh:
         doc = json.load(fh)
-    out = plan(doc, a.root)
+    prev = None
+    if a.prev_plan:
+        with open(a.prev_plan, encoding="utf-8") as fh:
+            prev = json.load(fh)
+    out = plan(doc, a.root, a.null_reps, prev)
 
     print("=" * 74)
     print("ECR 注入计划")
@@ -357,6 +413,18 @@ def main():
     print(f"[O6] 链内门位分布 {out['coverage']['by_gate']}")
     for w in out["coverage"]["warnings"]:
         print(f"     ⚠ {w}")
+    print("\n[O8] 基线统计（算子输出，不是待办）")
+    for line in out["baseline_stats"]["readout"]:
+        print(f"     {line}")
+    print(f"[判定] {out['verdict']}")
+    cv = out["convergence"]
+    print(f"\n[O9] 收敛度 D={cv['D_abs']} / D_max={cv['D_max']} = {cv['D_rel']}")
+    print(f"     分量 {cv['error_vector']}")
+    if cv["verdict"] == "first_run":
+        print("     首轮基线（无 prev）：D 落账，下一轮必须 ≤ 本轮")
+    else:
+        print(f"     对比 prev: ΔD={cv['delta']['D_abs']}  verdict={cv['verdict']}  "
+              f"monotone={cv['monotone']}  上升分量={cv['regressed_by']}")
     print("\n[O3] 链（按边际价值降序装配；mode 为 O5 升级后的最终档位）")
     up = {u["evidence"] for u in out["resolution_upgrades"]}
     for st in out["chain"]:

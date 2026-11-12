@@ -33,6 +33,12 @@ python3 scripts/ecr_plan.py \
 | 链长 | 10 步（8 共识 + 1 独占 + 1 锁定） |
 | 覆盖 | 共识 [x1,x2,x3] ｜ 独占 [x4,x5] ｜ 缺口 [x6] |
 | 门位分布 | `by_gate = {"2": 7, "3": 3}`，`warnings = []` |
+| O8 期望格 | `minE=0.045455` / `maxE=1.090909` → `not_applicable_binary` |
+| O8 零模型 | C-score 实测 `9.8` vs 保度零分布 `8.9906±0.55034`；`p_low=0.9321`、`p_high=0.1299` |
+| verdict | `overall=complete`（预算可行 / 门位 ok / 缺口 1 条属输出） |
+| O9 收敛度 | `D=11.5` / `D_max=39.5` / `D_rel=0.291139`，`verdict=first_run` |
+| O9 分量 | `gap:1, single_source:2, blocked:0, unverified:0, gate_missing:1, no_corroboration:5, scale_mismatch:1, budget_underuse:1` |
+| O9 自比 | 同输入二次运行 `ΔD=0.0`、`verdict=flat`、`monotone=True`（**不得记成 improved**） |
 | 升级 | 8 条 L2→L1 |
 | 拒载 / 降级 | 0 / 0 |
 | 停机 | `O4 停机: 无候选能新增覆盖或提供佐证(边际价值=0)` |
@@ -52,9 +58,9 @@ python3 scripts/ecr_plan.py \
 ## 5.4 未纳入验收的项（明确声明）
 
 1. **语义相关性**：`projections` 由调用方给出，ECR 不验证"这条证据是否真的支持这个子问题"。本实例的 stance 是我人工标注——**这是 ECR 的最大外部依赖，也是它最容易被污染的地方**（若标注者把"看起来像"当"支持"，A 不变量就形同虚设）。
-2. **O6 门位阻断**：目前只统计与告警，不阻断。
-3. **`expected_min_cell`**：本实例全为 `null`（该数据无格子设计），故检验力闸门未实际触发；其行为由 `t3` 覆盖。
-4. **多编码者一致性**：`projections` 无 κ 一致性检验。
+2. **O6 门位**：不再只是告警——`verdict.gate_balance` 输出 `ok|insufficient`。链内含 gate=3 证据而 gate 0/2 全空时判 `insufficient`，`verdict.overall` 随之 `degraded`（`t4 (e)` 断言了 degraded→complete 的翻转）。
+3. **`expected_min_cell`**：已由 O8 从边际推导，本实例判 `not_applicable_binary`。0/1 关联矩阵的期望格上限受边际约束（实测 `minE=0.045455`、`maxE=1.090909`，永远够不到 5）→ 逐格推断在该尺度上**无定义**，只能报整体零模型（`p_low=0.9321`、`p_high=0.1299`）。这既不是"数据不足"，也不是待办事项。
+4. **多编码者一致性**：输出 `coding` 块（`coders/status/kappa`）。单编码者时显式 `status="single_coder"`、`kappa=null`，并在 `impact` 里声明后果（独占层不得升级为共识）。**不代填 κ**——填它必须真的跑第二编码者。
 
 ## 5.5 复现命令（一段可粘贴）
 
