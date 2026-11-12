@@ -1,0 +1,73 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ecr.evidence_unit/v1",
+  "title": "ECR 证据单元",
+  "type": "object",
+  "required": ["id", "claim_type", "provenance", "usable", "projections"],
+  "properties": {
+    "id": {"type": "string"},
+    "path": {"type": ["string", "null"], "description": "相对 --root 的路径；合成用例可为 null"},
+    "bytes": {"type": "integer", "description": "声明字节数；给 --root 时运行时会与磁盘核对"},
+    "sha256": {"type": "string", "description": "可选；运行时以实际计算值为准"},
+    "trust_tier": {"enum": ["disk", "literature", "inference"], "description": "只作标注，不参与排序"},
+    "gate": {
+      "type": "integer", "minimum": 0, "maximum": 5,
+      "description": "O6 观测位置: 0设施 1承载物 2方法 3现象 4元层 5冻结"
+    },
+    "claim_type": {
+      "enum": ["measured", "relayed", "inferred"],
+      "description": "I 命名逃逸的闸门: 缺省即拒载; relayed 必须有 upstream_of + provenance"
+    },
+    "upstream_of": {"type": ["string", "null"], "description": "G 继承未核: relayed 的来源链"},
+    "provenance": {
+      "type": "object",
+      "required": ["verified"],
+      "properties": {
+        "verified": {"type": "boolean"},
+        "source": {"type": "string"}
+      }
+    },
+    "proxy_of": {"type": ["string", "null"], "description": "A 表层替代: 若本证据是某本体的代理，写本体标识"},
+    "proxy_domain_verified": {"type": "boolean", "default": false},
+    "usable": {"type": "boolean", "description": "E 静默失效: 必须显式 true 才进统计"},
+    "domain": {
+      "type": "object",
+      "description": "C 不同框",
+      "properties": {
+        "scope": {"type": "string", "description": "如 human/mouse/single_task_window"},
+        "frozen_scale": {"type": "string", "description": "口径刻度，如 cell_level / pseudobulk"}
+      }
+    },
+    "authorization": {
+      "type": "object",
+      "description": "F 越权",
+      "properties": {"in_scope": {"type": "boolean"}}
+    },
+    "projections": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["subquestion", "stance", "volume"],
+        "properties": {
+          "subquestion": {"type": "string"},
+          "stance": {"enum": ["support", "refute", "partial", "neutral", "undecidable"]},
+          "volume": {
+            "type": "object",
+            "required": ["L0", "L1", "L2"],
+            "properties": {
+              "L0": {"type": "integer"}, "L1": {"type": "integer"}, "L2": {"type": "integer"}
+            }
+          },
+          "power": {
+            "type": "object",
+            "description": "O3 检验力: expected_min_cell < 5 时该投影降为 undecidable",
+            "properties": {
+              "n": {"type": ["integer", "null"]},
+              "expected_min_cell": {"type": ["number", "null"]}
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,119 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "ecr.injection_plan/v1",
+  "title": "ECR 注入计划",
+  "description": "必填留痕位: gaps / dropped[].reason / invariants_failed / power_downgraded / provenance[].sha256 / moments —— 缺一视为未完成",
+  "type": "object",
+  "required": ["schema", "x_id", "status", "budget", "coverage", "chain", "gaps",
+               "dropped", "blocked", "invariants_failed", "power_downgraded",
+               "provenance", "moments", "stop_reason"],
+  "properties": {
+    "schema": {"const": "ecr.injection_plan/v1"},
+    "instance_id": {"type": ["string", "null"]},
+    "x_id": {"type": "string"},
+    "statement": {"type": "string", "description": "必须与输入命题逐字相同"},
+    "status": {"enum": ["ok", "infeasible"]},
+    "budget": {
+      "type": "object",
+      "required": ["B", "pools", "used", "residual", "total_used"],
+      "properties": {
+        "B": {"type": "integer"},
+        "lambda_exclusive": {"type": "number"},
+        "pools": {"type": "object", "properties": {
+          "B_C": {"type": "integer"}, "B_U": {"type": "integer"}, "B_L": {"type": "integer"}}},
+        "used": {"type": "object"},
+        "residual": {"type": "object"},
+        "total_used": {"type": "integer"}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": ["c", "consensus", "exclusive", "gap"],
+      "properties": {
+        "c": {"type": "object", "additionalProperties": {"type": "integer"}},
+        "consensus": {"type": "array", "items": {"type": "string"}},
+        "exclusive": {"type": "array", "items": {"type": "string"}},
+        "gap": {"type": "array", "items": {"type": "string"}},
+        "by_gate": {"type": "object", "description": "O6 链内门位分布"},
+        "warnings": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "chain": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["step", "evidence", "mode", "bytes", "delta_D", "v", "pool"],
+        "properties": {
+          "step": {"type": "integer"},
+          "evidence": {"type": "string"},
+          "subquestions": {"type": "array", "items": {"type": "string"}},
+          "corroborates": {"type": "array", "items": {"type": "string"}},
+          "mode_initial": {"enum": ["L0", "L1", "L2"]},
+          "mode": {"enum": ["L0", "L1", "L2"]},
+          "bytes": {"type": "integer"},
+          "pool": {"enum": ["B_C", "B_U", "B_L"]},
+          "delta_D": {"type": "number"},
+          "v": {"type": "number", "description": "边际价值 = ΔD / bytes，唯一排序依据"}
+        }
+      }
+    },
+    "resolution_upgrades": {"type": "array", "items": {"type": "object"}},
+    "exclusive_slot": {"type": "array", "items": {"type": "string"}},
+    "gaps": {"type": "array", "items": {"type": "string"}, "description": "c=0 的子问题，必须外显"},
+    "dropped": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence", "reason"],
+        "properties": {"evidence": {"type": "string"}, "reason": {"type": "string"}}
+      }
+    },
+    "blocked": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence", "reason"],
+        "properties": {"evidence": {"type": "string"}, "reason": {"type": "string"}}
+      }
+    },
+    "gates_checked": {"type": "array", "items": {"type": "string"}},
+    "invariants_failed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["evidence", "invariant", "detail"],
+        "properties": {
+          "evidence": {"type": "string"},
+          "invariant": {"enum": ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"]},
+          "detail": {"type": "string"}
+        }
+      }
+    },
+    "power_downgraded": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "evidence": {"type": "string"}, "subquestion": {"type": "string"},
+          "expected_min_cell": {"type": "number"},
+          "from": {"type": "string"}, "to": {"const": "undecidable"}
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "description": "逐证据的运行时核验: path/exists/bytes/sha256/bytes_match",
+      "additionalProperties": {"type": "object"}
+    },
+    "moments": {
+      "type": "object",
+      "required": ["T1", "T2", "T3", "T4", "T5"],
+      "description": "J 闸门位置: 检查点钉在落笔时刻",
+      "properties": {
+        "T1": {"type": "string"}, "T2": {"type": "string"}, "T3": {"type": "string"},
+        "T4": {"type": "string"}, "T5": {"type": "string"}
+      }
+    },
+    "stop_reason": {"type": "string"}
+  }
+}

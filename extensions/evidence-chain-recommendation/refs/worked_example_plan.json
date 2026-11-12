@@ -1,0 +1,415 @@
+{
+ "schema": "ecr.injection_plan/v1",
+ "instance_id": "worked_example_20261111",
+ "x_id": "x_wf010_distill_20261111",
+ "statement": "本轮 11-11 会话提炼出的方法论, 哪些可以写进 skill 仓库, 哪些还不能",
+ "status": "ok",
+ "budget": {
+  "B": 90000,
+  "lambda_exclusive": 0.3,
+  "pools": {
+   "B_C": 35005,
+   "B_U": 27000,
+   "B_L": 27995
+  },
+  "used": {
+   "B_C": 6000,
+   "B_U": 1200,
+   "B_L": 27995
+  },
+  "residual": {
+   "B_C": 29005,
+   "B_U": 25800,
+   "B_L": 0
+  },
+  "total_used": 35195
+ },
+ "coverage": {
+  "c": {
+   "x1": 12,
+   "x2": 3,
+   "x3": 5,
+   "x4": 1,
+   "x5": 1,
+   "x6": 0
+  },
+  "consensus": [
+   "x1",
+   "x2",
+   "x3"
+  ],
+  "exclusive": [
+   "x4",
+   "x5"
+  ],
+  "gap": [
+   "x6"
+  ],
+  "by_gate": {
+   "2": 7,
+   "3": 3
+  },
+  "warnings": []
+ },
+ "chain": [
+  {
+   "step": 1,
+   "evidence": "a11",
+   "subquestions": [
+    "x3"
+   ],
+   "corroborates": [],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 300,
+   "pool": "B_C",
+   "delta_D": 2.0,
+   "v": 0.1
+  },
+  {
+   "step": 2,
+   "evidence": "a17",
+   "subquestions": [
+    "x1"
+   ],
+   "corroborates": [],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 600,
+   "pool": "B_C",
+   "delta_D": 2.0,
+   "v": 0.05
+  },
+  {
+   "step": 3,
+   "evidence": "a10",
+   "subquestions": [
+    "x2"
+   ],
+   "corroborates": [],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 600,
+   "pool": "B_C",
+   "delta_D": 2.0,
+   "v": 0.05
+  },
+  {
+   "step": 4,
+   "evidence": "a16",
+   "subquestions": [],
+   "corroborates": [
+    "x1"
+   ],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 700,
+   "pool": "B_C",
+   "delta_D": 0.25,
+   "v": 0.00625
+  },
+  {
+   "step": 5,
+   "evidence": "a15",
+   "subquestions": [],
+   "corroborates": [
+    "x1"
+   ],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 600,
+   "pool": "B_C",
+   "delta_D": 0.25,
+   "v": 0.00625
+  },
+  {
+   "step": 6,
+   "evidence": "a09",
+   "subquestions": [],
+   "corroborates": [
+    "x2",
+    "x3"
+   ],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 800,
+   "pool": "B_C",
+   "delta_D": 0.25,
+   "v": 0.005
+  },
+  {
+   "step": 7,
+   "evidence": "a05",
+   "subquestions": [],
+   "corroborates": [
+    "x3"
+   ],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 1000,
+   "pool": "B_C",
+   "delta_D": 0.25,
+   "v": 0.004166667
+  },
+  {
+   "step": 8,
+   "evidence": "a08",
+   "subquestions": [],
+   "corroborates": [
+    "x2"
+   ],
+   "mode_initial": "L2",
+   "mode": "L1",
+   "bytes": 1400,
+   "pool": "B_C",
+   "delta_D": 0.25,
+   "v": 0.002777778
+  },
+  {
+   "step": 9,
+   "evidence": "a07",
+   "subquestions": [
+    "x4"
+   ],
+   "corroborates": [],
+   "mode_initial": "L1",
+   "mode": "L1",
+   "bytes": 1200,
+   "pool": "B_U",
+   "delta_D": 1.0,
+   "v": 0.000833333
+  },
+  {
+   "step": 10,
+   "evidence": "a01",
+   "subquestions": [
+    "x5"
+   ],
+   "corroborates": [],
+   "mode_initial": "L0",
+   "mode": "L0",
+   "bytes": 27995,
+   "pool": "B_L",
+   "delta_D": 2.0,
+   "v": 7.1441e-05
+  }
+ ],
+ "resolution_upgrades": [
+  {
+   "evidence": "a11",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 280
+  },
+  {
+   "evidence": "a17",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 560
+  },
+  {
+   "evidence": "a10",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 560
+  },
+  {
+   "evidence": "a16",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 660
+  },
+  {
+   "evidence": "a15",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 560
+  },
+  {
+   "evidence": "a09",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 750
+  },
+  {
+   "evidence": "a05",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 940
+  },
+  {
+   "evidence": "a08",
+   "from": "L2",
+   "to": "L1",
+   "delta_bytes": 1310
+  }
+ ],
+ "exclusive_slot": [
+  "a01",
+  "a07"
+ ],
+ "gaps": [
+  "x6"
+ ],
+ "dropped": [],
+ "blocked": [],
+ "gates_checked": [
+  "A",
+  "B",
+  "C",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J"
+ ],
+ "invariants_failed": [],
+ "power_downgraded": [],
+ "provenance": {
+  "a01": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/_DEMO.md",
+   "exists": true,
+   "bytes": 27995,
+   "sha256": "0f8829e022a15be7045424f55cffc63375f6fa36ad41152824c2d8b35c6b4d79",
+   "bytes_declared": 27995,
+   "bytes_match": true
+  },
+  "a02": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/instance_wf010_20261111.json",
+   "exists": true,
+   "bytes": 13010,
+   "sha256": "662d1032da49c998fb6796542ff610a2fd9db783df68a1e64dbdcddc90d5e3c7",
+   "bytes_declared": 13010,
+   "bytes_match": true
+  },
+  "a03": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/_BEHAVIOUR_v1.md",
+   "exists": true,
+   "bytes": 10121,
+   "sha256": "f1f1a9b615f2ca99c123b3727f900bbc95866b2fa09770f21eb73a3029723b59",
+   "bytes_declared": 10121,
+   "bytes_match": true
+  },
+  "a04": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/_PROCESS_v1.md",
+   "exists": true,
+   "bytes": 13480,
+   "sha256": "fcc84108bbee3b55506048987ae075eb674871976e4f9ff3775a33c538891c09",
+   "bytes_declared": 13480,
+   "bytes_match": true
+  },
+  "a05": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/_TESTS_v1.md",
+   "exists": true,
+   "bytes": 7405,
+   "sha256": "b5b4b8262b911025620a1248698b9fb44d8281d44e1010ec934f4a48a827647b",
+   "bytes_declared": 7405,
+   "bytes_match": true
+  },
+  "a06": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/_RESIDUAL_v1.md",
+   "exists": true,
+   "bytes": 6919,
+   "sha256": "952cc5152b55895c054cea6e0e90645ec3f64fccbbf29c82907426f9c08d3c4e",
+   "bytes_declared": 6919,
+   "bytes_match": true
+  },
+  "a07": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/_CAPABILITY_CROSSCHECK.md",
+   "exists": true,
+   "bytes": 6906,
+   "sha256": "78456f025c3187dd39625372e876018c4de52a49af62e0e141d97ca9b5eee683",
+   "bytes_declared": 6906,
+   "bytes_match": true
+  },
+  "a08": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/_SHAME_DISTILL_v1.md",
+   "exists": true,
+   "bytes": 9548,
+   "sha256": "ce898031f57659a8f80b7c02825bb2d3cf638805e05d4219319777f03a746cd3",
+   "bytes_declared": 9548,
+   "bytes_match": true
+  },
+  "a09": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/output_shame_wf010_20261111.txt",
+   "exists": true,
+   "bytes": 5605,
+   "sha256": "777e51ab6d0d7ad16a76d980db5ad497853498bcd31ec4741ba5831684eba71d",
+   "bytes_declared": 5605,
+   "bytes_match": true
+  },
+  "a10": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/coding_shame_pillar_20261111.csv",
+   "exists": true,
+   "bytes": 2157,
+   "sha256": "4ecb58471244a57346272f821c31c4b978668acdba2954dfb7c6f3206f653438",
+   "bytes_declared": 2157,
+   "bytes_match": true
+  },
+  "a11": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/coding_self_errors_20261111.csv",
+   "exists": true,
+   "bytes": 541,
+   "sha256": "bd3b95754df4fe01a267c2bbbc8e3a47b9a4ba6a3f41ad4360dbeffbeaaac956",
+   "bytes_declared": 541,
+   "bytes_match": true
+  },
+  "a12": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/output_residual_wf010_20261111.txt",
+   "exists": true,
+   "bytes": 4156,
+   "sha256": "897797e1950be1d7beb7f53fd6e410d479111fde943ce6275612b1dd6fca3558",
+   "bytes_declared": 4156,
+   "bytes_match": true
+  },
+  "a13": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/output_tests_wf010_20261111.txt",
+   "exists": true,
+   "bytes": 2637,
+   "sha256": "dd6c4aa47d2d5a2a22f672601aa7f83da26c3dd17c3e79ba103d1c5ba668ca81",
+   "bytes_declared": 2637,
+   "bytes_match": true
+  },
+  "a14": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/output_gates_wf010_20261111.txt",
+   "exists": true,
+   "bytes": 4586,
+   "sha256": "b1037f7b6e89430d49496570ec4c3c7f8444703f65c98a17d49079e705db48eb",
+   "bytes_declared": 4586,
+   "bytes_match": true
+  },
+  "a15": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/coding_wf010_20261111_gates.csv",
+   "exists": true,
+   "bytes": 2908,
+   "sha256": "b521e1dc28430d13fe0e7d6264179eaef2c8d2e99f5122a8e071862212aff035",
+   "bytes_declared": 2908,
+   "bytes_match": true
+  },
+  "a16": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/output_wf010_20261111.txt",
+   "exists": true,
+   "bytes": 4702,
+   "sha256": "099095cff3f0dfe909fd296c61322c82bc85b76713bfd7dac3b0427cc91e428b",
+   "bytes_declared": 4702,
+   "bytes_match": true
+  },
+  "a17": {
+   "path": "/mnt/d/hermes_memory/reference/提示词提炼_DEMO_v1_20261111/analysis/coding_wf010_20261111.csv",
+   "exists": true,
+   "bytes": 2801,
+   "sha256": "ef053203c6577995c738bbe39ab00d288a16a893f74ea0860c780844cd1855c6",
+   "bytes_declared": 2801,
+   "bytes_match": true
+  }
+ },
+ "moments": {
+  "T1": "写任何数字前: B(出处) + D(查的是不是最近版本)",
+  "T2": "写『实测/已验证/已核』前: B + I(动词是不是换了名字的没查)",
+  "T3": "写『覆盖度/审核完成』前: A(代理?) + E(探针只能做回归验收)",
+  "T4": "写结论/主因/权重前: H(降维?) + A + E(门槛接到检验? 基线去了?)",
+  "T5": "写归档/交付/补录前: B(零出处不落笔) + F(授权面) + J(闸门在落笔处?)"
+ },
+ "stop_reason": "O4 停机: 无候选能新增覆盖或提供佐证(边际价值=0)"
+}
